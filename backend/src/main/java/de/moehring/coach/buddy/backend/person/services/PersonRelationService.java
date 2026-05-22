@@ -13,6 +13,8 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @ApplicationScoped
 @RequiredArgsConstructor
 public class PersonRelationService {
@@ -49,4 +51,17 @@ public class PersonRelationService {
 
         return personRelationMapper.mapToDto(relation);
     }
+
+    public PersonRelationDto findById(UUID id) {
+        return personRelationMapper.mapToDto(personRelationRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Relation wurde nicht gefunden.")));
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        PersonRelation relation = personRelationRepository.findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Personenbeziehung wurde nicht gefunden."));
+
+        personRelationRepository.delete(relation);
+    }
+
 }

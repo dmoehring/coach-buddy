@@ -4,12 +4,12 @@ import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRelationRequest;
 import de.moehring.coach.buddy.backend.person.dtos.PersonRelationDto;
 import de.moehring.coach.buddy.backend.person.services.PersonRelationService;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+
+import java.util.UUID;
 
 @Path("/api/v1/person-relations")
 @Produces(MediaType.APPLICATION_JSON)
@@ -22,5 +22,18 @@ public class PersonRelationResource {
     @POST
     public PersonRelationDto createRelation(@Valid CreatePersonRelationRequest request) {
         return personRelationService.create(request);
+    }
+
+    @GET
+    @Path("/{id}")
+    public PersonRelationDto findById(@PathParam("id") UUID id) {
+        return personRelationService.findById(id);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deleteRelation(@PathParam("id") UUID id) {
+        personRelationService.delete(id);
+        return Response.noContent().build();
     }
 }

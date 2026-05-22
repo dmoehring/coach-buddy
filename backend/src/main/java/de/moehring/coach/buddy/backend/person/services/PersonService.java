@@ -1,6 +1,9 @@
 package de.moehring.coach.buddy.backend.person.services;
 
-import de.moehring.coach.buddy.backend.person.dtos.*;
+import de.moehring.coach.buddy.backend.person.dtos.ChildDto;
+import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRequest;
+import de.moehring.coach.buddy.backend.person.dtos.PersonDto;
+import de.moehring.coach.buddy.backend.person.dtos.UpdatePersonRequest;
 import de.moehring.coach.buddy.backend.person.entities.Person;
 import de.moehring.coach.buddy.backend.person.entities.PersonRelation;
 import de.moehring.coach.buddy.backend.person.entities.PhoneNumber;
@@ -69,7 +72,7 @@ public class PersonService {
     }
 
     public PersonDto findById(UUID id) {
-        return personMapper.mapToDto(personRepository.findById(id));
+        return personMapper.mapToDto(personRepository.findByIdOptional(id).orElseThrow(() -> new NotFoundException("Person wurde nicht gefunden.")));
     }
 
     @Transactional
