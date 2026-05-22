@@ -71,4 +71,39 @@ public class PersonRepository implements PanacheRepositoryBase<Person, UUID> {
                 birthDate
         ) > 0;
     }
+
+    public boolean existsByNameAndOptionalBirthDateExcludingId(
+            UUID id,
+            String firstName,
+            String lastName,
+            LocalDate birthDate
+    ) {
+        String normalizedFirstName = firstName.trim().toLowerCase();
+        String normalizedLastName = lastName.trim().toLowerCase();
+
+        if (birthDate == null) {
+            return count("""
+                id <> ?1
+                and lower(trim(firstName)) = ?2
+                and lower(trim(lastName)) = ?3
+                and birthDate is null
+                """,
+                    id,
+                    normalizedFirstName,
+                    normalizedLastName
+            ) > 0;
+        }
+
+        return count("""
+            id <> ?1
+            and lower(trim(firstName)) = ?2
+            and lower(trim(lastName)) = ?3
+            and birthDate = ?4
+            """,
+                id,
+                normalizedFirstName,
+                normalizedLastName,
+                birthDate
+        ) > 0;
+    }
 }

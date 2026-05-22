@@ -25,4 +25,11 @@ public class PersonRelationRepository implements PanacheRepositoryBase<PersonRel
     public List<PersonRelation> findByGuardianPersonId(UUID guardianPersonId) {
         return list("guardianPerson.id = ?1", guardianPersonId);
     }
+
+    public long deleteByPersonId(UUID personId) {
+        return delete(
+                "childPerson.id = ?1 or guardianPerson.id = ?1",
+                personId
+        );
+    }
 }
