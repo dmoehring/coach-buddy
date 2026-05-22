@@ -3,8 +3,10 @@ package de.moehring.coach.buddy.backend.person.dtos;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 public record PersonDto(
+        UUID id,
         String firstName,
         String lastName,
         LocalDate birthDate,

@@ -6,7 +6,10 @@ import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @ApplicationScoped
 public class PersonRepository implements PanacheRepositoryBase<Person, UUID> {
@@ -41,5 +44,31 @@ public class PersonRepository implements PanacheRepositoryBase<Person, UUID> {
         }
 
         return find(query.toString(), params).list();
+    }
+
+    public boolean existsByNameAndOptionalBirthDate(String firstName, String lastName, LocalDate birthDate) {
+        String normalizedFirstName = firstName.trim().toLowerCase();
+        String normalizedLastName = lastName.trim().toLowerCase();
+
+        if (birthDate == null) {
+            return count("""
+                            lower(trim(firstName)) = ?1
+                            and lower(trim(lastName)) = ?2
+                            and birthDate is null
+                            """,
+                    normalizedFirstName,
+                    normalizedLastName
+            ) > 0;
+        }
+
+        return count("""
+                        lower(trim(firstName)) = ?1
+                        and lower(trim(lastName)) = ?2
+                        and birthDate = ?3
+                        """,
+                normalizedFirstName,
+                normalizedLastName,
+                birthDate
+        ) > 0;
     }
 }

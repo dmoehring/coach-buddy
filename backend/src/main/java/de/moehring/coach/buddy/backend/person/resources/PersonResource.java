@@ -1,6 +1,7 @@
 package de.moehring.coach.buddy.backend.person.resources;
 
 import de.moehring.coach.buddy.backend.person.dtos.ChildDto;
+import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRequest;
 import de.moehring.coach.buddy.backend.person.dtos.PersonDto;
 import de.moehring.coach.buddy.backend.person.search.PersonSearchCriteria;
 import de.moehring.coach.buddy.backend.person.services.PersonService;
@@ -23,6 +24,13 @@ public class PersonResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<PersonDto> findAllPersons(@BeanParam PersonSearchCriteria personSearchCriteria) {
         return personService.findAll(personSearchCriteria);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public PersonDto createPerson(CreatePersonRequest createPersonRequest) {
+        return personService.create(createPersonRequest);
     }
 
     @GET
