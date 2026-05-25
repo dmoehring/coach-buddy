@@ -1,4 +1,4 @@
-package de.moehring.coach.buddy.backend.team.search;
+package de.moehring.coach.buddy.backend.team.dtos;
 
 import java.time.LocalDate;
 

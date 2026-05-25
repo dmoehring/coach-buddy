@@ -2,9 +2,10 @@ package de.moehring.coach.buddy.backend.team.resources;
 
 import de.moehring.coach.buddy.backend.team.dtos.CreateTeamMembershipRequest;
 import de.moehring.coach.buddy.backend.team.dtos.TeamMembershipDto;
-import de.moehring.coach.buddy.backend.team.search.DeactivateTeamMembershipRequest;
+import de.moehring.coach.buddy.backend.team.dtos.DeactivateTeamMembershipRequest;
 import de.moehring.coach.buddy.backend.team.search.TeamMembershipSearchCriteria;
 import de.moehring.coach.buddy.backend.team.services.TeamMembershipService;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class TeamMembershipResource {
     }
 
     @POST
-    public TeamMembershipDto createTeamMembership(CreateTeamMembershipRequest createTeamMembershipRequest) {
+    public TeamMembershipDto createTeamMembership(@Valid CreateTeamMembershipRequest createTeamMembershipRequest) {
         return teamMembershipService.createTeamMembership(createTeamMembershipRequest);
     }
 
