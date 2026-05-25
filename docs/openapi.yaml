@@ -1,0 +1,856 @@
+---
+openapi: 3.1.0
+components:
+  schemas:
+    AttendanceStatus:
+      type: string
+      enum:
+      - PRESENT
+      - ABSENT
+      - EXCUSED
+    ChildDto:
+      type: object
+      properties:
+        child:
+          $ref: "#/components/schemas/PersonDto"
+        guardians:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/PersonDto"
+    CreatePersonRelationRequest:
+      type: object
+      properties:
+        childPersonId:
+          $ref: "#/components/schemas/UUID"
+        guardianPersonId:
+          $ref: "#/components/schemas/UUID"
+        relationType:
+          $ref: "#/components/schemas/RelationType"
+    CreatePersonRequest:
+      type: object
+      required:
+      - firstName
+      - lastName
+      properties:
+        firstName:
+          type: string
+          pattern: \S
+        lastName:
+          type: string
+          pattern: \S
+        birthDate:
+          $ref: "#/components/schemas/LocalDate"
+        nickname:
+          type: string
+        notes:
+          type: string
+        phoneNumbers:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreatePhoneNumberRequest"
+    CreatePhoneNumberRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/PhoneType"
+        number:
+          type: string
+          pattern: \S
+      required:
+      - number
+    CreateSeasonRequest:
+      type: object
+      required:
+      - name
+      - startDate
+      properties:
+        name:
+          type: string
+          pattern: \S
+        startDate:
+          $ref: "#/components/schemas/LocalDate"
+    CreateTeamMembershipRequest:
+      type: object
+      required:
+      - teamId
+      - personId
+      - role
+      properties:
+        teamId:
+          $ref: "#/components/schemas/UUID"
+        personId:
+          $ref: "#/components/schemas/UUID"
+        role:
+          $ref: "#/components/schemas/TeamMemberRole"
+        joinedAt:
+          $ref: "#/components/schemas/LocalDate"
+        leftAt:
+          $ref: "#/components/schemas/LocalDate"
+    CreateTeamRequest:
+      type: object
+      required:
+      - seasonId
+      - name
+      properties:
+        seasonId:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+          pattern: \S
+        description:
+          type: string
+    CreateTrainingParticipantRequest:
+      type: object
+      required:
+      - trainingId
+      - personId
+      - attendanceStatus
+      properties:
+        trainingId:
+          $ref: "#/components/schemas/UUID"
+        personId:
+          $ref: "#/components/schemas/UUID"
+        attendanceStatus:
+          $ref: "#/components/schemas/AttendanceStatus"
+        notes:
+          type: string
+    CreateTrainingRequest:
+      type: object
+      required:
+      - teamId
+      - trainingDate
+      properties:
+        teamId:
+          $ref: "#/components/schemas/UUID"
+        trainingDate:
+          $ref: "#/components/schemas/LocalDate"
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        location:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/TrainingStatus"
+    DeactivateTeamMembershipRequest:
+      type: object
+      properties:
+        leftAt:
+          $ref: "#/components/schemas/LocalDate"
+    Instant:
+      type: string
+      format: date-time
+      examples:
+      - 2022-03-10T16:15:50Z
+    LocalDate:
+      type: string
+      format: date
+      examples:
+      - 2022-03-10
+    LocalTime:
+      type: string
+      format: local-time
+      examples:
+      - 13:45:30.123456789
+      externalDocs:
+        description: As defined by 'partial-time' in RFC3339
+        url: https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6
+    PersonDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        firstName:
+          type: string
+        lastName:
+          type: string
+        birthDate:
+          $ref: "#/components/schemas/LocalDate"
+        nickname:
+          type: string
+        notes:
+          type: string
+        phoneNumbers:
+          type: array
+          items:
+            $ref: "#/components/schemas/PhoneNumberDto"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    PersonRelationDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        childPerson:
+          $ref: "#/components/schemas/PersonDto"
+        guardianPerson:
+          $ref: "#/components/schemas/PersonDto"
+        relationType:
+          $ref: "#/components/schemas/RelationType"
+    PhoneNumberDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        type:
+          $ref: "#/components/schemas/PhoneType"
+        number:
+          type: string
+    PhoneType:
+      type: string
+      enum:
+      - MOBILE
+      - HOME
+      - WORK
+      - EMERGENCY
+    RelationType:
+      type: string
+      enum:
+      - MOTHER
+      - FATHER
+      - GRANDMOTHER
+      - GRANDFATHER
+      - STEP_PARENT
+      - OTHER
+    SeasonDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        name:
+          type: string
+        startDate:
+          $ref: "#/components/schemas/LocalDate"
+        endDate:
+          $ref: "#/components/schemas/LocalDate"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    TeamDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        seasonId:
+          $ref: "#/components/schemas/UUID"
+        seasonName:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    TeamMemberRole:
+      type: string
+      enum:
+      - PLAYER
+      - COACH
+      - ASSISTANT_COACH
+    TeamMembershipDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        team:
+          $ref: "#/components/schemas/TeamDto"
+        person:
+          $ref: "#/components/schemas/PersonDto"
+        role:
+          $ref: "#/components/schemas/TeamMemberRole"
+        joinedAt:
+          $ref: "#/components/schemas/LocalDate"
+        leftAt:
+          $ref: "#/components/schemas/LocalDate"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    TrainingDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        team:
+          $ref: "#/components/schemas/TeamDto"
+        trainingDate:
+          $ref: "#/components/schemas/LocalDate"
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        location:
+          type: string
+        notes:
+          type: string
+        status:
+          $ref: "#/components/schemas/TrainingStatus"
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    TrainingParticipantDto:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/UUID"
+        training:
+          $ref: "#/components/schemas/TrainingDto"
+        person:
+          $ref: "#/components/schemas/PersonDto"
+        attendanceStatus:
+          $ref: "#/components/schemas/AttendanceStatus"
+        notes:
+          type: string
+        createdAt:
+          $ref: "#/components/schemas/Instant"
+        updatedAt:
+          $ref: "#/components/schemas/Instant"
+    TrainingStatus:
+      type: string
+      enum:
+      - COMPLETED
+      - CANCELLED
+    UUID:
+      type: string
+      format: uuid
+      pattern: "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+    UpdatePersonRequest:
+      type: object
+      required:
+      - firstName
+      - lastName
+      properties:
+        firstName:
+          type: string
+          pattern: \S
+        lastName:
+          type: string
+          pattern: \S
+        birthDate:
+          $ref: "#/components/schemas/LocalDate"
+        nickname:
+          type: string
+        notes:
+          type: string
+        phoneNumbers:
+          type: array
+          items:
+            $ref: "#/components/schemas/UpdatePhoneNumberRequest"
+    UpdatePhoneNumberRequest:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/PhoneType"
+        number:
+          type: string
+          pattern: \S
+      required:
+      - number
+paths:
+  /api/v1/person-relations:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePersonRelationRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonRelationDto"
+        "400":
+          description: Bad Request
+      summary: Create Relation
+      tags:
+      - Person Relation Resource
+  /api/v1/person-relations/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonRelationDto"
+      summary: Find By Id
+      tags:
+      - Person Relation Resource
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Relation
+      tags:
+      - Person Relation Resource
+  /api/v1/persons:
+    get:
+      parameters:
+      - name: birthMonth
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: birthYear
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: firstName
+        in: query
+        schema:
+          type: string
+      - name: lastName
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PersonDto"
+      summary: Find All Persons
+      tags:
+      - Person Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePersonRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonDto"
+        "400":
+          description: Bad Request
+      summary: Create Person
+      tags:
+      - Person Resource
+  /api/v1/persons/children:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChildDto"
+      summary: Find All Children
+      tags:
+      - Person Resource
+  /api/v1/persons/{id}:
+    put:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePersonRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonDto"
+        "400":
+          description: Bad Request
+      summary: Update Person
+      tags:
+      - Person Resource
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PersonDto"
+      summary: Find By Id
+      tags:
+      - Person Resource
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Person
+      tags:
+      - Person Resource
+  /api/v1/seasons:
+    get:
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SeasonDto"
+      summary: Find All Seasons
+      tags:
+      - Season Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSeasonRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SeasonDto"
+        "400":
+          description: Bad Request
+      summary: Create Season
+      tags:
+      - Season Resource
+  /api/v1/team-memberships:
+    get:
+      parameters:
+      - name: active
+        in: query
+        schema:
+          type: boolean
+      - name: personId
+        in: query
+        schema:
+          $ref: "#/components/schemas/UUID"
+      - name: role
+        in: query
+        schema:
+          $ref: "#/components/schemas/TeamMemberRole"
+      - name: teamId
+        in: query
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamMembershipDto"
+      summary: Find All Team Memberships
+      tags:
+      - Team Membership Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeamMembershipRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMembershipDto"
+        "400":
+          description: Bad Request
+      summary: Create Team Membership
+      tags:
+      - Team Membership Resource
+  /api/v1/team-memberships/{id}/deactivate:
+    patch:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DeactivateTeamMembershipRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamMembershipDto"
+      summary: Deactivate Team Membership
+      tags:
+      - Team Membership Resource
+  /api/v1/teams:
+    get:
+      parameters:
+      - name: seasonId
+        in: query
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TeamDto"
+      summary: Find All Teams
+      tags:
+      - Team Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTeamRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamDto"
+        "400":
+          description: Bad Request
+      summary: Create Team
+      tags:
+      - Team Resource
+  /api/v1/teams/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamDto"
+      summary: Find By Id
+      tags:
+      - Team Resource
+  /api/v1/training-participants:
+    get:
+      parameters:
+      - name: attendanceStatus
+        in: query
+        schema:
+          $ref: "#/components/schemas/AttendanceStatus"
+      - name: personId
+        in: query
+        schema:
+          $ref: "#/components/schemas/UUID"
+      - name: trainingId
+        in: query
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainingParticipantDto"
+      summary: Find All Training Participants
+      tags:
+      - Training Participant Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTrainingParticipantRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingParticipantDto"
+        "400":
+          description: Bad Request
+      summary: Create Training Participant
+      tags:
+      - Training Participant Resource
+  /api/v1/training-participants/{id}:
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Training Participant
+      tags:
+      - Training Participant Resource
+  /api/v1/trainings:
+    get:
+      parameters:
+      - name: dateFrom
+        in: query
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      - name: dateTo
+        in: query
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      - name: status
+        in: query
+        schema:
+          $ref: "#/components/schemas/TrainingStatus"
+      - name: teamId
+        in: query
+        schema:
+          $ref: "#/components/schemas/UUID"
+      - name: trainingDate
+        in: query
+        schema:
+          $ref: "#/components/schemas/LocalDate"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TrainingDto"
+      summary: Find All Trainings
+      tags:
+      - Training Resource
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTrainingRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingDto"
+        "400":
+          description: Bad Request
+      summary: Create Training
+      tags:
+      - Training Resource
+  /api/v1/trainings/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TrainingDto"
+      summary: Find By Id
+      tags:
+      - Training Resource
+    delete:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/UUID"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: {}
+      summary: Delete Training
+      tags:
+      - Training Resource
+info:
+  title: Coach Buddy API
+  version: 1.0.0
+  description: "API für Trainings-, Team- und Personenverwaltung"
