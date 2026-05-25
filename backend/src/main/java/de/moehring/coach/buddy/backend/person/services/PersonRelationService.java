@@ -1,5 +1,6 @@
 package de.moehring.coach.buddy.backend.person.services;
 
+import de.moehring.coach.buddy.backend.common.exceptions.NotFoundException;
 import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRelationRequest;
 import de.moehring.coach.buddy.backend.person.dtos.PersonRelationDto;
 import de.moehring.coach.buddy.backend.person.entities.Person;
@@ -10,7 +11,6 @@ import de.moehring.coach.buddy.backend.person.repositories.PersonRelationReposit
 import de.moehring.coach.buddy.backend.person.repositories.PersonRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.UUID;

@@ -1,5 +1,6 @@
 package de.moehring.coach.buddy.backend.team.services;
 
+import de.moehring.coach.buddy.backend.common.exceptions.BadRequestException;
 import de.moehring.coach.buddy.backend.team.dtos.CreateSeasonRequest;
 import de.moehring.coach.buddy.backend.team.dtos.SeasonDto;
 import de.moehring.coach.buddy.backend.team.entities.Season;
@@ -7,8 +8,6 @@ import de.moehring.coach.buddy.backend.team.mappers.SeasonMapper;
 import de.moehring.coach.buddy.backend.team.repositories.SeasonRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
-import jakarta.ws.rs.BadRequestException;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;

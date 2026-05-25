@@ -1,5 +1,7 @@
 package de.moehring.coach.buddy.backend.team.services;
 
+import de.moehring.coach.buddy.backend.common.exceptions.ConflictException;
+import de.moehring.coach.buddy.backend.common.exceptions.NotFoundException;
 import de.moehring.coach.buddy.backend.team.dtos.CreateTeamRequest;
 import de.moehring.coach.buddy.backend.team.dtos.TeamDto;
 import de.moehring.coach.buddy.backend.team.entities.Season;
@@ -9,8 +11,6 @@ import de.moehring.coach.buddy.backend.team.repositories.SeasonRepository;
 import de.moehring.coach.buddy.backend.team.repositories.TeamRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class TeamService {
         String name = request.name().trim();
 
         if (teamRepository.existsBySeasonAndName(request.seasonId(), name)) {
-            throw new BadRequestException("In dieser Saison existiert bereits eine Mannschaft mit diesem Namen.");
+            throw new ConflictException("In dieser Saison existiert bereits eine Mannschaft mit diesem Namen.");
         }
 
         Team team = new Team();
