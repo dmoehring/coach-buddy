@@ -1,6 +1,7 @@
 package de.moehring.coach.buddy.backend.team.services;
 
 import de.moehring.coach.buddy.backend.common.exceptions.BadRequestException;
+import de.moehring.coach.buddy.backend.common.exceptions.ConflictException;
 import de.moehring.coach.buddy.backend.common.exceptions.NotFoundException;
 import de.moehring.coach.buddy.backend.person.entities.Person;
 import de.moehring.coach.buddy.backend.person.repositories.PersonRepository;
@@ -47,7 +48,7 @@ public class TeamMembershipService {
                 .orElseThrow(() -> new NotFoundException("Person wurde nicht gefunden."));
 
         if (teamMembershipRepository.existsByTeamIdAndPersonId(request.teamId(), request.personId())) {
-            throw new BadRequestException("Diese Person ist bereits Mitglied dieser Mannschaft.");
+            throw new ConflictException("Diese Person ist bereits Mitglied dieser Mannschaft.");
         }
 
         LocalDate joinedAt = request.joinedAt() != null

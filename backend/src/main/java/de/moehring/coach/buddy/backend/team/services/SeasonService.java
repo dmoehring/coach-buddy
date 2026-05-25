@@ -1,6 +1,7 @@
 package de.moehring.coach.buddy.backend.team.services;
 
 import de.moehring.coach.buddy.backend.common.exceptions.BadRequestException;
+import de.moehring.coach.buddy.backend.common.exceptions.ConflictException;
 import de.moehring.coach.buddy.backend.team.dtos.CreateSeasonRequest;
 import de.moehring.coach.buddy.backend.team.dtos.SeasonDto;
 import de.moehring.coach.buddy.backend.team.entities.Season;
@@ -48,7 +49,7 @@ public class SeasonService {
 
     private void validateRequest(CreateSeasonRequest request) {
         if (seasonRepository.existsByName(request.name())) {
-            throw new BadRequestException("Eine Saison mit diesem Namen existiert bereits.");
+            throw new ConflictException("Eine Saison mit diesem Namen existiert bereits.");
         }
 
         Optional<Season> openSeasonOptional = seasonRepository.findOpenSeason();
