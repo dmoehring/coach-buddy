@@ -8,7 +8,7 @@ import de.moehring.coach.buddy.backend.person.entities.Person;
 import de.moehring.coach.buddy.backend.person.entities.PersonRelation;
 import de.moehring.coach.buddy.backend.person.entities.PhoneNumber;
 import de.moehring.coach.buddy.backend.person.exceptions.DuplicatePersonException;
-import de.moehring.coach.buddy.backend.person.exceptions.NotFoundException;
+import de.moehring.coach.buddy.backend.common.exceptions.NotFoundException;
 import de.moehring.coach.buddy.backend.person.mappers.PersonMapper;
 import de.moehring.coach.buddy.backend.person.mappers.PersonWriteDataMapper;
 import de.moehring.coach.buddy.backend.person.model.PersonWriteData;

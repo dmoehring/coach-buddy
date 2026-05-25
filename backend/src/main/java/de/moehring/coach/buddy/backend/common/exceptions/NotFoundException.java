@@ -1,4 +1,4 @@
-package de.moehring.coach.buddy.backend.person.exceptions;
+package de.moehring.coach.buddy.backend.common.exceptions;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {

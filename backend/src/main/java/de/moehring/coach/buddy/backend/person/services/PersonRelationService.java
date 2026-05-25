@@ -4,7 +4,7 @@ import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRelationRequest;
 import de.moehring.coach.buddy.backend.person.dtos.PersonRelationDto;
 import de.moehring.coach.buddy.backend.person.entities.Person;
 import de.moehring.coach.buddy.backend.person.entities.PersonRelation;
-import de.moehring.coach.buddy.backend.person.exceptions.BadRequestException;
+import de.moehring.coach.buddy.backend.common.exceptions.BadRequestException;
 import de.moehring.coach.buddy.backend.person.mappers.PersonRelationMapper;
 import de.moehring.coach.buddy.backend.person.repositories.PersonRelationRepository;
 import de.moehring.coach.buddy.backend.person.repositories.PersonRepository;

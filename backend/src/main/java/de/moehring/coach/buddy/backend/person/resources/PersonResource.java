@@ -10,42 +10,37 @@ import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
 
 @Path("/api/v1/persons")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+@RequiredArgsConstructor
 public class PersonResource {
 
     private final PersonService personService;
 
-    public PersonResource(PersonService personService) {
-        this.personService = personService;
-    }
-
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<PersonDto> findAllPersons(@BeanParam PersonSearchCriteria personSearchCriteria) {
         return personService.findAll(personSearchCriteria);
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public PersonDto createPerson(@Valid CreatePersonRequest createPersonRequest) {
         return personService.create(createPersonRequest);
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public PersonDto findById(@PathParam("id") UUID id) {
         return personService.findById(id);
     }
 
     @PUT
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public PersonDto updatePerson(
             @PathParam("id") UUID id,
             @Valid UpdatePersonRequest updatePersonRequest) {
@@ -60,7 +55,6 @@ public class PersonResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/children")
     public List<ChildDto> findAllChildren() {
         return personService.findAllChildren();
