@@ -13,7 +13,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.media.ArraySchema;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -39,7 +39,7 @@ public class TrainingParticipantResource {
             description = "Training participants found",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    array = @ArraySchema(schema = @Schema(implementation = TrainingParticipantDto.class))
+                    schema = @Schema(type = SchemaType.ARRAY, implementation = TrainingParticipantDto.class)
             )
     )
     public List<TrainingParticipantDto> findAllTrainingParticipants(
