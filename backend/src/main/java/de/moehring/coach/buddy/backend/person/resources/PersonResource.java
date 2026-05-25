@@ -15,7 +15,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
-import org.eclipse.microprofile.openapi.annotations.media.ArraySchema;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
@@ -41,7 +41,7 @@ public class PersonResource {
             description = "Persons found",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    array = @ArraySchema(schema = @Schema(implementation = PersonDto.class))
+                    schema = @Schema(type = SchemaType.ARRAY, implementation = PersonDto.class)
             )
     )
     public List<PersonDto> findAllPersons(@BeanParam PersonSearchCriteria personSearchCriteria) {
@@ -179,7 +179,7 @@ public class PersonResource {
             description = "Children found",
             content = @Content(
                     mediaType = MediaType.APPLICATION_JSON,
-                    array = @ArraySchema(schema = @Schema(implementation = ChildDto.class))
+                    schema = @Schema(type = SchemaType.ARRAY, implementation = ChildDto.class)
             )
     )
     public List<ChildDto> findAllChildren() {
