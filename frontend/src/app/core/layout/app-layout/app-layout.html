@@ -1,0 +1,52 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="pi pi-heart"></i>
+      </div>
+      <div>
+        <div class="brand-title">Coach Buddy</div>
+        <div class="brand-subtitle">Minis Verwaltung</div>
+      </div>
+    </div>
+
+    <nav class="navigation">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="pi pi-home"></i>
+        Dashboard
+      </a>
+
+      <a routerLink="/persons" routerLinkActive="active">
+        <i class="pi pi-users"></i>
+        Personen
+      </a>
+
+      <a routerLink="/teams" routerLinkActive="active">
+        <i class="pi pi-sitemap"></i>
+        Teams
+      </a>
+
+      <a routerLink="/trainings" routerLinkActive="active">
+        <i class="pi pi-calendar"></i>
+        Trainings
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        (click)="toggleDarkMode()"
+      >
+        <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+        <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet />
+  </main>
+</div>

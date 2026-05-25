@@ -1,0 +1,71 @@
+.dashboard {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    letter-spacing: -0.04em;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--p-primary-color);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.description {
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color);
+  max-width: 44rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  display: grid;
+  gap: 0.35rem;
+
+  .stat-label {
+    color: var(--p-text-muted-color);
+    font-size: 0.85rem;
+  }
+
+  strong {
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  small {
+    color: var(--p-text-muted-color);
+  }
+}
+
+:host ::ng-deep .table-card {
+  overflow: hidden;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+}
