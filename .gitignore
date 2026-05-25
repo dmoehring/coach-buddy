@@ -46,6 +46,10 @@ quarkus.log
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.properties
 
+mvnw
+mvnw.cmd
+
+
 # ============================================================
 # Angular / Node.js
 # ============================================================

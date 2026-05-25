@@ -1,0 +1,1539 @@
+{
+  "openapi" : "3.1.0",
+  "tags" : [ {
+    "name" : "Person Relations",
+    "description" : "Verwaltung von Beziehungen zwischen Personen"
+  }, {
+    "name" : "Persons",
+    "description" : "Verwaltung von Personen"
+  }, {
+    "name" : "Seasons",
+    "description" : "Verwaltung von Saisons"
+  }, {
+    "name" : "Team Memberships",
+    "description" : "Verwaltung von Mannschaftsmitgliedschaften"
+  }, {
+    "name" : "Teams",
+    "description" : "Verwaltung von Mannschaften innerhalb einer Saison"
+  }, {
+    "name" : "Training Participants",
+    "description" : "Verwaltung von Trainingsteilnahmen und Anwesenheiten"
+  }, {
+    "name" : "Trainings",
+    "description" : "Verwaltung von Trainingseinheiten"
+  } ],
+  "components" : {
+    "schemas" : {
+      "AttendanceStatus" : {
+        "type" : "string",
+        "enum" : [ "PRESENT", "ABSENT", "EXCUSED" ]
+      },
+      "ChildDto" : {
+        "type" : "object",
+        "properties" : {
+          "child" : {
+            "$ref" : "#/components/schemas/PersonDto"
+          },
+          "guardians" : {
+            "type" : "object",
+            "additionalProperties" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/PersonDto"
+              }
+            }
+          }
+        }
+      },
+      "CreatePersonRelationRequest" : {
+        "type" : "object",
+        "properties" : {
+          "childPersonId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "guardianPersonId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "relationType" : {
+            "$ref" : "#/components/schemas/RelationType"
+          }
+        }
+      },
+      "CreatePersonRequest" : {
+        "type" : "object",
+        "required" : [ "firstName", "lastName" ],
+        "properties" : {
+          "firstName" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "lastName" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "birthDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "phoneNumbers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/CreatePhoneNumberRequest"
+            }
+          }
+        }
+      },
+      "CreatePhoneNumberRequest" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/PhoneType"
+          },
+          "number" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          }
+        },
+        "required" : [ "number" ]
+      },
+      "CreateSeasonRequest" : {
+        "type" : "object",
+        "required" : [ "name", "startDate" ],
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "startDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }
+      },
+      "CreateTeamMembershipRequest" : {
+        "type" : "object",
+        "required" : [ "teamId", "personId", "role" ],
+        "properties" : {
+          "teamId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "personId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/TeamMemberRole"
+          },
+          "joinedAt" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "leftAt" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }
+      },
+      "CreateTeamRequest" : {
+        "type" : "object",
+        "required" : [ "seasonId", "name" ],
+        "properties" : {
+          "seasonId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "name" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "description" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateTrainingParticipantRequest" : {
+        "type" : "object",
+        "required" : [ "trainingId", "personId", "attendanceStatus" ],
+        "properties" : {
+          "trainingId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "personId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "attendanceStatus" : {
+            "$ref" : "#/components/schemas/AttendanceStatus"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CreateTrainingRequest" : {
+        "type" : "object",
+        "required" : [ "teamId", "trainingDate" ],
+        "properties" : {
+          "teamId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "trainingDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "startTime" : {
+            "$ref" : "#/components/schemas/LocalTime"
+          },
+          "endTime" : {
+            "$ref" : "#/components/schemas/LocalTime"
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/TrainingStatus"
+          }
+        }
+      },
+      "DeactivateTeamMembershipRequest" : {
+        "type" : "object",
+        "properties" : {
+          "leftAt" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }
+      },
+      "ErrorResponse" : {
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "error" : {
+            "type" : "string"
+          },
+          "message" : {
+            "type" : "string"
+          },
+          "timestamp" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "Instant" : {
+        "type" : "string",
+        "format" : "date-time",
+        "examples" : [ "2022-03-10T16:15:50Z" ]
+      },
+      "LocalDate" : {
+        "type" : "string",
+        "format" : "date",
+        "examples" : [ "2022-03-10" ]
+      },
+      "LocalTime" : {
+        "type" : "string",
+        "format" : "local-time",
+        "examples" : [ "13:45:30.123456789" ],
+        "externalDocs" : {
+          "description" : "As defined by 'partial-time' in RFC3339",
+          "url" : "https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6"
+        }
+      },
+      "PersonDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "firstName" : {
+            "type" : "string"
+          },
+          "lastName" : {
+            "type" : "string"
+          },
+          "birthDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "phoneNumbers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/PhoneNumberDto"
+            }
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "PersonRelationDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "childPerson" : {
+            "$ref" : "#/components/schemas/PersonDto"
+          },
+          "guardianPerson" : {
+            "$ref" : "#/components/schemas/PersonDto"
+          },
+          "relationType" : {
+            "$ref" : "#/components/schemas/RelationType"
+          }
+        }
+      },
+      "PhoneNumberDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/PhoneType"
+          },
+          "number" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PhoneType" : {
+        "type" : "string",
+        "enum" : [ "MOBILE", "HOME", "WORK", "EMERGENCY" ]
+      },
+      "RelationType" : {
+        "type" : "string",
+        "enum" : [ "MOTHER", "FATHER", "GRANDMOTHER", "GRANDFATHER", "STEP_PARENT", "OTHER" ]
+      },
+      "SeasonDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "startDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "endDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "TeamDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "seasonId" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "seasonName" : {
+            "type" : "string"
+          },
+          "name" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "TeamMemberRole" : {
+        "type" : "string",
+        "enum" : [ "PLAYER", "COACH", "ASSISTANT_COACH" ]
+      },
+      "TeamMembershipDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "team" : {
+            "$ref" : "#/components/schemas/TeamDto"
+          },
+          "person" : {
+            "$ref" : "#/components/schemas/PersonDto"
+          },
+          "role" : {
+            "$ref" : "#/components/schemas/TeamMemberRole"
+          },
+          "joinedAt" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "leftAt" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "TrainingDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "team" : {
+            "$ref" : "#/components/schemas/TeamDto"
+          },
+          "trainingDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "startTime" : {
+            "$ref" : "#/components/schemas/LocalTime"
+          },
+          "endTime" : {
+            "$ref" : "#/components/schemas/LocalTime"
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/TrainingStatus"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "TrainingParticipantDto" : {
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "$ref" : "#/components/schemas/UUID"
+          },
+          "training" : {
+            "$ref" : "#/components/schemas/TrainingDto"
+          },
+          "person" : {
+            "$ref" : "#/components/schemas/PersonDto"
+          },
+          "attendanceStatus" : {
+            "$ref" : "#/components/schemas/AttendanceStatus"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "createdAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "updatedAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          }
+        }
+      },
+      "TrainingStatus" : {
+        "type" : "string",
+        "enum" : [ "COMPLETED", "CANCELLED" ]
+      },
+      "UUID" : {
+        "type" : "string",
+        "format" : "uuid",
+        "pattern" : "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"
+      },
+      "UpdatePersonRequest" : {
+        "type" : "object",
+        "required" : [ "firstName", "lastName" ],
+        "properties" : {
+          "firstName" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "lastName" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "birthDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "nickname" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "phoneNumbers" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/UpdatePhoneNumberRequest"
+            }
+          }
+        }
+      },
+      "UpdatePhoneNumberRequest" : {
+        "type" : "object",
+        "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/PhoneType"
+          },
+          "number" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          }
+        },
+        "required" : [ "number" ]
+      }
+    }
+  },
+  "paths" : {
+    "/api/v1/person-relations" : {
+      "post" : {
+        "summary" : "Create person relation",
+        "description" : "Creates a relation between a child person and a guardian person.",
+        "tags" : [ "Person Relations" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePersonRelationRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Person relation created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonRelationDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Referenced person not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Person relation already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/person-relations/{id}" : {
+      "get" : {
+        "summary" : "Find person relation by id",
+        "description" : "Returns a single person relation by id.",
+        "tags" : [ "Person Relations" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Person relation found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonRelationDto"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Person relation not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Delete person relation",
+        "description" : "Deletes a person relation.",
+        "tags" : [ "Person Relations" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Person relation deleted"
+          },
+          "404" : {
+            "description" : "Person relation not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/persons" : {
+      "get" : {
+        "summary" : "Find persons",
+        "description" : "Returns all persons matching the optional search criteria.",
+        "tags" : [ "Persons" ],
+        "parameters" : [ {
+          "name" : "birthMonth",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "birthYear",
+          "in" : "query",
+          "schema" : {
+            "type" : "integer",
+            "format" : "int32"
+          }
+        }, {
+          "name" : "firstName",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "lastName",
+          "in" : "query",
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Persons found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PersonDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create person",
+        "description" : "Creates a new person.",
+        "tags" : [ "Persons" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreatePersonRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Person created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Person already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/persons/children" : {
+      "get" : {
+        "summary" : "Find children",
+        "description" : "Returns persons interpreted as children with their guardians.",
+        "tags" : [ "Persons" ],
+        "responses" : {
+          "200" : {
+            "description" : "Children found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/ChildDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/persons/{id}" : {
+      "put" : {
+        "summary" : "Update person",
+        "description" : "Updates an existing person.",
+        "tags" : [ "Persons" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdatePersonRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Person updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Person not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Person already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get" : {
+        "summary" : "Find person by id",
+        "description" : "Returns a single person by id.",
+        "tags" : [ "Persons" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Person found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/PersonDto"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Person not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Delete person",
+        "description" : "Deletes a person and dependent person relations.",
+        "tags" : [ "Persons" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Person deleted"
+          },
+          "404" : {
+            "description" : "Person not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/seasons" : {
+      "get" : {
+        "summary" : "Find seasons",
+        "description" : "Returns all seasons.",
+        "tags" : [ "Seasons" ],
+        "responses" : {
+          "200" : {
+            "description" : "Seasons found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/SeasonDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create season",
+        "description" : "Creates a new open season and closes the previous open season if present.",
+        "tags" : [ "Seasons" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateSeasonRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Season created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/SeasonDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid season date",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Season already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/team-memberships" : {
+      "get" : {
+        "summary" : "Find team memberships",
+        "description" : "Returns team memberships matching the optional search criteria.",
+        "tags" : [ "Team Memberships" ],
+        "parameters" : [ {
+          "name" : "active",
+          "in" : "query",
+          "schema" : {
+            "type" : "boolean"
+          }
+        }, {
+          "name" : "personId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "role",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/TeamMemberRole"
+          }
+        }, {
+          "name" : "teamId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Team memberships found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TeamMembershipDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create team membership",
+        "description" : "Adds a person to a team with a role.",
+        "tags" : [ "Team Memberships" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTeamMembershipRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Team membership created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamMembershipDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Referenced person or team not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Team membership already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/team-memberships/{id}/deactivate" : {
+      "patch" : {
+        "summary" : "Deactivate team membership",
+        "description" : "Sets the left date of a team membership.",
+        "tags" : [ "Team Memberships" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/DeactivateTeamMembershipRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Team membership deactivated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamMembershipDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid left date",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Team membership not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teams" : {
+      "get" : {
+        "summary" : "Find teams",
+        "description" : "Returns all teams, optionally filtered by season id.",
+        "tags" : [ "Teams" ],
+        "parameters" : [ {
+          "name" : "seasonId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Teams found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TeamDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create team",
+        "description" : "Creates a new team for a season.",
+        "tags" : [ "Teams" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTeamRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Team created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Season not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Team already exists in season",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/teams/{id}" : {
+      "get" : {
+        "summary" : "Find team by id",
+        "description" : "Returns a single team by id.",
+        "tags" : [ "Teams" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Team found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TeamDto"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Team not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/training-participants" : {
+      "get" : {
+        "summary" : "Find training participants",
+        "description" : "Returns training participants matching the optional search criteria.",
+        "tags" : [ "Training Participants" ],
+        "parameters" : [ {
+          "name" : "attendanceStatus",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/AttendanceStatus"
+          }
+        }, {
+          "name" : "personId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "trainingId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Training participants found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TrainingParticipantDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create training participant",
+        "description" : "Adds a person to a training with an attendance status.",
+        "tags" : [ "Training Participants" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTrainingParticipantRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Training participant created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrainingParticipantDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Referenced training or person not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409" : {
+            "description" : "Training participant already exists",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/training-participants/{id}" : {
+      "delete" : {
+        "summary" : "Delete training participant",
+        "description" : "Deletes a mistakenly created training participant entry.",
+        "tags" : [ "Training Participants" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Training participant deleted"
+          },
+          "404" : {
+            "description" : "Training participant not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trainings" : {
+      "get" : {
+        "summary" : "Find trainings",
+        "description" : "Returns trainings matching the optional search criteria.",
+        "tags" : [ "Trainings" ],
+        "parameters" : [ {
+          "name" : "dateFrom",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "dateTo",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/TrainingStatus"
+          }
+        }, {
+          "name" : "teamId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "trainingDate",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Trainings found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/TrainingDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "summary" : "Create training",
+        "description" : "Creates a training for a team.",
+        "tags" : [ "Trainings" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CreateTrainingRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Training created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrainingDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Team not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/trainings/{id}" : {
+      "get" : {
+        "summary" : "Find training by id",
+        "description" : "Returns a single training by id.",
+        "tags" : [ "Trainings" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Training found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrainingDto"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Training not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete" : {
+        "summary" : "Delete training",
+        "description" : "Deletes a mistakenly created training including its participants.",
+        "tags" : [ "Trainings" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Training deleted"
+          },
+          "404" : {
+            "description" : "Training not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "info" : {
+    "title" : "Coach Buddy API",
+    "version" : "1.0.0",
+    "description" : "API für Trainings-, Team- und Personenverwaltung"
+  }
+}
