@@ -1,1 +1,96 @@
-<p>trainings-page works!</p>
+<section class="trainings-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Training</p>
+      <h1>Trainings</h1>
+      <p class="description">
+        Erfasste Trainings, ausgefallene Einheiten und spätere Anwesenheiten.
+      </p>
+    </div>
+
+    <button pButton type="button">
+      <i class="pi pi-plus"></i>
+      <span>Training erfassen</span>
+    </button>
+  </div>
+
+  <p-card styleClass="trainings-table-card">
+    <ng-template pTemplate="title">
+      Trainingsübersicht
+    </ng-template>
+
+    <ng-template pTemplate="subtitle">
+      Aktuell noch mit Mock-Daten
+    </ng-template>
+
+    <p-table
+      [value]="trainings"
+      [tableStyle]="{ 'min-width': '58rem' }"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Datum</th>
+          <th>Team</th>
+          <th>Uhrzeit</th>
+          <th>Ort</th>
+          <th>Status</th>
+          <th>Notiz</th>
+          <th class="actions-column">Aktionen</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-training>
+        <tr>
+          <td>
+            <div class="date-cell">
+              <strong>{{ training.trainingDate }}</strong>
+              <span>{{ training.weekday }}</span>
+            </div>
+          </td>
+
+          <td>{{ training.teamName }}</td>
+          <td>{{ getTimeRange(training) }}</td>
+          <td>{{ training.location ?? '-' }}</td>
+
+          <td>
+            <p-tag
+              [value]="getStatusLabel(training.status)"
+              [severity]="getStatusSeverity(training.status)"
+            />
+          </td>
+
+          <td>
+            <span class="note">
+              {{ training.notes ?? '-' }}
+            </span>
+          </td>
+
+          <td>
+            <div class="table-actions">
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [text]="true"
+                aria-label="Training anzeigen"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+
+              <button
+                pButton
+                type="button"
+                severity="danger"
+                [text]="true"
+                aria-label="Training löschen"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</section>
