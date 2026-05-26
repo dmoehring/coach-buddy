@@ -20,3 +20,38 @@ body.app-dark {
 * {
   box-sizing: border-box;
 }
+
+body.app-dark .p-card {
+  background: var(--p-surface-900);
+  color: var(--p-text-color);
+  border: 1px solid var(--p-surface-800);
+}
+
+body.app-dark .p-card-title {
+  color: var(--p-text-color);
+}
+
+body.app-dark .p-card-subtitle {
+  color: var(--p-text-muted-color);
+}
+
+body.app-dark .p-datatable {
+  background: var(--p-surface-900);
+  color: var(--p-text-color);
+}
+
+body.app-dark .p-datatable-thead > tr > th {
+  background: var(--p-surface-900);
+  color: var(--p-text-color);
+  border-color: var(--p-surface-800);
+}
+
+body.app-dark .p-datatable-tbody > tr > td {
+  background: var(--p-surface-900);
+  color: var(--p-text-color);
+  border-color: var(--p-surface-800);
+}
+
+body.app-dark .p-datatable-tbody > tr:hover > td {
+  background: var(--p-surface-800);
+}
