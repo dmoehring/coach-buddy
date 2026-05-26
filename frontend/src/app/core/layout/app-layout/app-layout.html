@@ -8,48 +8,43 @@
       (click)="toggleMobileMenu()"
       aria-label="Menü öffnen"
     >
-      <i class="pi pi-bars"></i>
+      <i
+        class="pi"
+        [class.pi-bars]="!mobileMenuOpen()"
+        [class.pi-times]="mobileMenuOpen()"
+      ></i>
     </button>
 
     <div class="mobile-brand">
       <strong>Coach Buddy</strong>
-      <span>Minis Verwaltung</span>
+      <span>{{ selectedSeason.name }} · {{ selectedTeam.name }}</span>
     </div>
-
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [text]="true"
-      (click)="toggleDarkMode()"
-      aria-label="Darstellung wechseln"
-    >
-      <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
-    </button>
   </header>
 
-  @if (mobileMenuOpen()) {
-    <button
-      class="mobile-backdrop"
-      type="button"
-      aria-label="Menü schließen"
-      (click)="closeMobileMenu()"
-    ></button>
-  }
+  <div class="mobile-menu" [class.open]="mobileMenuOpen()">
+    <div class="mobile-context">
+      <label class="mobile-context-control">
+        <span>Saison</span>
+        <p-select
+          [options]="seasons"
+          [(ngModel)]="selectedSeason"
+          optionLabel="name"
+          appendTo="body"
+        />
+      </label>
 
-  <aside class="sidebar" [class.open]="mobileMenuOpen()">
-    <div class="brand">
-      <div class="brand-icon">
-        <i class="pi pi-heart"></i>
-      </div>
-
-      <div>
-        <div class="brand-title">Coach Buddy</div>
-        <div class="brand-subtitle">Minis Verwaltung</div>
-      </div>
+      <label class="mobile-context-control">
+        <span>Mannschaft</span>
+        <p-select
+          [options]="teams"
+          [(ngModel)]="selectedTeam"
+          optionLabel="name"
+          appendTo="body"
+        />
+      </label>
     </div>
 
-    <nav class="navigation">
+    <nav class="mobile-navigation">
       <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="pi pi-home"></i>
         Dashboard
@@ -71,21 +66,98 @@
       </a>
     </nav>
 
-    <div class="sidebar-footer">
-      <button
-        pButton
-        type="button"
-        severity="secondary"
-        [outlined]="true"
-        (click)="toggleDarkMode()"
-      >
-        <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
-        <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
-      </button>
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      (click)="toggleDarkMode()"
+      class="mobile-darkmode"
+    >
+      <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+      <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
+    </button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="pi pi-heart"></i>
+      </div>
+
+      <div>
+        <div class="brand-title">Coach Buddy</div>
+        <div class="brand-subtitle">Minis Verwaltung</div>
+      </div>
     </div>
+
+    <nav class="navigation">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="pi pi-home"></i>
+        Dashboard
+      </a>
+
+      <a routerLink="/persons" routerLinkActive="active">
+        <i class="pi pi-users"></i>
+        Personen
+      </a>
+
+      <a routerLink="/teams" routerLinkActive="active">
+        <i class="pi pi-sitemap"></i>
+        Teams
+      </a>
+
+      <a routerLink="/trainings" routerLinkActive="active">
+        <i class="pi pi-calendar"></i>
+        Trainings
+      </a>
+    </nav>
   </aside>
 
   <main class="content">
-    <router-outlet />
+    <header class="topbar">
+      <div class="topbar-title">
+        <span>Aktueller Kontext</span>
+        <strong>{{ selectedSeason.name }} · {{ selectedTeam.name }}</strong>
+      </div>
+
+      <div class="topbar-controls">
+        <label class="topbar-control">
+          <span>Saison</span>
+          <p-select
+            [options]="seasons"
+            [(ngModel)]="selectedSeason"
+            optionLabel="name"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="topbar-control">
+          <span>Mannschaft</span>
+          <p-select
+            [options]="teams"
+            [(ngModel)]="selectedTeam"
+            optionLabel="name"
+            appendTo="body"
+          />
+        </label>
+
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          (click)="toggleDarkMode()"
+          class="topbar-darkmode"
+        >
+          <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+          <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <router-outlet />
+    </div>
   </main>
 </div>
