@@ -7,37 +7,12 @@
         Aktuelle Saison, letzte Trainings und schneller Einstieg in die Verwaltung.
       </p>
     </div>
-
-    <button pButton type="button">
-      <i class="pi pi-plus"></i>
-      <span>Training erfassen</span>
-    </button>
   </div>
 
   <div class="stats-grid">
-    <p-card>
-      <div class="stat-card">
-        <span class="stat-label">Aktuelle Saison</span>
-        <strong>2025/2026</strong>
-        <small>offene Saison</small>
-      </div>
-    </p-card>
-
-    <p-card>
-      <div class="stat-card">
-        <span class="stat-label">Aktuelles Team</span>
-        <strong>Minis</strong>
-        <small>Jahrgänge 2017–2019</small>
-      </div>
-    </p-card>
-
-    <p-card>
-      <div class="stat-card">
-        <span class="stat-label">Letztes Training</span>
-        <strong>18 anwesend</strong>
-        <small>3 entschuldigt · 2 fehlend</small>
-      </div>
-    </p-card>
+    @for (metric of metrics; track metric.label) {
+      <app-dashboard-stat-card [metric]="metric"/>
+    }
   </div>
 
   <p-card styleClass="table-card">
