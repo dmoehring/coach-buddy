@@ -1,0 +1,60 @@
+.quick-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.quick-action {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.95rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1.1rem;
+  color: inherit;
+  text-decoration: none;
+  background: var(--p-surface-0);
+  transition:
+    transform 140ms ease,
+    border-color 140ms ease,
+    background 140ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: var(--p-primary-color);
+  }
+
+  &.primary {
+    color: var(--p-primary-color);
+    background: color-mix(in srgb, var(--p-primary-color), transparent 94%);
+  }
+}
+
+:host-context(.app-dark) .quick-action {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.quick-action-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 0.9rem;
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color), transparent 90%);
+}
+
+.quick-action-text {
+  display: grid;
+  gap: 0.15rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.85rem;
+  }
+}
+
+.arrow {
+  color: var(--p-text-muted-color);
+}

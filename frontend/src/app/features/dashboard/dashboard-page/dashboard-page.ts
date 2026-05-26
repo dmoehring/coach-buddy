@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 
-import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { TagModule } from 'primeng/tag';
-import { TableModule } from 'primeng/table';
+import {ButtonModule} from 'primeng/button';
+import {CardModule} from 'primeng/card';
+import {TagModule} from 'primeng/tag';
+import {TableModule} from 'primeng/table';
 
-import { DashboardMetric, DashboardTraining, TrainingStatus } from '../dashboard.model';
-import { DashboardStatCard } from '../components/dashboard-stat-card/dashboard-stat-card';
+import {DashboardMetric, DashboardQuickAction, DashboardTraining, TrainingStatus} from '../dashboard.model';
+import {DashboardStatCard} from '../components/dashboard-stat-card/dashboard-stat-card';
+import {DashboardQuickActions} from '../components/dashboard-quick-actions/dashboard-quick-actions';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -15,7 +16,8 @@ import { DashboardStatCard } from '../components/dashboard-stat-card/dashboard-s
     CardModule,
     TagModule,
     TableModule,
-    DashboardStatCard
+    DashboardStatCard,
+    DashboardQuickActions
   ],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss'
@@ -50,6 +52,28 @@ export class DashboardPage {
       value: `${this.lastTrainingSummary.present} anwesend`,
       description: `${this.lastTrainingSummary.excused} entschuldigt · ${this.lastTrainingSummary.absent} fehlend`,
       icon: 'pi pi-calendar'
+    }
+  ];
+
+  readonly quickActions: DashboardQuickAction[] = [
+    {
+      label: 'Training erfassen',
+      description: 'Training anlegen und Anwesenheit pflegen',
+      icon: 'pi pi-plus-circle',
+      route: '/trainings',
+      primary: true
+    },
+    {
+      label: 'Person anlegen',
+      description: 'Kind, Trainer oder Kontakt erfassen',
+      icon: 'pi pi-user-plus',
+      route: '/persons'
+    },
+    {
+      label: 'Team verwalten',
+      description: 'Mitglieder und Rollen prüfen',
+      icon: 'pi pi-sitemap',
+      route: '/teams'
     }
   ];
 
