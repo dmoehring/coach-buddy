@@ -7,46 +7,94 @@
     Die letzten erfassten Einheiten und Ausfälle
   </ng-template>
 
-  <p-table
-    [value]="trainings"
-    [tableStyle]="{ 'min-width': '54rem' }"
-    responsiveLayout="scroll"
-  >
-    <ng-template pTemplate="header">
-      <tr>
-        <th>Datum</th>
-        <th>Team</th>
-        <th>Ort</th>
-        <th>Status</th>
-        <th>Anwesend</th>
-        <th>Entschuldigt</th>
-        <th>Fehlend</th>
-      </tr>
-    </ng-template>
+  <div class="desktop-table">
+    <p-table
+      [value]="trainings"
+      [tableStyle]="{ 'min-width': '54rem' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Datum</th>
+          <th>Team</th>
+          <th>Ort</th>
+          <th>Status</th>
+          <th>Anwesend</th>
+          <th>Entschuldigt</th>
+          <th>Fehlend</th>
+        </tr>
+      </ng-template>
 
-    <ng-template pTemplate="body" let-training>
-      <tr>
-        <td>
-          <div class="date-cell">
+      <ng-template pTemplate="body" let-training>
+        <tr>
+          <td>
+            <div class="date-cell">
+              <strong>{{ training.date }}</strong>
+              <span>{{ training.weekday }}</span>
+            </div>
+          </td>
+
+          <td>{{ training.team }}</td>
+          <td>{{ training.location }}</td>
+
+          <td>
+            <p-tag
+              [value]="getStatusLabel(training.status)"
+              [severity]="getStatusSeverity(training.status)"
+            />
+          </td>
+
+          <td>{{ training.present }}</td>
+          <td>{{ training.excused }}</td>
+          <td>{{ training.absent }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="mobile-training-list">
+    @for (training of trainings; track training.date) {
+      <article class="training-card">
+        <div class="training-card-header">
+          <div class="training-date">
             <strong>{{ training.date }}</strong>
             <span>{{ training.weekday }}</span>
           </div>
-        </td>
 
-        <td>{{ training.team }}</td>
-        <td>{{ training.location }}</td>
-
-        <td>
           <p-tag
             [value]="getStatusLabel(training.status)"
             [severity]="getStatusSeverity(training.status)"
           />
-        </td>
+        </div>
 
-        <td>{{ training.present }}</td>
-        <td>{{ training.excused }}</td>
-        <td>{{ training.absent }}</td>
-      </tr>
-    </ng-template>
-  </p-table>
+        <div class="training-card-content">
+          <div class="training-info">
+            <span>Team</span>
+            <strong>{{ training.team }}</strong>
+          </div>
+
+          <div class="training-info">
+            <span>Ort</span>
+            <strong>{{ training.location }}</strong>
+          </div>
+        </div>
+
+        <div class="attendance-grid">
+          <div>
+            <span>Anwesend</span>
+            <strong>{{ training.present }}</strong>
+          </div>
+
+          <div>
+            <span>Entschuldigt</span>
+            <strong>{{ training.excused }}</strong>
+          </div>
+
+          <div>
+            <span>Fehlend</span>
+            <strong>{{ training.absent }}</strong>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
 </p-card>

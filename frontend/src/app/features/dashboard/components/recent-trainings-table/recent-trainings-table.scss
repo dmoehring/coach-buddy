@@ -1,3 +1,11 @@
+.desktop-table {
+  display: block;
+}
+
+.mobile-training-list {
+  display: none;
+}
+
 .date-cell {
   display: grid;
   gap: 0.1rem;
@@ -10,4 +18,92 @@
 
 :host ::ng-deep .table-card {
   overflow: hidden;
+}
+
+.training-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1.25rem;
+  background: var(--p-surface-0);
+}
+
+:host-context(.app-dark) .training-card {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.training-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.training-date {
+  display: grid;
+  gap: 0.1rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.85rem;
+  }
+}
+
+.training-card-content {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.training-info {
+  display: grid;
+  gap: 0.15rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+  }
+
+  strong {
+    font-weight: 650;
+  }
+}
+
+.attendance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+
+  div {
+    display: grid;
+    gap: 0.15rem;
+    padding: 0.75rem;
+    border-radius: 1rem;
+    background: var(--p-surface-100);
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.75rem;
+  }
+
+  strong {
+    font-size: 1.2rem;
+  }
+}
+
+:host-context(.app-dark) .attendance-grid div {
+  background: var(--p-surface-800);
+}
+
+@media (max-width: 760px) {
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-training-list {
+    display: grid;
+    gap: 1rem;
+  }
 }
