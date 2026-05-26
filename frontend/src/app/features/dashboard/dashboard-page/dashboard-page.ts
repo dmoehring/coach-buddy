@@ -8,6 +8,7 @@ import {TableModule} from 'primeng/table';
 import {DashboardMetric, DashboardQuickAction, DashboardTraining, TrainingStatus} from '../dashboard.model';
 import {DashboardStatCard} from '../components/dashboard-stat-card/dashboard-stat-card';
 import {DashboardQuickActions} from '../components/dashboard-quick-actions/dashboard-quick-actions';
+import {RecentTrainingsTable} from '../components/recent-trainings-table/recent-trainings-table';
 
 @Component({
   selector: 'app-dashboard-page',
@@ -17,7 +18,8 @@ import {DashboardQuickActions} from '../components/dashboard-quick-actions/dashb
     TagModule,
     TableModule,
     DashboardStatCard,
-    DashboardQuickActions
+    DashboardQuickActions,
+    RecentTrainingsTable
   ],
   templateUrl: './dashboard-page.html',
   styleUrl: './dashboard-page.scss'
@@ -110,11 +112,4 @@ export class DashboardPage {
     }
   ];
 
-  getStatusLabel(status: TrainingStatus): string {
-    return status === 'COMPLETED' ? 'Stattgefunden' : 'Ausgefallen';
-  }
-
-  getStatusSeverity(status: TrainingStatus): 'success' | 'danger' {
-    return status === 'COMPLETED' ? 'success' : 'danger';
-  }
 }

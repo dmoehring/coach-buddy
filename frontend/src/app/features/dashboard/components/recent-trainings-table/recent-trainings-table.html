@@ -1,1 +1,52 @@
-<p>recent-trainings-table works!</p>
+<p-card styleClass="table-card">
+  <ng-template pTemplate="title">
+    Letzte Trainings
+  </ng-template>
+
+  <ng-template pTemplate="subtitle">
+    Die letzten erfassten Einheiten und Ausfälle
+  </ng-template>
+
+  <p-table
+    [value]="trainings"
+    [tableStyle]="{ 'min-width': '54rem' }"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Datum</th>
+        <th>Team</th>
+        <th>Ort</th>
+        <th>Status</th>
+        <th>Anwesend</th>
+        <th>Entschuldigt</th>
+        <th>Fehlend</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-training>
+      <tr>
+        <td>
+          <div class="date-cell">
+            <strong>{{ training.date }}</strong>
+            <span>{{ training.weekday }}</span>
+          </div>
+        </td>
+
+        <td>{{ training.team }}</td>
+        <td>{{ training.location }}</td>
+
+        <td>
+          <p-tag
+            [value]="getStatusLabel(training.status)"
+            [severity]="getStatusSeverity(training.status)"
+          />
+        </td>
+
+        <td>{{ training.present }}</td>
+        <td>{{ training.excused }}</td>
+        <td>{{ training.absent }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</p-card>

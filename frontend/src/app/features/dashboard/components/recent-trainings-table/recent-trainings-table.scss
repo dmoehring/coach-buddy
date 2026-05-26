@@ -1,0 +1,13 @@
+.date-cell {
+  display: grid;
+  gap: 0.1rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.82rem;
+  }
+}
+
+:host ::ng-deep .table-card {
+  overflow: hidden;
+}

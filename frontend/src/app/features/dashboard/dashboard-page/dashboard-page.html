@@ -17,40 +17,5 @@
 
   <app-dashboard-quick-actions [actions]="quickActions" />
 
-  <p-card styleClass="table-card">
-    <ng-template pTemplate="title">
-      Letzte Trainings
-    </ng-template>
-
-    <p-table [value]="trainings" [tableStyle]="{ 'min-width': '54rem' }">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Datum</th>
-          <th>Team</th>
-          <th>Ort</th>
-          <th>Status</th>
-          <th>Anwesend</th>
-          <th>Entschuldigt</th>
-          <th>Fehlend</th>
-        </tr>
-      </ng-template>
-
-      <ng-template pTemplate="body" let-training>
-        <tr>
-          <td>{{ training.date }}</td>
-          <td>{{ training.team }}</td>
-          <td>{{ training.location }}</td>
-          <td>
-            <p-tag
-              [value]="getStatusLabel(training.status)"
-              [severity]="getStatusSeverity(training.status)"
-            />
-          </td>
-          <td>{{ training.present }}</td>
-          <td>{{ training.excused }}</td>
-          <td>{{ training.absent }}</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </p-card>
+  <app-recent-trainings-table [trainings]="trainings" />
 </section>
