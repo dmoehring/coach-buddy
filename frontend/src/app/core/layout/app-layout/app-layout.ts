@@ -16,10 +16,18 @@ import { ButtonModule } from 'primeng/button';
 })
 export class AppLayout {
   readonly darkMode = signal(false);
+  readonly mobileMenuOpen = signal(false);
 
   toggleDarkMode(): void {
     this.darkMode.update(value => !value);
-
     document.body.classList.toggle('app-dark', this.darkMode());
+  }
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen.update(value => !value);
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen.set(false);
   }
 }

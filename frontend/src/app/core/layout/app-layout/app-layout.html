@@ -1,9 +1,48 @@
 <div class="app-shell">
-  <aside class="sidebar">
+  <header class="mobile-header">
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [text]="true"
+      (click)="toggleMobileMenu()"
+      aria-label="Menü öffnen"
+    >
+      <i class="pi pi-bars"></i>
+    </button>
+
+    <div class="mobile-brand">
+      <strong>Coach Buddy</strong>
+      <span>Minis Verwaltung</span>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [text]="true"
+      (click)="toggleDarkMode()"
+      aria-label="Darstellung wechseln"
+    >
+      <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+    </button>
+  </header>
+
+  @if (mobileMenuOpen()) {
+    <button
+      class="mobile-backdrop"
+      type="button"
+      aria-label="Menü schließen"
+      (click)="closeMobileMenu()"
+    ></button>
+  }
+
+  <aside class="sidebar" [class.open]="mobileMenuOpen()">
     <div class="brand">
       <div class="brand-icon">
         <i class="pi pi-heart"></i>
       </div>
+
       <div>
         <div class="brand-title">Coach Buddy</div>
         <div class="brand-subtitle">Minis Verwaltung</div>
@@ -11,22 +50,22 @@
     </div>
 
     <nav class="navigation">
-      <a routerLink="/dashboard" routerLinkActive="active">
+      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="pi pi-home"></i>
         Dashboard
       </a>
 
-      <a routerLink="/persons" routerLinkActive="active">
+      <a routerLink="/persons" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="pi pi-users"></i>
         Personen
       </a>
 
-      <a routerLink="/teams" routerLinkActive="active">
+      <a routerLink="/teams" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="pi pi-sitemap"></i>
         Teams
       </a>
 
-      <a routerLink="/trainings" routerLinkActive="active">
+      <a routerLink="/trainings" routerLinkActive="active" (click)="closeMobileMenu()">
         <i class="pi pi-calendar"></i>
         Trainings
       </a>
