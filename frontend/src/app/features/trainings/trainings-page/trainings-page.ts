@@ -4,6 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import {RouterLink} from '@angular/router';
 
 type TrainingStatus = 'COMPLETED' | 'CANCELLED';
 
@@ -25,7 +26,8 @@ interface TrainingOverview {
     ButtonModule,
     CardModule,
     TableModule,
-    TagModule
+    TagModule,
+    RouterLink
   ],
   templateUrl: './trainings-page.html',
   styleUrl: './trainings-page.scss'

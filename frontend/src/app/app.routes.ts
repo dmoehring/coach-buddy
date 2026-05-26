@@ -4,6 +4,7 @@ import { DashboardPage } from './features/dashboard/dashboard-page/dashboard-pag
 import { PersonsPage } from './features/persons/persons-page/persons-page';
 import { TeamsPage } from './features/teams/teams-page/teams-page';
 import { TrainingsPage } from './features/trainings/trainings-page/trainings-page';
+import { TrainingFormPage } from './features/trainings/training-form-page/training-form-page';
 
 export const routes: Routes = [
   {
@@ -13,6 +14,7 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardPage },
       { path: 'persons', component: PersonsPage },
       { path: 'teams', component: TeamsPage },
+      { path: 'trainings/new', component: TrainingFormPage },
       { path: 'trainings', component: TrainingsPage },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

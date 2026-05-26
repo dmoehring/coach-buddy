@@ -62,7 +62,7 @@ export class DashboardPage {
       label: 'Training erfassen',
       description: 'Training anlegen und Anwesenheit pflegen',
       icon: 'pi pi-plus-circle',
-      route: '/trainings',
+      route: '/trainings/new',
       primary: true
     },
     {
