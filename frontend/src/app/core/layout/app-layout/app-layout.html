@@ -17,7 +17,7 @@
 
     <div class="mobile-brand">
       <strong>Coach Buddy</strong>
-      <span>{{ selectedSeason.name }} · {{ selectedTeam.name }}</span>
+      <span>{{ context.selectedSeason().name }} · {{ context.selectedTeam().name }}</span>
     </div>
   </header>
 
@@ -26,8 +26,9 @@
       <label class="mobile-context-control">
         <span>Saison</span>
         <p-select
-          [options]="seasons"
-          [(ngModel)]="selectedSeason"
+          [options]="context.seasons"
+          [ngModel]="context.selectedSeason()"
+          (ngModelChange)="context.selectSeason($event)"
           optionLabel="name"
           appendTo="body"
         />
@@ -36,8 +37,9 @@
       <label class="mobile-context-control">
         <span>Mannschaft</span>
         <p-select
-          [options]="teams"
-          [(ngModel)]="selectedTeam"
+          [options]="context.teamsForSelectedSeason()"
+          [ngModel]="context.selectedTeam()"
+          (ngModelChange)="context.selectTeam($event)"
           optionLabel="name"
           appendTo="body"
         />
@@ -87,7 +89,9 @@
 
       <div>
         <div class="brand-title">Coach Buddy</div>
-        <div class="brand-subtitle">Minis Verwaltung</div>
+        <div class="brand-subtitle">
+          {{ context.selectedTeam().name }} Verwaltung
+        </div>
       </div>
     </div>
 
@@ -118,15 +122,16 @@
     <header class="topbar">
       <div class="topbar-title">
         <span>Aktueller Kontext</span>
-        <strong>{{ selectedSeason.name }} · {{ selectedTeam.name }}</strong>
+        <strong>{{ context.selectedSeason().name }} · {{ context.selectedTeam().name }}</strong>
       </div>
 
       <div class="topbar-controls">
         <label class="topbar-control">
           <span>Saison</span>
           <p-select
-            [options]="seasons"
-            [(ngModel)]="selectedSeason"
+            [options]="context.seasons"
+            [ngModel]="context.selectedSeason()"
+            (ngModelChange)="context.selectSeason($event)"
             optionLabel="name"
             appendTo="body"
           />
@@ -135,8 +140,9 @@
         <label class="topbar-control">
           <span>Mannschaft</span>
           <p-select
-            [options]="teams"
-            [(ngModel)]="selectedTeam"
+            [options]="context.teamsForSelectedSeason()"
+            [ngModel]="context.selectedTeam()"
+            (ngModelChange)="context.selectTeam($event)"
             optionLabel="name"
             appendTo="body"
           />

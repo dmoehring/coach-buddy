@@ -4,17 +4,120 @@
       <p class="eyebrow">Training</p>
       <h1>Training erfassen</h1>
       <p class="description">
-        Hier wird später das Formular zum Anlegen eines Trainings stehen.
+        Lege ein Training für eine Mannschaft an. Die Anwesenheit wird danach auf einer eigenen Seite erfasst.
       </p>
     </div>
 
-    <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/trainings">
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/trainings"
+    >
       <i class="pi pi-arrow-left"></i>
       <span>Zurück</span>
     </button>
   </div>
 
-  <p-card>
-    <p>Formular folgt im nächsten Schritt.</p>
-  </p-card>
+  <div class="form-grid">
+    <p-card styleClass="training-card">
+      <ng-template pTemplate="title">
+        Trainingsdaten
+      </ng-template>
+
+      <ng-template pTemplate="subtitle">
+        Saison, Mannschaft, Datum und Status
+      </ng-template>
+
+      <form class="training-form" [formGroup]="form" (ngSubmit)="createTraining()">
+        <label class="form-field">
+          <span>Saison</span>
+          <p-select
+            formControlName="season"
+            [options]="context.seasons"
+            optionLabel="name"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Mannschaft</span>
+          <p-select
+            formControlName="team"
+            [options]="context.teamsForSelectedSeason()"
+            optionLabel="name"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Datum</span>
+          <p-datepicker
+            formControlName="trainingDate"
+            dateFormat="dd.mm.yy"
+            appendTo="body"
+          />
+        </label>
+
+        <div class="time-grid">
+          <label class="form-field">
+            <span>Startzeit</span>
+            <input pInputText type="time" formControlName="startTime" />
+          </label>
+
+          <label class="form-field">
+            <span>Endzeit</span>
+            <input pInputText type="time" formControlName="endTime" />
+          </label>
+        </div>
+
+        <label class="form-field">
+          <span>Ort</span>
+          <input
+            pInputText
+            type="text"
+            formControlName="location"
+            placeholder="z. B. Realschulhalle"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Status</span>
+          <p-select
+            formControlName="status"
+            [options]="trainingStatuses"
+            optionLabel="label"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Notiz</span>
+          <textarea
+            rows="4"
+            formControlName="notes"
+            placeholder="Optionale Notiz zum Training"
+          ></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            routerLink="/trainings"
+          >
+            Abbrechen
+          </button>
+
+          <button pButton type="submit">
+            <i class="pi pi-check"></i>
+            <span>Training speichern</span>
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
 </section>
