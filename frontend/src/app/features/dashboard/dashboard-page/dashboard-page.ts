@@ -1,11 +1,7 @@
 import {Component} from '@angular/core';
 
-import {ButtonModule} from 'primeng/button';
-import {CardModule} from 'primeng/card';
-import {TagModule} from 'primeng/tag';
-import {TableModule} from 'primeng/table';
+import {DashboardMetric, DashboardQuickAction, DashboardTraining} from '../dashboard.model';
 
-import {DashboardMetric, DashboardQuickAction, DashboardTraining, TrainingStatus} from '../dashboard.model';
 import {DashboardStatCard} from '../components/dashboard-stat-card/dashboard-stat-card';
 import {DashboardQuickActions} from '../components/dashboard-quick-actions/dashboard-quick-actions';
 import {RecentTrainingsTable} from '../components/recent-trainings-table/recent-trainings-table';
@@ -13,10 +9,6 @@ import {RecentTrainingsTable} from '../components/recent-trainings-table/recent-
 @Component({
   selector: 'app-dashboard-page',
   imports: [
-    ButtonModule,
-    CardModule,
-    TagModule,
-    TableModule,
     DashboardStatCard,
     DashboardQuickActions,
     RecentTrainingsTable
