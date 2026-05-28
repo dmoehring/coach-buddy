@@ -73,9 +73,10 @@
                   type="button"
                   severity="secondary"
                   [text]="true"
-                  aria-label="Training anzeigen"
+                  [routerLink]="['/trainings', training.id, 'attendance']"
+                  aria-label="Anwesenheit erfassen"
                 >
-                  <i class="pi pi-eye"></i>
+                  <i class="pi pi-list-check"></i>
                 </button>
 
                 <button
@@ -138,9 +139,10 @@
               type="button"
               severity="secondary"
               [outlined]="true"
+              [routerLink]="['/trainings', training.id, 'attendance']"
             >
-              <i class="pi pi-eye"></i>
-              <span>Anzeigen</span>
+              <i class="pi pi-list-check"></i>
+              <span>Anwesenheit</span>
             </button>
 
             <button
