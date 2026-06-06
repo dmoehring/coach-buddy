@@ -1,0 +1,184 @@
+.persons-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    letter-spacing: -0.04em;
+  }
+
+  button {
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--p-primary-color);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.description {
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color);
+  max-width: 44rem;
+}
+
+.error-box {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--p-red-200);
+  border-radius: 0.9rem;
+  color: var(--p-red-700);
+  background: var(--p-red-50);
+}
+
+:host-context(.app-dark) .error-box {
+  border-color: color-mix(in srgb, var(--p-red-400), transparent 40%);
+  color: var(--p-red-300);
+  background: color-mix(in srgb, var(--p-red-950), transparent 30%);
+}
+
+.desktop-table {
+  display: block;
+}
+
+.mobile-person-list {
+  display: none;
+}
+
+.person-cell {
+  display: grid;
+  gap: 0.1rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.78rem;
+  }
+}
+
+.note {
+  color: var(--p-text-muted-color);
+}
+
+.actions-column {
+  width: 7rem;
+}
+
+.table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 2rem;
+  color: var(--p-text-muted-color);
+  text-align: center;
+
+  i {
+    font-size: 1.8rem;
+    color: var(--p-primary-color);
+  }
+
+  strong {
+    color: var(--p-text-color);
+  }
+}
+
+:host ::ng-deep .persons-card {
+  overflow: hidden;
+}
+
+.person-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1.25rem;
+  background: var(--p-surface-0);
+}
+
+:host-context(.app-dark) .person-card {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+}
+
+.person-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  > div {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.85rem;
+  }
+
+  button {
+    gap: 0.45rem;
+    white-space: nowrap;
+  }
+}
+
+.person-card-content {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.person-info {
+  display: grid;
+  gap: 0.15rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+  }
+
+  strong {
+    font-weight: 650;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-header {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-person-list {
+    display: grid;
+    gap: 1rem;
+  }
+}

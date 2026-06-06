@@ -1,1 +1,154 @@
-<p>persons-page works!</p>
+<section class="persons-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Personen</p>
+      <h1>Personenverwaltung</h1>
+      <p class="description">
+        Verwalte Spieler, Trainer, Helfer und Kontakte als Grundlage für Mannschaften und Anwesenheiten.
+      </p>
+    </div>
+
+    <button pButton type="button" routerLink="/persons/new">
+      <i class="pi pi-plus"></i>
+      <span>Person anlegen</span>
+    </button>
+  </div>
+
+  <p-card styleClass="persons-card">
+    <ng-template pTemplate="title">
+      Personenübersicht
+    </ng-template>
+
+    <ng-template pTemplate="subtitle">
+      Personen aus dem Backend
+    </ng-template>
+
+    @if (error()) {
+      <div class="error-box">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
+      </div>
+    }
+
+    <div class="desktop-table">
+      <p-table
+        [value]="persons()"
+        [loading]="loading()"
+        [tableStyle]="{ 'min-width': '52rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+            <th>Geburtsdatum</th>
+            <th>Spitzname</th>
+            <th>Notiz</th>
+            <th class="actions-column">Aktionen</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-person>
+          <tr>
+            <td>
+              <div class="person-cell">
+                <strong>{{ getFullName(person) || '-' }}</strong>
+                @if (person.id) {
+                  <span>{{ person.id }}</span>
+                }
+              </div>
+            </td>
+
+            <td>{{ formatBirthDate(person.birthDate) }}</td>
+            <td>{{ person.nickname || '-' }}</td>
+
+            <td>
+              <span class="note">
+                {{ person.notes || '-' }}
+              </span>
+            </td>
+
+            <td>
+              <div class="table-actions">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [text]="true"
+                  [routerLink]="['/persons', person.id, 'edit']"
+                  [disabled]="!person.id"
+                  aria-label="Person bearbeiten"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <i class="pi pi-users"></i>
+                <strong>Keine Personen vorhanden</strong>
+                <span>Lege die erste Person an, um mit Mannschaften und Trainings weiterzumachen.</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="mobile-person-list">
+      @if (loading()) {
+        <article class="person-card">
+          <span>Personen werden geladen ...</span>
+        </article>
+      } @else {
+        @for (person of persons(); track person.id) {
+          <article class="person-card">
+            <div class="person-card-header">
+              <div>
+                <strong>{{ getFullName(person) || '-' }}</strong>
+                @if (person.nickname) {
+                  <span>{{ person.nickname }}</span>
+                }
+              </div>
+
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/persons', person.id, 'edit']"
+                [disabled]="!person.id"
+              >
+                <i class="pi pi-pencil"></i>
+                <span>Bearbeiten</span>
+              </button>
+            </div>
+
+            <div class="person-card-content">
+              <div class="person-info">
+                <span>Geburtsdatum</span>
+                <strong>{{ formatBirthDate(person.birthDate) }}</strong>
+              </div>
+
+              <div class="person-info">
+                <span>Notiz</span>
+                <strong>{{ person.notes || '-' }}</strong>
+              </div>
+            </div>
+          </article>
+        } @empty {
+          <article class="person-card">
+            <div class="empty-state">
+              <i class="pi pi-users"></i>
+              <strong>Keine Personen vorhanden</strong>
+              <span>Lege die erste Person an.</span>
+            </div>
+          </article>
+        }
+      }
+    </div>
+  </p-card>
+</section>

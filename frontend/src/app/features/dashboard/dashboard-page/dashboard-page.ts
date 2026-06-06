@@ -61,7 +61,7 @@ export class DashboardPage {
       label: 'Person anlegen',
       description: 'Kind, Trainer oder Kontakt erfassen',
       icon: 'pi pi-user-plus',
-      route: '/persons'
+      route: '/persons/new'
     },
     {
       label: 'Team verwalten',

@@ -1,0 +1,49 @@
+<section class="person-edit-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Personen</p>
+      <h1>Person bearbeiten</h1>
+      <p class="description">
+        Bearbeite die Stammdaten einer bestehenden Person.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/persons"
+    >
+      <i class="pi pi-arrow-left"></i>
+      <span>Zurück</span>
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="error-box">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="form-grid">
+    @if (loading()) {
+      <p-card styleClass="loading-card">
+        <div class="loading-state">
+          <i class="pi pi-spin pi-spinner"></i>
+          <span>Person wird geladen ...</span>
+        </div>
+      </p-card>
+    } @else if (initialValue()) {
+      <app-person-form
+        title="Person bearbeiten"
+        subtitle="Vorname, Nachname und optionale Stammdaten"
+        submitLabel="Änderungen speichern"
+        [initialValue]="initialValue()"
+        [saving]="saving()"
+        (submitted)="savePerson($event)"
+      />
+    }
+  </div>
+</section>
