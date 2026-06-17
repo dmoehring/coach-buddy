@@ -17,7 +17,11 @@
 
     <div class="mobile-brand">
       <strong>Coach Buddy</strong>
-      <span>{{ context.selectedSeason().name }} · {{ context.selectedTeam().name }}</span>
+      <span>
+        {{ context.selectedSeason()?.name ?? 'Keine Saison' }}
+        ·
+        {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
+      </span>
     </div>
   </header>
 
@@ -25,44 +29,66 @@
     <div class="mobile-context">
       <label class="mobile-context-control">
         <span>Saison</span>
+
         <p-select
-          [options]="context.seasons"
+          [options]="context.seasons()"
           [ngModel]="context.selectedSeason()"
           (ngModelChange)="context.selectSeason($event)"
+          [disabled]="context.loadingSeasons()"
           optionLabel="name"
+          placeholder="Saison auswählen"
           appendTo="body"
         />
       </label>
 
       <label class="mobile-context-control">
         <span>Mannschaft</span>
+
         <p-select
           [options]="context.teamsForSelectedSeason()"
           [ngModel]="context.selectedTeam()"
           (ngModelChange)="context.selectTeam($event)"
+          [disabled]="context.loadingTeams() || !context.selectedSeason()"
           optionLabel="name"
+          placeholder="Mannschaft auswählen"
           appendTo="body"
         />
       </label>
     </div>
 
     <nav class="mobile-navigation">
-      <a routerLink="/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
         <i class="pi pi-home"></i>
         Dashboard
       </a>
 
-      <a routerLink="/persons" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a
+        routerLink="/persons"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
         <i class="pi pi-users"></i>
         Personen
       </a>
 
-      <a routerLink="/teams" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a
+        routerLink="/teams"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
         <i class="pi pi-sitemap"></i>
         Teams
       </a>
 
-      <a routerLink="/trainings" routerLinkActive="active" (click)="closeMobileMenu()">
+      <a
+        routerLink="/trainings"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
         <i class="pi pi-calendar"></i>
         Trainings
       </a>
@@ -76,7 +102,12 @@
       (click)="toggleDarkMode()"
       class="mobile-darkmode"
     >
-      <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+      <i
+        class="pi"
+        [class.pi-moon]="!darkMode()"
+        [class.pi-sun]="darkMode()"
+      ></i>
+
       <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
     </button>
   </div>
@@ -89,8 +120,10 @@
 
       <div>
         <div class="brand-title">Coach Buddy</div>
+
         <div class="brand-subtitle">
-          {{ context.selectedTeam().name }} Verwaltung
+          {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
+          Verwaltung
         </div>
       </div>
     </div>
@@ -122,28 +155,39 @@
     <header class="topbar">
       <div class="topbar-title">
         <span>Aktueller Kontext</span>
-        <strong>{{ context.selectedSeason().name }} · {{ context.selectedTeam().name }}</strong>
+
+        <strong>
+          {{ context.selectedSeason()?.name ?? 'Keine Saison' }}
+          ·
+          {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
+        </strong>
       </div>
 
       <div class="topbar-controls">
         <label class="topbar-control">
           <span>Saison</span>
+
           <p-select
-            [options]="context.seasons"
+            [options]="context.seasons()"
             [ngModel]="context.selectedSeason()"
             (ngModelChange)="context.selectSeason($event)"
+            [disabled]="context.loadingSeasons()"
             optionLabel="name"
+            placeholder="Saison auswählen"
             appendTo="body"
           />
         </label>
 
         <label class="topbar-control">
           <span>Mannschaft</span>
+
           <p-select
             [options]="context.teamsForSelectedSeason()"
             [ngModel]="context.selectedTeam()"
             (ngModelChange)="context.selectTeam($event)"
+            [disabled]="context.loadingTeams() || !context.selectedSeason()"
             optionLabel="name"
+            placeholder="Mannschaft auswählen"
             appendTo="body"
           />
         </label>
@@ -156,7 +200,12 @@
           (click)="toggleDarkMode()"
           class="topbar-darkmode"
         >
-          <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+          <i
+            class="pi"
+            [class.pi-moon]="!darkMode()"
+            [class.pi-sun]="darkMode()"
+          ></i>
+
           <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
         </button>
       </div>

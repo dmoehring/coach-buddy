@@ -3,8 +3,10 @@
     <div>
       <p class="eyebrow">Training</p>
       <h1>Training erfassen</h1>
+
       <p class="description">
-        Lege ein Training für eine Mannschaft an. Die Anwesenheit wird danach auf einer eigenen Seite erfasst.
+        Lege ein Training für eine Mannschaft an. Die Anwesenheit wird danach
+        auf einer eigenen Seite erfasst.
       </p>
     </div>
 
@@ -30,50 +32,103 @@
         Saison, Mannschaft, Datum und Status
       </ng-template>
 
-      <form class="training-form" [formGroup]="form" (ngSubmit)="createTraining()">
+      <form
+        class="training-form"
+        [formGroup]="form"
+        (ngSubmit)="createTraining()"
+      >
         <label class="form-field">
           <span>Saison</span>
+
           <p-select
             formControlName="season"
-            [options]="context.seasons"
+            [options]="context.seasons()"
             optionLabel="name"
+            placeholder="Saison auswählen"
+            [disabled]="context.loadingSeasons()"
             appendTo="body"
           />
+
+          @if (
+            form.controls.season.invalid &&
+            form.controls.season.touched
+            ) {
+            <small class="field-error">
+              Bitte wähle eine Saison aus.
+            </small>
+          }
         </label>
 
         <label class="form-field">
           <span>Mannschaft</span>
+
           <p-select
             formControlName="team"
             [options]="context.teamsForSelectedSeason()"
             optionLabel="name"
+            placeholder="Mannschaft auswählen"
+            [disabled]="
+              context.loadingTeams() ||
+              !context.selectedSeason()
+            "
             appendTo="body"
           />
+
+          @if (
+            form.controls.team.invalid &&
+            form.controls.team.touched
+            ) {
+            <small class="field-error">
+              Bitte wähle eine Mannschaft aus.
+            </small>
+          }
         </label>
 
         <label class="form-field">
           <span>Datum</span>
+
           <p-datepicker
             formControlName="trainingDate"
             dateFormat="dd.mm.yy"
+            [showIcon]="true"
             appendTo="body"
           />
+
+          @if (
+            form.controls.trainingDate.invalid &&
+            form.controls.trainingDate.touched
+            ) {
+            <small class="field-error">
+              Bitte wähle ein Trainingsdatum aus.
+            </small>
+          }
         </label>
 
         <div class="time-grid">
           <label class="form-field">
             <span>Startzeit</span>
-            <input pInputText type="time" formControlName="startTime" />
+
+            <input
+              pInputText
+              type="time"
+              formControlName="startTime"
+            />
           </label>
 
           <label class="form-field">
             <span>Endzeit</span>
-            <input pInputText type="time" formControlName="endTime" />
+
+            <input
+              pInputText
+              type="time"
+              formControlName="endTime"
+            />
           </label>
         </div>
 
         <label class="form-field">
           <span>Ort</span>
+
           <input
             pInputText
             type="text"
@@ -84,22 +139,41 @@
 
         <label class="form-field">
           <span>Status</span>
+
           <p-select
             formControlName="status"
             [options]="trainingStatuses"
             optionLabel="label"
+            placeholder="Status auswählen"
             appendTo="body"
           />
+
+          @if (
+            form.controls.status.invalid &&
+            form.controls.status.touched
+            ) {
+            <small class="field-error">
+              Bitte wähle einen Status aus.
+            </small>
+          }
         </label>
 
         <label class="form-field">
           <span>Notiz</span>
+
           <textarea
             rows="4"
             formControlName="notes"
             placeholder="Optionale Notiz zum Training"
           ></textarea>
         </label>
+
+        @if (context.error()) {
+          <div class="form-error" role="alert">
+            <i class="pi pi-exclamation-circle"></i>
+            <span>{{ context.error() }}</span>
+          </div>
+        }
 
         <div class="form-actions">
           <button
@@ -112,7 +186,14 @@
             Abbrechen
           </button>
 
-          <button pButton type="submit">
+          <button
+            pButton
+            type="submit"
+            [disabled]="
+              context.loadingSeasons() ||
+              context.loadingTeams()
+            "
+          >
             <i class="pi pi-check"></i>
             <span>Training speichern</span>
           </button>

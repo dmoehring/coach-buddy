@@ -1,72 +1,123 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 
-export interface SeasonOption {
-  id: string;
-  name: string;
-}
-
-export interface TeamOption {
-  id: string;
-  seasonId: string;
-  name: string;
-  description: string;
-}
+import { SeasonsService } from '../../api/api/seasons.service';
+import { TeamsService } from '../../api/api/teams.service';
+import { SeasonDto } from '../../api/model/season-dto';
+import { TeamDto } from '../../api/model/team-dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CurrentContextService {
-  readonly seasons: SeasonOption[] = [
-    {
-      id: 'season-2025-2026',
-      name: '2025/2026'
-    },
-    {
-      id: 'season-2024-2025',
-      name: '2024/2025'
-    }
-  ];
+  private readonly seasonsService = inject(SeasonsService);
+  private readonly teamsService = inject(TeamsService);
 
-  readonly teams: TeamOption[] = [
-    {
-      id: 'team-minis',
-      seasonId: 'season-2025-2026',
-      name: 'Minis',
-      description: 'Jahrgänge 2017–2019'
-    },
-    {
-      id: 'team-f-jugend',
-      seasonId: 'season-2025-2026',
-      name: 'F-Jugend',
-      description: 'Jahrgänge 2016–2017'
-    },
-    {
-      id: 'team-minis-2024',
-      seasonId: 'season-2024-2025',
-      name: 'Minis',
-      description: 'Jahrgänge 2016–2018'
-    }
-  ];
+  readonly seasons = signal<SeasonDto[]>([]);
+  readonly teams = signal<TeamDto[]>([]);
 
-  readonly selectedSeason = signal<SeasonOption>(this.seasons[0]);
-  readonly selectedTeam = signal<TeamOption>(this.teams[0]);
+  readonly selectedSeason = signal<SeasonDto | null>(null);
+  readonly selectedTeam = signal<TeamDto | null>(null);
 
-  readonly teamsForSelectedSeason = computed(() =>
-    this.teams.filter(team => team.seasonId === this.selectedSeason().id)
-  );
+  readonly loadingSeasons = signal(false);
+  readonly loadingTeams = signal(false);
+  readonly error = signal<string | null>(null);
 
-  selectSeason(season: SeasonOption): void {
-    this.selectedSeason.set(season);
+  /**
+   * Die Teams werden bereits nach Saison vom Backend geladen.
+   * Der Name bleibt bestehen, damit die bisherigen Templates
+   * zunächst weiterverwendet werden können.
+   */
+  readonly teamsForSelectedSeason = computed(() => this.teams());
 
-    const availableTeams = this.teams.filter(team => team.seasonId === season.id);
-    const currentTeamStillAvailable = availableTeams.some(team => team.id === this.selectedTeam().id);
-
-    if (!currentTeamStillAvailable && availableTeams.length > 0) {
-      this.selectedTeam.set(availableTeams[0]);
-    }
+  constructor() {
+    this.loadSeasons();
   }
 
-  selectTeam(team: TeamOption): void {
+  loadSeasons(): void {
+    this.loadingSeasons.set(true);
+    this.error.set(null);
+
+    this.seasonsService.apiV1SeasonsGet().subscribe({
+      next: seasons => {
+        this.seasons.set(seasons);
+        this.loadingSeasons.set(false);
+
+        if (seasons.length === 0) {
+          this.selectedSeason.set(null);
+          this.selectedTeam.set(null);
+          this.teams.set([]);
+          return;
+        }
+
+        const currentSeasonId = this.selectedSeason()?.id;
+
+        const selectedSeason =
+          seasons.find(season => season.id === currentSeasonId)
+          ?? seasons.find(season => !season.endDate)
+          ?? seasons[0];
+
+        this.selectSeason(selectedSeason);
+      },
+      error: error => {
+        console.error('Seasons could not be loaded:', error);
+        console.error('Backend error body:', error.error);
+
+        this.error.set('Saisons konnten nicht geladen werden.');
+        this.loadingSeasons.set(false);
+      }
+    });
+  }
+
+  selectSeason(season: SeasonDto | null): void {
+    this.selectedSeason.set(season);
+
+    this.selectedTeam.set(null);
+    this.teams.set([]);
+
+    if (!season?.id) {
+      return;
+    }
+
+    this.loadTeams(season.id);
+  }
+
+  loadTeams(seasonId: string): void {
+    this.loadingTeams.set(true);
+    this.error.set(null);
+
+    this.teamsService.apiV1TeamsGet(seasonId).subscribe({
+      next: teams => {
+        this.teams.set(teams);
+        this.loadingTeams.set(false);
+
+        if (teams.length === 0) {
+          this.selectedTeam.set(null);
+          return;
+        }
+
+        const currentTeamId = this.selectedTeam()?.id;
+
+        const selectedTeam =
+          teams.find(team => team.id === currentTeamId)
+          ?? teams[0];
+
+        this.selectedTeam.set(selectedTeam);
+      },
+      error: error => {
+        console.error('Teams could not be loaded:', error);
+        console.error('Backend error body:', error.error);
+
+        this.error.set('Mannschaften konnten nicht geladen werden.');
+        this.loadingTeams.set(false);
+      }
+    });
+  }
+
+  selectTeam(team: TeamDto | null): void {
     this.selectedTeam.set(team);
+  }
+
+  reloadContext(): void {
+    this.loadSeasons();
   }
 }
