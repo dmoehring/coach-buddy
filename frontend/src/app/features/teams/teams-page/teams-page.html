@@ -1,1 +1,336 @@
-<p>teams-page works!</p>
+<section class="teams-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Mannschaften</p>
+      <h1>Teamverwaltung</h1>
+
+      <p class="description">
+        Verwalte die Mannschaften der aktuell ausgewählten Saison.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      routerLink="/teams/new"
+      [disabled]="!context.selectedSeason()"
+    >
+      <i class="pi pi-plus"></i>
+      <span>Team anlegen</span>
+    </button>
+  </div>
+
+  @if (context.selectedSeason(); as season) {
+    <div class="season-context">
+      <div class="season-icon">
+        <i class="pi pi-calendar"></i>
+      </div>
+
+      <div class="season-details">
+        <span>Ausgewählte Saison</span>
+
+        <strong>
+          {{ season.name || 'Saison ohne Namen' }}
+        </strong>
+
+        <small>
+          {{ formatDate(season.startDate) }}
+          bis
+          {{ formatDate(season.endDate) }}
+        </small>
+      </div>
+
+      <div class="team-count">
+        <strong>
+          {{ context.teamsForSelectedSeason().length }}
+        </strong>
+
+        <span>
+          {{
+            context.teamsForSelectedSeason().length === 1
+              ? 'Team'
+              : 'Teams'
+          }}
+        </span>
+      </div>
+    </div>
+  } @else {
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+
+      <div>
+        <strong>Keine Saison ausgewählt</strong>
+
+        <span>
+          Wähle zuerst eine Saison aus, um die zugehörigen
+          Mannschaften anzuzeigen.
+        </span>
+      </div>
+    </div>
+  }
+
+  <p-card styleClass="teams-card">
+    <ng-template pTemplate="title">
+      Mannschaftsübersicht
+    </ng-template>
+
+    <ng-template pTemplate="subtitle">
+      @if (context.selectedSeason(); as season) {
+        Teams der Saison {{ season.name }}
+      } @else {
+        Keine Saison ausgewählt
+      }
+    </ng-template>
+
+    @if (context.error()) {
+      <div class="error-box" role="alert">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ context.error() }}</span>
+      </div>
+    }
+
+    <div class="desktop-table">
+      <p-table
+        [value]="context.teamsForSelectedSeason()"
+        [loading]="context.loadingTeams()"
+        [tableStyle]="{ 'min-width': '58rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Mannschaft</th>
+            <th>Beschreibung</th>
+            <th>Saison</th>
+            <th>Status</th>
+            <th class="actions-column">Aktionen</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-team>
+          <tr>
+            <td>
+              <div class="team-cell">
+                <div class="team-symbol">
+                  <i class="pi pi-users"></i>
+                </div>
+
+                <div>
+                  <strong>
+                    {{ team.name || 'Team ohne Namen' }}
+                  </strong>
+
+                  @if (team.id) {
+                    <span>{{ team.id }}</span>
+                  }
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="team-description">
+                {{
+                  team.description ||
+                  'Keine Beschreibung vorhanden'
+                }}
+              </span>
+            </td>
+
+            <td>
+              {{
+                team.seasonName ||
+                context.selectedSeason()?.name ||
+                '-'
+              }}
+            </td>
+
+            <td>
+              @if (isSelected(team)) {
+                <span class="selected-badge">
+                  <i class="pi pi-check"></i>
+                  Ausgewählt
+                </span>
+              } @else {
+                <span class="muted-text">
+                  Nicht ausgewählt
+                </span>
+              }
+            </td>
+
+            <td>
+              <div class="table-actions">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  [disabled]="isSelected(team)"
+                  (click)="selectTeam(team)"
+                  [attr.aria-label]="
+                    'Team ' + team.name + ' auswählen'
+                  "
+                >
+                  <i class="pi pi-check-circle"></i>
+                  <span>Auswählen</span>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [text]="true"
+                  [routerLink]="['/teams', team.id]"
+                  [disabled]="!team.id"
+                  [attr.aria-label]="
+                    'Team ' + team.name + ' anzeigen'
+                  "
+                >
+                  <i class="pi pi-eye"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <i class="pi pi-sitemap"></i>
+
+                <strong>
+                  Keine Mannschaften vorhanden
+                </strong>
+
+                <span>
+                  Für die ausgewählte Saison wurde noch keine
+                  Mannschaft angelegt.
+                </span>
+
+                @if (context.selectedSeason()) {
+                  <button
+                    pButton
+                    type="button"
+                    routerLink="/teams/new"
+                  >
+                    <i class="pi pi-plus"></i>
+                    <span>Erstes Team anlegen</span>
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <div class="mobile-team-list">
+      @if (context.loadingTeams()) {
+        <article class="team-card">
+          <div class="loading-state">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Mannschaften werden geladen ...</span>
+          </div>
+        </article>
+      } @else {
+        @for (
+          team of context.teamsForSelectedSeason();
+          track team.id ?? $index
+          ) {
+          <article
+            class="team-card"
+            [class.team-card-selected]="isSelected(team)"
+          >
+            <div class="team-card-header">
+              <div class="team-symbol">
+                <i class="pi pi-users"></i>
+              </div>
+
+              <div class="team-card-title">
+                <strong>
+                  {{ team.name || 'Team ohne Namen' }}
+                </strong>
+
+                <span>
+                  {{
+                    team.seasonName ||
+                    context.selectedSeason()?.name ||
+                    '-'
+                  }}
+                </span>
+              </div>
+
+              @if (isSelected(team)) {
+                <span class="selected-badge">
+                  <i class="pi pi-check"></i>
+                  Aktiv
+                </span>
+              }
+            </div>
+
+            <div class="team-card-content">
+              <span>Beschreibung</span>
+
+              <strong>
+                {{
+                  team.description ||
+                  'Keine Beschreibung vorhanden'
+                }}
+              </strong>
+            </div>
+
+            <div class="team-card-actions">
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [disabled]="isSelected(team)"
+                (click)="selectTeam(team)"
+              >
+                <i class="pi pi-check-circle"></i>
+                <span>Auswählen</span>
+              </button>
+
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/teams', team.id]"
+                [disabled]="!team.id"
+              >
+                <i class="pi pi-eye"></i>
+                <span>Anzeigen</span>
+              </button>
+            </div>
+          </article>
+        } @empty {
+          <article class="team-card">
+            <div class="empty-state">
+              <i class="pi pi-sitemap"></i>
+
+              <strong>
+                Keine Mannschaften vorhanden
+              </strong>
+
+              <span>
+                Für diese Saison wurde noch keine Mannschaft
+                angelegt.
+              </span>
+
+              @if (context.selectedSeason()) {
+                <button
+                  pButton
+                  type="button"
+                  routerLink="/teams/new"
+                >
+                  <i class="pi pi-plus"></i>
+                  <span>Erstes Team anlegen</span>
+                </button>
+              }
+            </div>
+          </article>
+        }
+      }
+    </div>
+  </p-card>
+</section>

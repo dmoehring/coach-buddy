@@ -9,6 +9,7 @@ import {TrainingAttendancePage} from './features/trainings/training-attendance-p
 import {PersonCreatePage} from './features/persons/person-create-page/person-create-page';
 import {PersonEditPage} from './features/persons/person-edit-page/person-edit-page';
 import {TeamCreatePage} from './features/teams/team-create-page/team-create-page';
+import {TeamMembersPage} from './features/teams/team-members-page/team-members-page';
 
 export const routes: Routes = [
   {
@@ -21,7 +22,9 @@ export const routes: Routes = [
       { path: 'persons/:id/edit', component: PersonEditPage },
       { path: 'teams', component: TeamsPage },
       { path: 'teams/new', component: TeamCreatePage },
-      // { path: 'teams/seasons/new', component: SeasonCreatePage },
+      { path: 'teams/:id/members', component: TeamMembersPage},
+      //{ path: 'teams/:id', component: TeamDetailPage },
+      //{ path: 'teams/:id/edit', component: TeamEditPage },
       { path: 'trainings/new', component: TrainingFormPage },
       { path: 'trainings/:id/attendance', component: TrainingAttendancePage },
       { path: 'trainings', component: TrainingsPage },

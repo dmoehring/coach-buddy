@@ -1,0 +1,350 @@
+<section class="team-members-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Mannschaften</p>
+      <h1>Teammitglieder zuweisen</h1>
+
+      <p class="description">
+        Ordne dem Team Spieler, Trainer und Co-Trainer zu.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/teams"
+    >
+      <i class="pi pi-arrow-left"></i>
+      <span>Zur Teamübersicht</span>
+    </button>
+  </div>
+
+  @if (team(); as currentTeam) {
+    <div class="team-context">
+      <div class="team-icon">
+        <i class="pi pi-users"></i>
+      </div>
+
+      <div>
+        <span>Aktuelles Team</span>
+
+        <strong>
+          {{ currentTeam.name || 'Team ohne Namen' }}
+        </strong>
+
+        <small>
+          {{
+            currentTeam.seasonName ||
+            context.selectedSeason()?.name ||
+            'Keine Saison'
+          }}
+        </small>
+      </div>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="message-box error-box" role="alert">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (success()) {
+    <div class="message-box success-box" role="status">
+      <i class="pi pi-check-circle"></i>
+      <span>{{ success() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <p-card>
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Teamdaten werden geladen ...</span>
+      </div>
+    </p-card>
+  } @else {
+    <div class="content-grid">
+      <p-card styleClass="assignment-card">
+        <ng-template pTemplate="title">
+          Person zuweisen
+        </ng-template>
+
+        <ng-template pTemplate="subtitle">
+          Person, Rolle und Eintrittsdatum auswählen
+        </ng-template>
+
+        @if (availablePersonOptions().length === 0) {
+          <div class="info-box">
+            <i class="pi pi-info-circle"></i>
+
+            <div>
+              <strong>
+                Keine weiteren Personen verfügbar
+              </strong>
+
+              <span>
+Alle vorhandenen Personen sind bereits diesem
+Team zugewiesen oder es wurden noch keine
+Personen angelegt.
+</span>
+            </div>
+          </div>
+        }
+
+        <form
+          class="assignment-form"
+          [formGroup]="form"
+          (ngSubmit)="addMembership()"
+        >
+          <label class="form-field">
+            <span>Person</span>
+
+            <p-select
+              formControlName="person"
+              [options]="availablePersonOptions()"
+              optionLabel="label"
+              placeholder="Person auswählen"
+              [filter]="true"
+              filterBy="label"
+              [showClear]="true"
+              [disabled]="
+saving() ||
+availablePersonOptions().length === 0
+"
+              appendTo="body"
+            />
+
+            @if (form.controls.person.touched &&
+            form.controls.person.invalid) {
+              <small class="field-error">
+                Bitte wähle eine Person aus.
+              </small>
+            }
+          </label>
+
+          <label class="form-field">
+            <span>Rolle</span>
+
+            <p-select
+              formControlName="role"
+              [options]="roleOptions"
+              optionLabel="label"
+              placeholder="Rolle auswählen"
+              [disabled]="saving()"
+              appendTo="body"
+            />
+
+            @if (form.controls.role.touched &&
+            form.controls.role.invalid) {
+              <small class="field-error">
+                Bitte wähle eine Rolle aus.
+              </small>
+            }
+          </label>
+
+          <label class="form-field">
+            <span>Eintrittsdatum</span>
+
+            <p-datepicker
+              formControlName="joinedAt"
+              dateFormat="dd.mm.yy"
+              [showIcon]="true"
+              [disabled]="saving()"
+              appendTo="body"
+            />
+
+            @if (form.controls.joinedAt.touched &&
+            form.controls.joinedAt.invalid) {
+              <small class="field-error">
+                Bitte gib ein Eintrittsdatum an.
+              </small>
+            }
+          </label>
+
+          <div class="form-actions">
+            <button
+              pButton
+              type="submit"
+              [loading]="saving()"
+              [disabled]="
+saving() ||
+availablePersonOptions().length === 0
+"
+            >
+              @if (!saving()) {
+                <i class="pi pi-user-plus"></i>
+              }
+
+              <span>
+{{
+                  saving()
+                    ? 'Zuweisung wird gespeichert'
+                    : 'Person zuweisen'
+                }}
+</span>
+            </button>
+          </div>
+        </form>
+      </p-card>
+
+      <p-card styleClass="members-card">
+        <ng-template pTemplate="title">
+          Teammitglieder
+        </ng-template>
+
+        <ng-template pTemplate="subtitle">
+          Aktuell zugewiesene Personen
+        </ng-template>
+
+        <div class="desktop-table">
+          <p-table
+            [value]="memberships()"
+            [tableStyle]="{ 'min-width': '46rem' }"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Person</th>
+                <th>Rolle</th>
+                <th>Eintritt</th>
+                <th>Status</th>
+              </tr>
+            </ng-template>
+
+            <ng-template
+              pTemplate="body"
+              let-membership
+            >
+              <tr>
+                <td>
+                  <div class="person-cell">
+                    <i class="pi pi-user"></i>
+
+                    <strong>
+                      {{
+                        getMembershipPersonName(
+                          membership
+                        )
+                      }}
+                    </strong>
+                  </div>
+                </td>
+
+                <td>
+                  {{ getRoleLabel(membership.role) }}
+                </td>
+
+                <td>
+                  {{
+                    formatDisplayDate(
+                      membership.joinedAt
+                    )
+                  }}
+                </td>
+
+                <td>
+                  @if (isActive(membership)) {
+                    <span class="status-badge active">
+Aktiv
+</span>
+                  } @else {
+                    <span class="status-badge inactive">
+Ausgetreten
+</span>
+                  }
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4">
+                  <div class="empty-state">
+                    <i class="pi pi-user-plus"></i>
+
+                    <strong>
+                      Noch keine Personen zugewiesen
+                    </strong>
+
+                    <span>
+Füge links die ersten Spieler oder
+Trainer hinzu.
+</span>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+
+        <div class="mobile-members-list">
+          @for (membership of memberships();
+            track membership.id ??
+            membership.person?.id ??
+            $index) {
+            <article class="member-card">
+              <div class="member-card-header">
+                <div class="person-icon">
+                  <i class="pi pi-user"></i>
+                </div>
+
+                <div>
+                  <strong>
+                    {{
+                      getMembershipPersonName(
+                        membership
+                      )
+                    }}
+                  </strong>
+
+                  <span>
+{{ getRoleLabel(membership.role) }}
+</span>
+                </div>
+
+                @if (isActive(membership)) {
+                  <span class="status-badge active">
+Aktiv
+</span>
+                } @else {
+                  <span class="status-badge inactive">
+Ausgetreten
+</span>
+                }
+              </div>
+
+              <div class="member-info">
+                <span>Eintrittsdatum</span>
+
+                <strong>
+                  {{
+                    formatDisplayDate(
+                      membership.joinedAt
+                    )
+                  }}
+                </strong>
+              </div>
+            </article>
+          } @empty {
+            <article class="member-card">
+              <div class="empty-state">
+                <i class="pi pi-user-plus"></i>
+
+                <strong>
+                  Noch keine Personen zugewiesen
+                </strong>
+
+                <span>
+Weise dem Team die ersten Personen zu.
+</span>
+              </div>
+            </article>
+          }
+        </div>
+      </p-card>
+    </div>
+  }
+</section>
