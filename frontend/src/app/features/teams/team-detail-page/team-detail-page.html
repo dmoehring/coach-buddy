@@ -1,0 +1,217 @@
+<section class="team-detail-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Mannschaften</p>
+      <h1>Teamdetails</h1>
+
+      <p class="description">
+        Stammdaten und Mitglieder der Mannschaft.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        routerLink="/teams"
+      >
+        <i class="pi pi-arrow-left"></i>
+        <span>Zur Übersicht</span>
+      </button>
+
+      @if (team(); as currentTeam) {
+        <button
+          pButton
+          type="button"
+          [routerLink]="[
+            '/teams',
+            currentTeam.id,
+            'members'
+          ]"
+          [disabled]="!currentTeam.id"
+        >
+          <i class="pi pi-users"></i>
+          <span>Mitglieder verwalten</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-box" role="alert">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <p-card>
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Mannschaft wird geladen ...</span>
+      </div>
+    </p-card>
+  } @else if (team(); as currentTeam) {
+    <div class="summary-grid">
+      <p-card>
+        <ng-template pTemplate="title">
+          Mannschaft
+        </ng-template>
+
+        <div class="team-header">
+          <div class="team-icon">
+            <i class="pi pi-users"></i>
+          </div>
+
+          <div>
+            <strong>
+              {{ currentTeam.name || 'Team ohne Namen' }}
+            </strong>
+
+            <span>
+              {{
+                currentTeam.seasonName ||
+                context.selectedSeason()?.name ||
+                'Keine Saison'
+              }}
+            </span>
+          </div>
+        </div>
+
+        <dl class="detail-list">
+          <div>
+            <dt>Beschreibung</dt>
+
+            <dd>
+              {{
+                currentTeam.description ||
+                'Keine Beschreibung vorhanden'
+              }}
+            </dd>
+          </div>
+
+          <div>
+            <dt>Team-ID</dt>
+            <dd>{{ currentTeam.id || '-' }}</dd>
+          </div>
+        </dl>
+      </p-card>
+
+      <p-card>
+        <ng-template pTemplate="title">
+          Mitgliederstatistik
+        </ng-template>
+
+        <div class="statistics">
+          <div>
+            <strong>{{ activeMemberships().length }}</strong>
+            <span>Aktive Mitglieder</span>
+          </div>
+
+          <div>
+            <strong>{{ playerCount() }}</strong>
+            <span>Spieler</span>
+          </div>
+
+          <div>
+            <strong>{{ coachCount() }}</strong>
+            <span>Trainerteam</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+
+    <p-card>
+      <ng-template pTemplate="title">
+        Teammitglieder
+      </ng-template>
+
+      <ng-template pTemplate="subtitle">
+        Aktive und ehemalige Zuordnungen
+      </ng-template>
+
+      <p-table
+        [value]="memberships()"
+        [tableStyle]="{ 'min-width': '46rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Person</th>
+            <th>Rolle</th>
+            <th>Eintritt</th>
+            <th>Austritt</th>
+            <th>Status</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-membership>
+          <tr>
+            <td>
+              <strong>
+                {{ getPersonName(membership.person) }}
+              </strong>
+            </td>
+
+            <td>
+              {{ getRoleLabel(membership.role) }}
+            </td>
+
+            <td>
+              {{ formatDate(membership.joinedAt) }}
+            </td>
+
+            <td>
+              {{ formatDate(membership.leftAt) }}
+            </td>
+
+            <td>
+              @if (!membership.leftAt) {
+                <span class="status-badge active">
+                  Aktiv
+                </span>
+              } @else {
+                <span class="status-badge inactive">
+                  Ausgetreten
+                </span>
+              }
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5">
+              <div class="empty-state">
+                <i class="pi pi-user-plus"></i>
+
+                <strong>
+                  Noch keine Personen zugewiesen
+                </strong>
+
+                <span>
+                  Öffne die Mitgliederverwaltung, um Spieler
+                  und Trainer hinzuzufügen.
+                </span>
+
+                <button
+                  pButton
+                  type="button"
+                  [routerLink]="[
+                    '/teams',
+                    currentTeam.id,
+                    'members'
+                  ]"
+                >
+                  <i class="pi pi-users"></i>
+                  <span>Mitglieder verwalten</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
+</section>

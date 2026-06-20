@@ -18,6 +18,7 @@ import { TeamMembershipsService } from '../../../api/api/team-memberships.servic
 import { TeamsService } from '../../../api/api/teams.service';
 
 import { CreateTeamMembershipRequest } from '../../../api/model/create-team-membership-request';
+import { DeactivateTeamMembershipRequest } from '../../../api/model/deactivate-team-membership-request';
 import { PersonDto } from '../../../api/model/person-dto';
 import { TeamDto } from '../../../api/model/team-dto';
 import { TeamMemberRole } from '../../../api/model/team-member-role';
@@ -67,6 +68,7 @@ export class TeamMembersPage {
 
   readonly loading = signal(true);
   readonly saving = signal(false);
+  readonly deactivatingMembershipId = signal<string | null>(null);
 
   readonly error = signal<string | null>(null);
   readonly success = signal<string | null>(null);
@@ -227,6 +229,85 @@ export class TeamMembersPage {
             'Die Person konnte dem Team nicht zugewiesen werden.'
           );
           this.saving.set(false);
+        }
+      });
+  }
+
+  deactivateMembership(membership: TeamMembershipDto): void {
+    const membershipId = membership.id;
+
+    if (!membershipId) {
+      this.error.set(
+        'Die Mitgliedschaft kann nicht beendet werden, weil die ID fehlt.'
+      );
+      return;
+    }
+
+    if (!this.teamId) {
+      this.error.set('Die Team-ID fehlt.');
+      return;
+    }
+
+    if (!this.isActive(membership)) {
+      return;
+    }
+
+    const personName = this.getMembershipPersonName(membership);
+
+    const confirmed = window.confirm(
+      `${personName} wirklich aus dieser Mannschaft entfernen?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    const request: DeactivateTeamMembershipRequest = {
+      leftAt: this.formatApiDate(new Date())
+    };
+
+    this.deactivatingMembershipId.set(membershipId);
+    this.error.set(null);
+    this.success.set(null);
+
+    this.membershipsService
+      .apiV1TeamMembershipsIdDeactivatePatch(
+        membershipId,
+        request
+      )
+      .pipe(
+        switchMap(() => {
+          return this.membershipsService.apiV1TeamMembershipsGet(
+            undefined,
+            undefined,
+            undefined,
+            this.teamId!
+          );
+        })
+      )
+      .subscribe({
+        next: memberships => {
+          this.memberships.set(memberships);
+          this.deactivatingMembershipId.set(null);
+
+          this.success.set(
+            `${personName} ist nicht mehr dieser Mannschaft zugeordnet.`
+          );
+        },
+        error: error => {
+          console.error(
+            'Team membership could not be deactivated:',
+            error
+          );
+          console.error(
+            'Backend error body:',
+            error.error
+          );
+
+          this.error.set(
+            'Die Zuordnung konnte nicht beendet werden.'
+          );
+          this.deactivatingMembershipId.set(null);
         }
       });
   }

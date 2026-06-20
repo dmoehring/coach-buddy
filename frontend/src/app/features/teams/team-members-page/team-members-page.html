@@ -87,10 +87,10 @@
               </strong>
 
               <span>
-Alle vorhandenen Personen sind bereits diesem
-Team zugewiesen oder es wurden noch keine
-Personen angelegt.
-</span>
+                Alle vorhandenen Personen sind bereits diesem
+                Team zugewiesen oder es wurden noch keine
+                Personen angelegt.
+              </span>
             </div>
           </div>
         }
@@ -112,14 +112,17 @@ Personen angelegt.
               filterBy="label"
               [showClear]="true"
               [disabled]="
-saving() ||
-availablePersonOptions().length === 0
-"
+                saving() ||
+                deactivatingMembershipId() !== null ||
+                availablePersonOptions().length === 0
+              "
               appendTo="body"
             />
 
-            @if (form.controls.person.touched &&
-            form.controls.person.invalid) {
+            @if (
+              form.controls.person.touched &&
+              form.controls.person.invalid
+              ) {
               <small class="field-error">
                 Bitte wähle eine Person aus.
               </small>
@@ -134,12 +137,17 @@ availablePersonOptions().length === 0
               [options]="roleOptions"
               optionLabel="label"
               placeholder="Rolle auswählen"
-              [disabled]="saving()"
+              [disabled]="
+                saving() ||
+                deactivatingMembershipId() !== null
+              "
               appendTo="body"
             />
 
-            @if (form.controls.role.touched &&
-            form.controls.role.invalid) {
+            @if (
+              form.controls.role.touched &&
+              form.controls.role.invalid
+              ) {
               <small class="field-error">
                 Bitte wähle eine Rolle aus.
               </small>
@@ -153,12 +161,17 @@ availablePersonOptions().length === 0
               formControlName="joinedAt"
               dateFormat="dd.mm.yy"
               [showIcon]="true"
-              [disabled]="saving()"
+              [disabled]="
+                saving() ||
+                deactivatingMembershipId() !== null
+              "
               appendTo="body"
             />
 
-            @if (form.controls.joinedAt.touched &&
-            form.controls.joinedAt.invalid) {
+            @if (
+              form.controls.joinedAt.touched &&
+              form.controls.joinedAt.invalid
+              ) {
               <small class="field-error">
                 Bitte gib ein Eintrittsdatum an.
               </small>
@@ -171,21 +184,22 @@ availablePersonOptions().length === 0
               type="submit"
               [loading]="saving()"
               [disabled]="
-saving() ||
-availablePersonOptions().length === 0
-"
+                saving() ||
+                deactivatingMembershipId() !== null ||
+                availablePersonOptions().length === 0
+              "
             >
               @if (!saving()) {
                 <i class="pi pi-user-plus"></i>
               }
 
               <span>
-{{
+                {{
                   saving()
                     ? 'Zuweisung wird gespeichert'
                     : 'Person zuweisen'
                 }}
-</span>
+              </span>
             </button>
           </div>
         </form>
@@ -197,13 +211,13 @@ availablePersonOptions().length === 0
         </ng-template>
 
         <ng-template pTemplate="subtitle">
-          Aktuell zugewiesene Personen
+          Aktuelle und ehemalige Zuordnungen
         </ng-template>
 
         <div class="desktop-table">
           <p-table
             [value]="memberships()"
-            [tableStyle]="{ 'min-width': '46rem' }"
+            [tableStyle]="{ 'min-width': '56rem' }"
           >
             <ng-template pTemplate="header">
               <tr>
@@ -211,6 +225,7 @@ availablePersonOptions().length === 0
                 <th>Rolle</th>
                 <th>Eintritt</th>
                 <th>Status</th>
+                <th class="actions-column">Aktionen</th>
               </tr>
             </ng-template>
 
@@ -248,12 +263,43 @@ availablePersonOptions().length === 0
                 <td>
                   @if (isActive(membership)) {
                     <span class="status-badge active">
-Aktiv
-</span>
+                      Aktiv
+                    </span>
                   } @else {
                     <span class="status-badge inactive">
-Ausgetreten
-</span>
+                      Ausgetreten
+                    </span>
+                  }
+                </td>
+
+                <td>
+                  @if (isActive(membership)) {
+                    <button
+                      pButton
+                      type="button"
+                      severity="danger"
+                      [outlined]="true"
+                      [loading]="
+                        deactivatingMembershipId() === membership.id
+                      "
+                      [disabled]="
+                        !membership.id ||
+                        deactivatingMembershipId() !== null
+                      "
+                      (click)="deactivateMembership(membership)"
+                    >
+                      @if (
+                        deactivatingMembershipId() !== membership.id
+                        ) {
+                        <i class="pi pi-user-minus"></i>
+                      }
+
+                      <span>Entfernen</span>
+                    </button>
+                  } @else {
+                    <span class="muted-text">
+                      Bereits entfernt
+                    </span>
                   }
                 </td>
               </tr>
@@ -261,7 +307,7 @@ Ausgetreten
 
             <ng-template pTemplate="emptymessage">
               <tr>
-                <td colspan="4">
+                <td colspan="5">
                   <div class="empty-state">
                     <i class="pi pi-user-plus"></i>
 
@@ -270,9 +316,9 @@ Ausgetreten
                     </strong>
 
                     <span>
-Füge links die ersten Spieler oder
-Trainer hinzu.
-</span>
+                      Füge links die ersten Spieler oder
+                      Trainer hinzu.
+                    </span>
                   </div>
                 </td>
               </tr>
@@ -281,10 +327,12 @@ Trainer hinzu.
         </div>
 
         <div class="mobile-members-list">
-          @for (membership of memberships();
+          @for (
+            membership of memberships();
             track membership.id ??
             membership.person?.id ??
-            $index) {
+            $index
+            ) {
             <article class="member-card">
               <div class="member-card-header">
                 <div class="person-icon">
@@ -301,18 +349,18 @@ Trainer hinzu.
                   </strong>
 
                   <span>
-{{ getRoleLabel(membership.role) }}
-</span>
+                    {{ getRoleLabel(membership.role) }}
+                  </span>
                 </div>
 
                 @if (isActive(membership)) {
                   <span class="status-badge active">
-Aktiv
-</span>
+                    Aktiv
+                  </span>
                 } @else {
                   <span class="status-badge inactive">
-Ausgetreten
-</span>
+                    Ausgetreten
+                  </span>
                 }
               </div>
 
@@ -327,6 +375,33 @@ Ausgetreten
                   }}
                 </strong>
               </div>
+
+              <div class="member-card-actions">
+                @if (isActive(membership)) {
+                  <button
+                    pButton
+                    type="button"
+                    severity="danger"
+                    [outlined]="true"
+                    [loading]="
+                      deactivatingMembershipId() === membership.id
+                    "
+                    [disabled]="
+                      !membership.id ||
+                      deactivatingMembershipId() !== null
+                    "
+                    (click)="deactivateMembership(membership)"
+                  >
+                    @if (
+                      deactivatingMembershipId() !== membership.id
+                      ) {
+                      <i class="pi pi-user-minus"></i>
+                    }
+
+                    <span>Aus Team entfernen</span>
+                  </button>
+                }
+              </div>
             </article>
           } @empty {
             <article class="member-card">
@@ -338,8 +413,8 @@ Ausgetreten
                 </strong>
 
                 <span>
-Weise dem Team die ersten Personen zu.
-</span>
+                  Weise dem Team die ersten Personen zu.
+                </span>
               </div>
             </article>
           }
