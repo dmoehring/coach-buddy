@@ -10,6 +10,7 @@ import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideApi } from './api/provide-api';
 import { authInterceptor } from './core/auth/auth.interceptor';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
-    provideApi('http://localhost:8080'), // TODO in env outsourcen
+    provideApi(environment.apiBaseUrl),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
