@@ -150,9 +150,19 @@
         <ng-template pTemplate="body" let-membership>
           <tr>
             <td>
-              <strong>
-                {{ getPersonName(membership.person) }}
-              </strong>
+              @if (membership.person?.id) {
+                <a
+                  class="person-name-link"
+                  [routerLink]="['/persons', membership.person.id]"
+                  [queryParams]="{ returnUrl: '/teams/' + teamId }"
+                >
+                  {{ getPersonName(membership.person) }}
+                </a>
+              } @else {
+                <strong>
+                  {{ getPersonName(membership.person) }}
+                </strong>
+              }
             </td>
 
             <td>

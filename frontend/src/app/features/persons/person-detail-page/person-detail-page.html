@@ -1,0 +1,264 @@
+<section class="person-detail-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Personen</p>
+      <h1>{{ person() ? getPersonName(person()) : 'Personendetails' }}</h1>
+
+      <p class="description">
+        Stammdaten, Kontakte und Zuordnungen der Person.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        [routerLink]="returnUrl"
+      >
+        <i class="pi pi-arrow-left"></i>
+        <span>Zurück</span>
+      </button>
+
+      @if (personId) {
+        <button
+          pButton
+          type="button"
+          [routerLink]="['/persons', personId, 'edit']"
+        >
+          <i class="pi pi-pencil"></i>
+          <span>Bearbeiten</span>
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="error-box" role="alert">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (loading()) {
+    <p-card>
+      <div class="loading-state">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Person wird geladen ...</span>
+      </div>
+    </p-card>
+  } @else if (person(); as currentPerson) {
+    <p-card>
+      <ng-template pTemplate="title">
+        Stammdaten
+      </ng-template>
+
+      <dl class="detail-list">
+        <div>
+          <dt>Name</dt>
+          <dd>{{ getPersonName(currentPerson) }}</dd>
+        </div>
+
+        <div>
+          <dt>Spitzname</dt>
+          <dd>{{ currentPerson.nickname || '-' }}</dd>
+        </div>
+
+        <div>
+          <dt>Geburtsdatum</dt>
+          <dd>{{ formatDate(currentPerson.birthDate) }}</dd>
+        </div>
+
+        <div>
+          <dt>Notiz</dt>
+          <dd>{{ currentPerson.notes || 'Keine Notiz vorhanden' }}</dd>
+        </div>
+
+        <div>
+          <dt>Personen-ID</dt>
+          <dd>{{ currentPerson.id || '-' }}</dd>
+        </div>
+      </dl>
+    </p-card>
+
+    <p-card>
+      <ng-template pTemplate="title">
+        Telefonnummern
+      </ng-template>
+
+      @if (getContactEntries(currentPerson).length) {
+        <ul class="contact-list">
+          @for (
+            entry of getContactEntries(currentPerson);
+            track entry.label + entry.number
+          ) {
+            <li>
+              <a [href]="'tel:' + entry.tel" class="contact-link">
+                <i class="pi pi-phone"></i>
+                <span>{{ entry.label }}: {{ entry.number }}</span>
+              </a>
+            </li>
+          }
+        </ul>
+      } @else {
+        <span class="no-contact">
+          Keine Telefonnummern hinterlegt
+        </span>
+      }
+    </p-card>
+
+    @if (guardianRelations().length) {
+      <p-card>
+        <ng-template pTemplate="title">
+          Erziehungsberechtigte
+        </ng-template>
+
+        <ul class="relation-list">
+          @for (relation of guardianRelations(); track relation.id) {
+            <li>
+              <div class="relation-header">
+                @if (relation.guardianPerson?.id) {
+                  <a
+                    class="relation-name"
+                    [routerLink]="['/persons', relation.guardianPerson!.id]"
+                  >
+                    {{ getPersonName(relation.guardianPerson) }}
+                  </a>
+                } @else {
+                  <strong class="relation-name">
+                    {{ getPersonName(relation.guardianPerson) }}
+                  </strong>
+                }
+
+                <span class="relation-type">
+                  {{ getRelationTypeLabel(relation.relationType) }}
+                </span>
+              </div>
+
+              @if (getContactEntries(relation.guardianPerson).length) {
+                <ul class="contact-list">
+                  @for (
+                    entry of getContactEntries(relation.guardianPerson);
+                    track entry.label + entry.number
+                  ) {
+                    <li>
+                      <a [href]="'tel:' + entry.tel" class="contact-link">
+                        <i class="pi pi-phone"></i>
+                        <span>{{ entry.label }}: {{ entry.number }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <span class="no-contact">
+                  Keine Telefonnummer hinterlegt
+                </span>
+              }
+            </li>
+          }
+        </ul>
+      </p-card>
+    }
+
+    @if (childRelations().length) {
+      <p-card>
+        <ng-template pTemplate="title">
+          Kinder
+        </ng-template>
+
+        <ul class="relation-list">
+          @for (relation of childRelations(); track relation.id) {
+            <li>
+              <div class="relation-header">
+                @if (relation.childPerson?.id) {
+                  <a
+                    class="relation-name"
+                    [routerLink]="['/persons', relation.childPerson!.id]"
+                  >
+                    {{ getPersonName(relation.childPerson) }}
+                  </a>
+                } @else {
+                  <strong class="relation-name">
+                    {{ getPersonName(relation.childPerson) }}
+                  </strong>
+                }
+
+                <span class="relation-type">
+                  {{ getRelationTypeLabel(relation.relationType) }}
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
+      </p-card>
+    }
+
+    <p-card>
+      <ng-template pTemplate="title">
+        Mannschaften
+      </ng-template>
+
+      <p-table
+        [value]="memberships()"
+        [tableStyle]="{ 'min-width': '40rem' }"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Mannschaft</th>
+            <th>Saison</th>
+            <th>Rolle</th>
+            <th>Eintritt</th>
+            <th>Austritt</th>
+            <th>Status</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-membership>
+          <tr>
+            <td>
+              @if (membership.team?.id) {
+                <a
+                  class="relation-name"
+                  [routerLink]="['/teams', membership.team.id]"
+                >
+                  {{ membership.team.name || 'Team ohne Namen' }}
+                </a>
+              } @else {
+                <strong>{{ membership.team?.name || 'Team ohne Namen' }}</strong>
+              }
+            </td>
+
+            <td>{{ membership.team?.seasonName || '-' }}</td>
+            <td>{{ getRoleLabel(membership.role) }}</td>
+            <td>{{ formatDate(membership.joinedAt) }}</td>
+            <td>{{ formatDate(membership.leftAt) }}</td>
+
+            <td>
+              @if (!membership.leftAt) {
+                <span class="status-badge active">
+                  Aktiv
+                </span>
+              } @else {
+                <span class="status-badge inactive">
+                  Ausgetreten
+                </span>
+              }
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <i class="pi pi-users"></i>
+                <strong>Keiner Mannschaft zugeordnet</strong>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  }
+</section>

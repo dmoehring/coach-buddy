@@ -106,7 +106,17 @@
             <article class="participant-row">
               <div class="participant-main">
                 <div class="participant-name">
-                  <strong>{{ getPersonName(entry.person) }}</strong>
+                  @if (entry.person.id) {
+                    <a
+                      class="person-name-link"
+                      [routerLink]="['/persons', entry.person.id]"
+                      [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
+                    >
+                      {{ getPersonName(entry.person) }}
+                    </a>
+                  } @else {
+                    <strong>{{ getPersonName(entry.person) }}</strong>
+                  }
                   <span>{{ getRoleLabel(entry.role) }}</span>
                 </div>
 
@@ -171,7 +181,17 @@
             <article class="participant-row">
               <div class="participant-main">
                 <div class="participant-name">
-                  <strong>{{ getPersonName(entry.person) }}</strong>
+                  @if (entry.person.id) {
+                    <a
+                      class="person-name-link"
+                      [routerLink]="['/persons', entry.person.id]"
+                      [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
+                    >
+                      {{ getPersonName(entry.person) }}
+                    </a>
+                  } @else {
+                    <strong>{{ getPersonName(entry.person) }}</strong>
+                  }
                   <span>{{ getRoleLabel(entry.role) }}</span>
                 </div>
 

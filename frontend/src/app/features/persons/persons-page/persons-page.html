@@ -73,6 +73,18 @@
                   type="button"
                   severity="secondary"
                   [text]="true"
+                  [routerLink]="['/persons', person.id]"
+                  [disabled]="!person.id"
+                  aria-label="Person anzeigen"
+                >
+                  <i class="pi pi-eye"></i>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [text]="true"
                   [routerLink]="['/persons', person.id, 'edit']"
                   [disabled]="!person.id"
                   aria-label="Person bearbeiten"
@@ -114,17 +126,31 @@
                 }
               </div>
 
-              <button
-                pButton
-                type="button"
-                severity="secondary"
-                [outlined]="true"
-                [routerLink]="['/persons', person.id, 'edit']"
-                [disabled]="!person.id"
-              >
-                <i class="pi pi-pencil"></i>
-                <span>Bearbeiten</span>
-              </button>
+              <div class="person-card-actions">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  [routerLink]="['/persons', person.id]"
+                  [disabled]="!person.id"
+                >
+                  <i class="pi pi-eye"></i>
+                  <span>Anzeigen</span>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [outlined]="true"
+                  [routerLink]="['/persons', person.id, 'edit']"
+                  [disabled]="!person.id"
+                >
+                  <i class="pi pi-pencil"></i>
+                  <span>Bearbeiten</span>
+                </button>
+              </div>
             </div>
 
             <div class="person-card-content">

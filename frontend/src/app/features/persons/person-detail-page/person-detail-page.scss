@@ -1,4 +1,4 @@
-.team-detail-page {
+.person-detail-page {
   display: grid;
   gap: 1.5rem;
 }
@@ -53,8 +53,13 @@
   background: var(--p-red-50);
 }
 
-.loading-state,
-.empty-state {
+:host-context(.app-dark) .error-box {
+  border-color: color-mix(in srgb, var(--p-red-400), transparent 40%);
+  color: var(--p-red-300);
+  background: color-mix(in srgb, var(--p-red-950), transparent 30%);
+}
+
+.loading-state {
   display: grid;
   justify-items: center;
   gap: 0.5rem;
@@ -66,65 +71,12 @@
     color: var(--p-primary-color);
     font-size: 1.8rem;
   }
-
-  strong {
-    color: var(--p-text-color);
-  }
-
-  button {
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-  }
-}
-
-.summary-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
-  gap: 1.5rem;
-}
-
-.team-header {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-
-  > div:last-child {
-    display: grid;
-    gap: 0.15rem;
-  }
-
-  strong {
-    font-size: 1.25rem;
-  }
-
-  span {
-    color: var(--p-text-muted-color);
-  }
-}
-
-.team-icon {
-  display: grid;
-  width: 3rem;
-  height: 3rem;
-  place-items: center;
-  border-radius: 1rem;
-  color: var(--p-primary-color);
-  background: color-mix(
-    in srgb,
-    var(--p-primary-color),
-    transparent 88%
-  );
 }
 
 .detail-list {
   display: grid;
   gap: 1rem;
-  margin: 1.5rem 0 0;
-
-  > div {
-    display: grid;
-    gap: 0.2rem;
-  }
+  margin: 0;
 
   dt {
     color: var(--p-text-muted-color);
@@ -134,42 +86,6 @@
   dd {
     margin: 0;
     font-weight: 650;
-  }
-}
-
-.statistics {
-  display: grid;
-  gap: 1rem;
-
-  > div {
-    display: grid;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--p-surface-200);
-
-    &:last-child {
-      padding-bottom: 0;
-      border-bottom: 0;
-    }
-  }
-
-  strong {
-    font-size: 1.5rem;
-  }
-
-  span {
-    color: var(--p-text-muted-color);
-    font-size: 0.85rem;
-  }
-}
-
-.person-name-link {
-  color: var(--p-text-color);
-  font-weight: 650;
-  text-decoration: none;
-
-  &:hover {
-    color: var(--p-primary-color);
-    text-decoration: underline;
   }
 }
 
@@ -204,6 +120,53 @@
   font-size: 0.85rem;
 }
 
+.relation-list {
+  display: grid;
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  > li {
+    display: grid;
+    gap: 0.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--p-surface-200);
+
+    &:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+  }
+}
+
+:host-context(.app-dark) .relation-list > li {
+  border-color: var(--p-surface-800);
+}
+
+.relation-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.relation-name {
+  color: var(--p-text-color);
+  font-weight: 650;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--p-primary-color);
+    text-decoration: underline;
+  }
+}
+
+.relation-type {
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+}
+
 .status-badge {
   display: inline-flex;
   width: fit-content;
@@ -224,28 +187,10 @@
 }
 
 :host-context(.app-dark) {
-  .error-box {
-    border-color: color-mix(
-      in srgb,
-      var(--p-red-400),
-      transparent 40%
-    );
-    color: var(--p-red-300);
-    background: color-mix(
-      in srgb,
-      var(--p-red-950),
-      transparent 30%
-    );
-  }
-
   .status-badge {
     &.active {
       color: var(--p-green-300);
-      background: color-mix(
-        in srgb,
-        var(--p-green-900),
-        transparent 25%
-      );
+      background: color-mix(in srgb, var(--p-green-900), transparent 25%);
     }
 
     &.inactive {
@@ -255,9 +200,21 @@
   }
 }
 
-@media (max-width: 960px) {
-  .summary-grid {
-    grid-template-columns: 1fr;
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 2rem;
+  color: var(--p-text-muted-color);
+  text-align: center;
+
+  i {
+    font-size: 1.8rem;
+    color: var(--p-primary-color);
+  }
+
+  strong {
+    color: var(--p-text-color);
   }
 }
 

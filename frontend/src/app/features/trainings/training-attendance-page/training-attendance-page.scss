@@ -118,6 +118,18 @@
   }
 }
 
+.person-name-link {
+  width: fit-content;
+  color: var(--p-text-color);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--p-primary-color);
+    text-decoration: underline;
+  }
+}
+
 .attendance-actions {
   display: flex;
   flex-wrap: wrap;
