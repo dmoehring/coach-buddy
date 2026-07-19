@@ -45,26 +45,38 @@ cp .env.example .env
 
 `.env` bei Bedarf anpassen (Passwörter, `FRONTEND_PORT`).
 
-Die JWT-Schlüssel sind **nicht** im Repository (siehe `backend/.gitignore`) und müssen vor dem Build manuell an ihren Platz kopiert werden:
+Der private JWT-Signierschlüssel ist **nicht** im Repository (siehe `backend/.gitignore`) und wird zur Laufzeit in den Backend-Container gemountet, statt ins Image eingebacken zu werden — er muss also lokal vorhanden und für den Container lesbar sein:
 
-- `backend/src/main/resources/privateKey.pem`
-- `backend/src/main/resources/publicKey.pem`
+```shell
+chmod 644 backend/src/main/resources/privateKey.pem
+```
 
-### 3. Stack bauen und starten
+(`publicKey.pem` ist unkritisch und bereits im Repository enthalten.)
+
+### 3. Stack starten
+
+Die Images werden automatisch bei jedem Push auf `main` und bei Versions-Tags nach [ghcr.io](https://github.com/dmoehring?tab=packages) gebaut und veröffentlicht (siehe [`.github/workflows/docker-publish.yml`](.github/workflows/docker-publish.yml)). Auf dem Pi reicht es daher, die fertigen Images zu ziehen — kein Java/Maven/Node nötig:
+
+```shell
+docker compose pull
+docker compose up -d
+```
+
+Alternativ kann der Stack auch komplett lokal aus dem Quellcode gebaut werden (z. B. für Entwicklung oder wenn kein Zugriff auf die Registry gewünscht ist):
 
 ```shell
 docker compose up -d --build
 ```
 
-Das baut Backend (Maven-Multi-Stage-Build) und Frontend (Node-Build + nginx) direkt aus dem Quellcode — auf dem Pi ist dafür weder Java/Maven noch Node nötig. Danach ist die App unter `http://<pi-ip>:${FRONTEND_PORT:-80}/` erreichbar (im Docker-Netz spricht das Frontend intern mit dem `backend`-Service, kein Port davon ist nach außen offen).
+Danach ist die App unter `http://<pi-ip>:${FRONTEND_PORT:-80}/` erreichbar (im Docker-Netz spricht das Frontend intern mit dem `backend`-Service, kein Port davon ist nach außen offen).
 
 Login mit dem seed-Account `admin` / `ChangeMe123!` (definiert in [`V8__create_account_table.sql`](backend/src/main/resources/db/migration/V8__create_account_table.sql)). Eine Passwortänderung über die App gibt es aktuell nicht — bei Bedarf direkt in der Datenbank über `UPDATE coach_buddy.account SET password_hash = crypt('<neues-passwort>', gen_salt('bf')) WHERE username = 'admin';`.
 
 ### Updates einspielen
 
 ```shell
-git pull
-docker compose up -d --build
+docker compose pull
+docker compose up -d
 ```
 
 ## License

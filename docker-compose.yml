@@ -24,6 +24,7 @@ services:
   backend:
     build:
       context: ./backend
+    image: ghcr.io/dmoehring/coach-buddy-backend:latest
     container_name: coach-buddy-backend
     restart: unless-stopped
 
@@ -34,6 +35,9 @@ services:
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
 
+    volumes:
+      - ./backend/src/main/resources/privateKey.pem:/deployments/keys/privateKey.pem:ro
+
     depends_on:
       postgres:
         condition: service_healthy
@@ -41,6 +45,7 @@ services:
   frontend:
     build:
       context: ./frontend
+    image: ghcr.io/dmoehring/coach-buddy-frontend:latest
     container_name: coach-buddy-frontend
     restart: unless-stopped
 

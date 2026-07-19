@@ -1,3 +1,7 @@
 target/
 .idea/
 *.iml
+
+# Never bake the private signing key into the image; it's mounted at
+# runtime instead (see docker-compose.yml).
+src/main/resources/privateKey.pem
