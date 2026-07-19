@@ -8,6 +8,8 @@ import { SelectModule } from 'primeng/select';
 import { CurrentContextService } from '../../context/current-context.service';
 import { SessionService } from '../../auth/session.service';
 
+const DARK_MODE_STORAGE_KEY = 'coach-buddy.dark-mode';
+
 @Component({
   selector: 'app-layout',
   imports: [
@@ -26,8 +28,12 @@ export class AppLayout {
   readonly session = inject(SessionService);
   private readonly router = inject(Router);
 
-  readonly darkMode = signal(false);
+  readonly darkMode = signal(this.readStoredDarkMode());
   readonly mobileMenuOpen = signal(false);
+
+  constructor() {
+    document.body.classList.toggle('app-dark', this.darkMode());
+  }
 
   logout(): void {
     this.session.clearSession();
@@ -37,6 +43,7 @@ export class AppLayout {
   toggleDarkMode(): void {
     this.darkMode.update(value => !value);
     document.body.classList.toggle('app-dark', this.darkMode());
+    localStorage.setItem(DARK_MODE_STORAGE_KEY, JSON.stringify(this.darkMode()));
   }
 
   toggleMobileMenu(): void {
@@ -45,5 +52,9 @@ export class AppLayout {
 
   closeMobileMenu(): void {
     this.mobileMenuOpen.set(false);
+  }
+
+  private readStoredDarkMode(): boolean {
+    return localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
   }
 }

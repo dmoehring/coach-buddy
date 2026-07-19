@@ -55,3 +55,31 @@ body.app-dark .p-datatable-tbody > tr > td {
 body.app-dark .p-datatable-tbody > tr:hover > td {
   background: var(--p-surface-800);
 }
+
+body.app-dark .p-select {
+  background: var(--p-surface-900);
+  border-color: var(--p-surface-800);
+}
+
+body.app-dark .p-select-label {
+  color: var(--p-text-color);
+}
+
+body.app-dark .p-select-dropdown-icon {
+  color: var(--p-text-muted-color);
+}
+
+body.app-dark .p-select-overlay {
+  background: var(--p-surface-900);
+  border: 1px solid var(--p-surface-800);
+  color: var(--p-text-color);
+}
+
+body.app-dark .p-select-option {
+  color: var(--p-text-color);
+}
+
+body.app-dark .p-select-option:hover,
+body.app-dark .p-select-option-selected {
+  background: var(--p-surface-800);
+}
