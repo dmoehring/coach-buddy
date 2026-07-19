@@ -10,12 +10,12 @@
   </div>
 
   <div class="stats-grid">
-    @for (metric of metrics; track metric.label) {
+    @for (metric of metrics(); track metric.label) {
       <app-dashboard-stat-card [metric]="metric"/>
     }
   </div>
 
   <app-dashboard-quick-actions [actions]="quickActions" />
 
-  <app-recent-trainings-table [trainings]="trainings" />
+  <app-recent-trainings-table [trainings]="recentTrainings()" />
 </section>
