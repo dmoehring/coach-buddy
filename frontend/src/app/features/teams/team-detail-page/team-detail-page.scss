@@ -162,6 +162,37 @@
   }
 }
 
+.contact-list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--p-text-color);
+  font-size: 0.85rem;
+  text-decoration: none;
+
+  i {
+    color: var(--p-primary-color);
+  }
+
+  &:hover {
+    color: var(--p-primary-color);
+    text-decoration: underline;
+  }
+}
+
+.no-contact {
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+}
+
 .status-badge {
   display: inline-flex;
   width: fit-content;

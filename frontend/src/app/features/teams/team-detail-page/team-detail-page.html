@@ -139,6 +139,7 @@
         <ng-template pTemplate="header">
           <tr>
             <th>Person</th>
+            <th>Kontakt</th>
             <th>Rolle</th>
             <th>Eintritt</th>
             <th>Austritt</th>
@@ -152,6 +153,31 @@
               <strong>
                 {{ getPersonName(membership.person) }}
               </strong>
+            </td>
+
+            <td>
+              @if (getContactEntries(membership.person).length) {
+                <ul class="contact-list">
+                  @for (
+                    entry of getContactEntries(membership.person);
+                    track entry.label + entry.number
+                  ) {
+                    <li>
+                      <a
+                        [href]="'tel:' + entry.tel"
+                        class="contact-link"
+                      >
+                        <i class="pi pi-phone"></i>
+                        <span>{{ entry.label }}: {{ entry.number }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              } @else {
+                <span class="no-contact">
+                  Keine Kontaktdaten hinterlegt
+                </span>
+              }
             </td>
 
             <td>
@@ -182,7 +208,7 @@
 
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="5">
+            <td colspan="6">
               <div class="empty-state">
                 <i class="pi pi-user-plus"></i>
 
