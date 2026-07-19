@@ -33,7 +33,8 @@ export class PersonCreatePage {
       lastName: value.lastName,
       birthDate: value.birthDate,
       nickname: value.nickname,
-      notes: value.notes
+      notes: value.notes,
+      phoneNumbers: value.phoneNumbers
     };
 
     this.personsService.apiV1PersonsPost(request).subscribe({

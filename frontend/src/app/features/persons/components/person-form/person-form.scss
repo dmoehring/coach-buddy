@@ -40,6 +40,51 @@
   font-size: 0.8rem;
 }
 
+.phone-numbers-section {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.phone-numbers-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  > span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  button {
+    gap: 0.4rem;
+  }
+}
+
+.phone-numbers-empty {
+  margin: 0;
+  color: var(--p-text-muted-color);
+  font-size: 0.9rem;
+}
+
+.phone-number-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr auto;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.phone-number-input {
+  display: grid;
+  gap: 0.3rem;
+
+  input {
+    width: 100%;
+  }
+}
+
 :host-context(.app-dark) .form-field textarea {
   border-color: var(--p-surface-700);
   background: var(--p-surface-900);
@@ -74,6 +119,10 @@
 @media (max-width: 560px) {
   .name-grid,
   .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .phone-number-row {
     grid-template-columns: 1fr;
   }
 }

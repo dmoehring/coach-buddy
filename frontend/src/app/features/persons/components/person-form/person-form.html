@@ -68,6 +68,61 @@
       ></textarea>
     </label>
 
+    <div class="phone-numbers-section" formArrayName="phoneNumbers">
+      <div class="phone-numbers-header">
+        <span>Telefonnummern</span>
+
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          (click)="addPhoneNumber()"
+        >
+          <i class="pi pi-plus"></i>
+          <span>Nummer hinzufügen</span>
+        </button>
+      </div>
+
+      @for (phoneNumberGroup of phoneNumbers.controls; track $index) {
+        <div class="phone-number-row" [formGroupName]="$index">
+          <p-select
+            [options]="phoneTypeOptions"
+            formControlName="type"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+
+          <div class="phone-number-input">
+            <input
+              pInputText
+              type="text"
+              formControlName="number"
+              placeholder="z. B. 0170 1234567"
+            />
+
+            @if (isPhoneNumberInvalid($index)) {
+              <small class="field-error">Nummer ist erforderlich.</small>
+            }
+          </div>
+
+          <button
+            pButton
+            type="button"
+            severity="danger"
+            [text]="true"
+            (click)="removePhoneNumber($index)"
+            aria-label="Nummer entfernen"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      } @empty {
+        <p class="phone-numbers-empty">Noch keine Telefonnummer erfasst.</p>
+      }
+    </div>
+
     <div class="form-actions">
       <button
         pButton

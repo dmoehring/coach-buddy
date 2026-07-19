@@ -46,4 +46,128 @@
       />
     }
   </div>
+
+  @if (!loading() && initialValue()) {
+    <p-card styleClass="relations-card">
+      <ng-template pTemplate="title">
+        Beziehungen
+      </ng-template>
+
+      <ng-template pTemplate="subtitle">
+        Eltern-Kind- und Kontaktbeziehungen dieser Person
+      </ng-template>
+
+      @if (relationsError()) {
+        <p class="relations-message error">{{ relationsError() }}</p>
+      }
+
+      @if (relationsSuccess()) {
+        <p class="relations-message success">{{ relationsSuccess() }}</p>
+      }
+
+      @if (relationsLoading()) {
+        <p class="relations-empty">Beziehungen werden geladen ...</p>
+      } @else {
+        <div class="relations-lists">
+          <div class="relations-list">
+            <h3>Kontaktpersonen</h3>
+
+            @if (guardianRelations().length === 0) {
+              <p class="relations-empty">Keine Kontaktpersonen hinterlegt.</p>
+            } @else {
+              @for (relation of guardianRelations(); track relation.id) {
+                <div class="relation-row">
+                  <div>
+                    <strong>{{ getPersonName(relation.guardianPerson) }}</strong>
+                    <span>{{ getRelationTypeLabel(relation.relationType) }}</span>
+                  </div>
+
+                  <button
+                    pButton
+                    type="button"
+                    severity="danger"
+                    [text]="true"
+                    [disabled]="deletingRelationId() === relation.id"
+                    (click)="deleteRelation(relation)"
+                    aria-label="Beziehung entfernen"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              }
+            }
+          </div>
+
+          <div class="relations-list">
+            <h3>Zugeordnete Kinder</h3>
+
+            @if (childRelations().length === 0) {
+              <p class="relations-empty">Keine Kinder zugeordnet.</p>
+            } @else {
+              @for (relation of childRelations(); track relation.id) {
+                <div class="relation-row">
+                  <div>
+                    <strong>{{ getPersonName(relation.childPerson) }}</strong>
+                    <span>{{ getRelationTypeLabel(relation.relationType) }}</span>
+                  </div>
+
+                  <button
+                    pButton
+                    type="button"
+                    severity="danger"
+                    [text]="true"
+                    [disabled]="deletingRelationId() === relation.id"
+                    (click)="deleteRelation(relation)"
+                    aria-label="Beziehung entfernen"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      <form class="relation-form" [formGroup]="relationForm" (ngSubmit)="addRelation()">
+        <label class="form-field">
+          <span>Rolle</span>
+          <p-select
+            [options]="relationRoleOptions"
+            formControlName="role"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Person</span>
+          <p-select
+            [options]="otherPersonOptions()"
+            formControlName="otherPerson"
+            optionLabel="label"
+            placeholder="Person auswählen"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="form-field">
+          <span>Beziehungsart</span>
+          <p-select
+            [options]="relationTypeOptions"
+            formControlName="relationType"
+            optionLabel="label"
+            placeholder="Beziehungsart auswählen"
+            appendTo="body"
+          />
+        </label>
+
+        <button pButton type="submit" [disabled]="relationsSaving()" class="relation-submit">
+          <i class="pi pi-plus"></i>
+          <span>{{ relationsSaving() ? 'Speichert ...' : 'Beziehung hinzufügen' }}</span>
+        </button>
+      </form>
+    </p-card>
+  }
 </section>

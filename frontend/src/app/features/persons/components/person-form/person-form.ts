@@ -1,11 +1,19 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+
+import { PhoneType } from '../../../../api/model/phone-type';
+
+export interface PersonPhoneNumberFormValue {
+  type: PhoneType;
+  number: string;
+}
 
 export interface PersonFormValue {
   firstName: string;
@@ -13,6 +21,12 @@ export interface PersonFormValue {
   birthDate?: string;
   nickname?: string;
   notes?: string;
+  phoneNumbers: PersonPhoneNumberFormValue[];
+}
+
+interface PhoneTypeOption {
+  label: string;
+  value: PhoneType;
 }
 
 @Component({
@@ -23,7 +37,8 @@ export interface PersonFormValue {
     ButtonModule,
     CardModule,
     DatePickerModule,
-    InputTextModule
+    InputTextModule,
+    SelectModule
   ],
   templateUrl: './person-form.html',
   styleUrl: './person-form.scss'
@@ -40,18 +55,38 @@ export class PersonForm implements OnChanges {
 
   @Output() submitted = new EventEmitter<PersonFormValue>();
 
+  readonly phoneTypeOptions: PhoneTypeOption[] = [
+    { label: 'Mobil', value: PhoneType.Mobile },
+    { label: 'Privat', value: PhoneType.Home },
+    { label: 'Geschäftlich', value: PhoneType.Work },
+    { label: 'Notfall', value: PhoneType.Emergency }
+  ];
+
   readonly form = this.formBuilder.group({
     firstName: this.formBuilder.nonNullable.control('', Validators.required),
     lastName: this.formBuilder.nonNullable.control('', Validators.required),
     birthDate: this.formBuilder.control<Date | null>(null),
     nickname: this.formBuilder.nonNullable.control(''),
-    notes: this.formBuilder.nonNullable.control('')
+    notes: this.formBuilder.nonNullable.control(''),
+    phoneNumbers: this.formBuilder.array<FormGroup>([])
   });
+
+  get phoneNumbers(): FormArray {
+    return this.form.controls.phoneNumbers;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialValue']) {
       this.patchForm(this.initialValue);
     }
+  }
+
+  addPhoneNumber(): void {
+    this.phoneNumbers.push(this.createPhoneNumberGroup());
+  }
+
+  removePhoneNumber(index: number): void {
+    this.phoneNumbers.removeAt(index);
   }
 
   submit(): void {
@@ -67,7 +102,11 @@ export class PersonForm implements OnChanges {
       lastName: formValue.lastName.trim(),
       birthDate: formValue.birthDate ? this.formatDate(formValue.birthDate) : undefined,
       nickname: this.toOptionalString(formValue.nickname),
-      notes: this.toOptionalString(formValue.notes)
+      notes: this.toOptionalString(formValue.notes),
+      phoneNumbers: (formValue.phoneNumbers as PersonPhoneNumberFormValue[]).map(phoneNumber => ({
+        type: phoneNumber.type,
+        number: phoneNumber.number.trim()
+      }))
     });
   }
 
@@ -77,6 +116,19 @@ export class PersonForm implements OnChanges {
     return control.invalid && (control.dirty || control.touched);
   }
 
+  isPhoneNumberInvalid(index: number): boolean {
+    const control = this.phoneNumbers.at(index).get('number');
+
+    return Boolean(control?.invalid && (control.dirty || control.touched));
+  }
+
+  private createPhoneNumberGroup(value?: PersonPhoneNumberFormValue): FormGroup {
+    return this.formBuilder.group({
+      type: this.formBuilder.nonNullable.control(value?.type ?? PhoneType.Mobile, Validators.required),
+      number: this.formBuilder.nonNullable.control(value?.number ?? '', Validators.required)
+    });
+  }
+
   private patchForm(value: PersonFormValue | null): void {
     this.form.reset({
       firstName: value?.firstName ?? '',
@@ -84,6 +136,11 @@ export class PersonForm implements OnChanges {
       birthDate: value?.birthDate ? this.parseDate(value.birthDate) : null,
       nickname: value?.nickname ?? '',
       notes: value?.notes ?? ''
+    });
+
+    this.phoneNumbers.clear();
+    (value?.phoneNumbers ?? []).forEach(phoneNumber => {
+      this.phoneNumbers.push(this.createPhoneNumberGroup(phoneNumber));
     });
   }
 
