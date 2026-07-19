@@ -3,6 +3,7 @@ package de.moehring.coach.buddy.backend.training.resources;
 import de.moehring.coach.buddy.backend.common.exceptions.ErrorResponse;
 import de.moehring.coach.buddy.backend.training.dtos.CreateTrainingParticipantRequest;
 import de.moehring.coach.buddy.backend.training.dtos.TrainingParticipantDto;
+import de.moehring.coach.buddy.backend.training.dtos.UpdateTrainingParticipantRequest;
 import de.moehring.coach.buddy.backend.training.search.TrainingParticipantSearchCriteria;
 import de.moehring.coach.buddy.backend.training.services.TrainingParticipantService;
 import jakarta.validation.Valid;
@@ -93,6 +94,42 @@ public class TrainingParticipantResource {
                 .created(uriInfo.getAbsolutePathBuilder().path(participant.id().toString()).build())
                 .entity(participant)
                 .build();
+    }
+
+    @PATCH
+    @Path("/{id}")
+    @Operation(summary = "Update training participant", description = "Updates the attendance status and notes of an existing training participant.")
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Training participant updated",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = TrainingParticipantDto.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "Training participant not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
+    })
+    public TrainingParticipantDto updateTrainingParticipant(
+            @PathParam("id") UUID id,
+            @Valid UpdateTrainingParticipantRequest updateTrainingParticipantRequest
+    ) {
+        return trainingParticipantService.updateAttendance(id, updateTrainingParticipantRequest);
     }
 
     @DELETE

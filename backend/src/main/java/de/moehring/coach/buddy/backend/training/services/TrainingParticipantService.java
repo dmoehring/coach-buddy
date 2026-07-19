@@ -6,6 +6,7 @@ import de.moehring.coach.buddy.backend.person.entities.Person;
 import de.moehring.coach.buddy.backend.person.repositories.PersonRepository;
 import de.moehring.coach.buddy.backend.training.dtos.CreateTrainingParticipantRequest;
 import de.moehring.coach.buddy.backend.training.dtos.TrainingParticipantDto;
+import de.moehring.coach.buddy.backend.training.dtos.UpdateTrainingParticipantRequest;
 import de.moehring.coach.buddy.backend.training.entities.Training;
 import de.moehring.coach.buddy.backend.training.entities.TrainingParticipant;
 import de.moehring.coach.buddy.backend.training.mappers.TrainingParticipantMapper;
@@ -54,6 +55,17 @@ public class TrainingParticipantService {
         trainingParticipant.setNotes(trimToNull(request.notes()));
 
         trainingParticipantRepository.persist(trainingParticipant);
+
+        return trainingParticipantMapper.mapToDto(trainingParticipant);
+    }
+
+    @Transactional
+    public TrainingParticipantDto updateAttendance(UUID id, UpdateTrainingParticipantRequest request) {
+        TrainingParticipant trainingParticipant = trainingParticipantRepository.findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Trainingsteilnahme wurde nicht gefunden."));
+
+        trainingParticipant.setAttendanceStatus(request.attendanceStatus());
+        trainingParticipant.setNotes(trimToNull(request.notes()));
 
         return trainingParticipantMapper.mapToDto(trainingParticipant);
     }
