@@ -5,12 +5,22 @@ import { TeamsService } from '../../api/api/teams.service';
 import { SeasonDto } from '../../api/model/season-dto';
 import { TeamDto } from '../../api/model/team-dto';
 
+interface StoredContext {
+  seasonId: string | null;
+  teamId: string | null;
+}
+
+const STORAGE_KEY = 'coach-buddy.context';
+
 @Injectable({
   providedIn: 'root'
 })
 export class CurrentContextService {
   private readonly seasonsService = inject(SeasonsService);
   private readonly teamsService = inject(TeamsService);
+
+  private readonly persistedSeasonId: string | null;
+  private readonly persistedTeamId: string | null;
 
   readonly seasons = signal<SeasonDto[]>([]);
   readonly teams = signal<TeamDto[]>([]);
@@ -30,6 +40,10 @@ export class CurrentContextService {
   readonly teamsForSelectedSeason = computed(() => this.teams());
 
   constructor() {
+    const stored = this.readStoredContext();
+    this.persistedSeasonId = stored.seasonId;
+    this.persistedTeamId = stored.teamId;
+
     this.loadSeasons();
   }
 
@@ -44,12 +58,12 @@ export class CurrentContextService {
 
         if (seasons.length === 0) {
           this.selectedSeason.set(null);
-          this.selectedTeam.set(null);
           this.teams.set([]);
+          this.selectTeam(null);
           return;
         }
 
-        const currentSeasonId = this.selectedSeason()?.id;
+        const currentSeasonId = this.selectedSeason()?.id ?? this.persistedSeasonId;
 
         const selectedSeason =
           seasons.find(season => season.id === currentSeasonId)
@@ -70,9 +84,8 @@ export class CurrentContextService {
 
   selectSeason(season: SeasonDto | null): void {
     this.selectedSeason.set(season);
-
-    this.selectedTeam.set(null);
     this.teams.set([]);
+    this.selectTeam(null);
 
     if (!season?.id) {
       return;
@@ -91,17 +104,17 @@ export class CurrentContextService {
         this.loadingTeams.set(false);
 
         if (teams.length === 0) {
-          this.selectedTeam.set(null);
+          this.selectTeam(null);
           return;
         }
 
-        const currentTeamId = this.selectedTeam()?.id;
+        const currentTeamId = this.selectedTeam()?.id ?? this.persistedTeamId;
 
         const selectedTeam =
           teams.find(team => team.id === currentTeamId)
           ?? teams[0];
 
-        this.selectedTeam.set(selectedTeam);
+        this.selectTeam(selectedTeam);
       },
       error: error => {
         console.error('Teams could not be loaded:', error);
@@ -115,9 +128,33 @@ export class CurrentContextService {
 
   selectTeam(team: TeamDto | null): void {
     this.selectedTeam.set(team);
+    this.persistContext();
   }
 
   reloadContext(): void {
     this.loadSeasons();
+  }
+
+  private persistContext(): void {
+    const context: StoredContext = {
+      seasonId: this.selectedSeason()?.id ?? null,
+      teamId: this.selectedTeam()?.id ?? null
+    };
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(context));
+  }
+
+  private readStoredContext(): StoredContext {
+    const raw = localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) {
+      return { seasonId: null, teamId: null };
+    }
+
+    try {
+      return JSON.parse(raw) as StoredContext;
+    } catch {
+      return { seasonId: null, teamId: null };
+    }
   }
 }
