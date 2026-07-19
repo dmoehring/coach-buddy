@@ -1,3 +1,5 @@
+export * from './auth.service';
+import { AuthService } from './auth.service';
 export * from './person-relations.service';
 import { PersonRelationsService } from './person-relations.service';
 export * from './persons.service';
@@ -12,4 +14,4 @@ export * from './training-participants.service';
 import { TrainingParticipantsService } from './training-participants.service';
 export * from './trainings.service';
 import { TrainingsService } from './trainings.service';
-export const APIS = [PersonRelationsService, PersonsService, SeasonsService, TeamMembershipsService, TeamsService, TrainingParticipantsService, TrainingsService];
+export const APIS = [AuthService, PersonRelationsService, PersonsService, SeasonsService, TeamMembershipsService, TeamsService, TrainingParticipantsService, TrainingsService];

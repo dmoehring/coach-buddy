@@ -10,13 +10,11 @@
 import { AttendanceStatus } from './attendance-status';
 
 
-export interface CreateTrainingParticipantRequest { 
-    trainingId: string;
-    personId: string;
+export interface UpdateTrainingParticipantRequest { 
     attendanceStatus: AttendanceStatus;
     notes?: string;
 }
-export namespace CreateTrainingParticipantRequest {
+export namespace UpdateTrainingParticipantRequest {
 }
 
 

@@ -14,6 +14,7 @@ export interface CreatePhoneNumberRequest {
     type?: PhoneType;
     number: string;
 }
-
+export namespace CreatePhoneNumberRequest {
+}
 
 

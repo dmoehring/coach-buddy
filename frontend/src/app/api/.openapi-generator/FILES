@@ -1,9 +1,9 @@
 .gitignore
-.openapi-generator-ignore
 README.md
 api.base.service.ts
 api.module.ts
 api/api.ts
+api/auth.service.ts
 api/person-relations.service.ts
 api/persons.service.ts
 api/seasons.service.ts
@@ -27,6 +27,8 @@ model/create-training-participant-request.ts
 model/create-training-request.ts
 model/deactivate-team-membership-request.ts
 model/error-response.ts
+model/login-request.ts
+model/login-response.ts
 model/models.ts
 model/person-dto.ts
 model/person-relation-dto.ts
@@ -42,6 +44,7 @@ model/training-participant-dto.ts
 model/training-status.ts
 model/update-person-request.ts
 model/update-phone-number-request.ts
+model/update-training-participant-request.ts
 param.ts
 provide-api.ts
 query.params.ts

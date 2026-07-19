@@ -21,6 +21,7 @@ export interface TrainingParticipantDto {
     createdAt?: string;
     updatedAt?: string;
 }
-
+export namespace TrainingParticipantDto {
+}
 
 

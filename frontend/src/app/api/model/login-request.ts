@@ -9,10 +9,8 @@
  */
 
 
-export const AttendanceStatus = {
-    Present: 'PRESENT',
-    Absent: 'ABSENT',
-    Excused: 'EXCUSED'
-} as const;
-export type AttendanceStatus = typeof AttendanceStatus[keyof typeof AttendanceStatus];
+export interface LoginRequest { 
+    username: string;
+    password: string;
+}
 

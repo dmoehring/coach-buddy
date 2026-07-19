@@ -9,14 +9,11 @@
  */
 
 
-export enum PhoneType {
-
-    Mobile = 'MOBILE',
-
-    Home = 'HOME',
-
-    Work = 'WORK',
-
-    Emergency = 'EMERGENCY'
-}
+export const PhoneType = {
+    Mobile: 'MOBILE',
+    Home: 'HOME',
+    Work: 'WORK',
+    Emergency: 'EMERGENCY'
+} as const;
+export type PhoneType = typeof PhoneType[keyof typeof PhoneType];
 

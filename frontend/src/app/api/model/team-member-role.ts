@@ -9,12 +9,10 @@
  */
 
 
-export enum TeamMemberRole {
-
-    Player = 'PLAYER',
-
-    Coach = 'COACH',
-
-    AssistantCoach = 'ASSISTANT_COACH'
-}
+export const TeamMemberRole = {
+    Player: 'PLAYER',
+    Coach: 'COACH',
+    AssistantCoach: 'ASSISTANT_COACH'
+} as const;
+export type TeamMemberRole = typeof TeamMemberRole[keyof typeof TeamMemberRole];
 

@@ -9,18 +9,13 @@
  */
 
 
-export enum RelationType {
-
-    Mother = 'MOTHER',
-
-    Father = 'FATHER',
-
-    Grandmother = 'GRANDMOTHER',
-
-    Grandfather = 'GRANDFATHER',
-
-    StepParent = 'STEP_PARENT',
-
-    Other = 'OTHER'
-}
+export const RelationType = {
+    Mother: 'MOTHER',
+    Father: 'FATHER',
+    Grandmother: 'GRANDMOTHER',
+    Grandfather: 'GRANDFATHER',
+    StepParent: 'STEP_PARENT',
+    Other: 'OTHER'
+} as const;
+export type RelationType = typeof RelationType[keyof typeof RelationType];
 

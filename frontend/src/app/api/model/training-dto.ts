@@ -23,6 +23,7 @@ export interface TrainingDto {
     createdAt?: string;
     updatedAt?: string;
 }
-
+export namespace TrainingDto {
+}
 
 

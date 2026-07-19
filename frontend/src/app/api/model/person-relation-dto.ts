@@ -17,6 +17,7 @@ export interface PersonRelationDto {
     guardianPerson?: PersonDto;
     relationType?: RelationType;
 }
-
+export namespace PersonRelationDto {
+}
 
 

@@ -1,6 +1,9 @@
 {
   "openapi" : "3.1.0",
   "tags" : [ {
+    "name" : "Auth",
+    "description" : "Anmeldung am System"
+  }, {
     "name" : "Person Relations",
     "description" : "Verwaltung von Beziehungen zwischen Personen"
   }, {
@@ -239,6 +242,37 @@
         "externalDocs" : {
           "description" : "As defined by 'partial-time' in RFC3339",
           "url" : "https://www.rfc-editor.org/rfc/rfc3339.html#section-5.6"
+        }
+      },
+      "LoginRequest" : {
+        "type" : "object",
+        "required" : [ "username", "password" ],
+        "properties" : {
+          "username" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          },
+          "password" : {
+            "type" : "string",
+            "pattern" : "\\S"
+          }
+        }
+      },
+      "LoginResponse" : {
+        "type" : "object",
+        "properties" : {
+          "token" : {
+            "type" : "string"
+          },
+          "expiresAt" : {
+            "$ref" : "#/components/schemas/Instant"
+          },
+          "displayName" : {
+            "type" : "string"
+          },
+          "username" : {
+            "type" : "string"
+          }
         }
       },
       "PersonDto" : {
@@ -508,11 +542,106 @@
           }
         },
         "required" : [ "number" ]
+      },
+      "UpdateTrainingParticipantRequest" : {
+        "type" : "object",
+        "required" : [ "attendanceStatus" ],
+        "properties" : {
+          "attendanceStatus" : {
+            "$ref" : "#/components/schemas/AttendanceStatus"
+          },
+          "notes" : {
+            "type" : "string"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "SecurityScheme" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT",
+        "description" : "Authentication"
       }
     }
   },
   "paths" : {
+    "/api/v1/auth/login" : {
+      "post" : {
+        "summary" : "Login",
+        "description" : "Meldet einen Account per Benutzername und Passwort an und liefert ein JWT.",
+        "tags" : [ "Auth" ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Anmeldung erfolgreich",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Benutzername oder Passwort ist falsch",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        }
+      }
+    },
     "/api/v1/person-relations" : {
+      "get" : {
+        "summary" : "Find person relations",
+        "description" : "Returns person relations matching the optional search criteria.",
+        "tags" : [ "Person Relations" ],
+        "parameters" : [ {
+          "name" : "childPersonId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "guardianPersonId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "Person relations found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/PersonRelationDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "post" : {
         "summary" : "Create person relation",
         "description" : "Creates a relation between a child person and a guardian person.",
@@ -1336,6 +1465,61 @@
       }
     },
     "/api/v1/training-participants/{id}" : {
+      "patch" : {
+        "summary" : "Update training participant",
+        "description" : "Updates the attendance status and notes of an existing training participant.",
+        "tags" : [ "Training Participants" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateTrainingParticipantRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Training participant updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrainingParticipantDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Training participant not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "delete" : {
         "summary" : "Delete training participant",
         "description" : "Deletes a mistakenly created training participant entry.",

@@ -15,6 +15,7 @@ export interface PhoneNumberDto {
     type?: PhoneType;
     number?: string;
 }
-
+export namespace PhoneNumberDto {
+}
 
 

@@ -15,6 +15,7 @@ export interface CreatePersonRelationRequest {
     guardianPersonId?: string;
     relationType?: RelationType;
 }
-
+export namespace CreatePersonRelationRequest {
+}
 
 

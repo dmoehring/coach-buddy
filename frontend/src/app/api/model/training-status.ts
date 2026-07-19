@@ -9,10 +9,9 @@
  */
 
 
-export enum TrainingStatus {
-
-    Completed = 'COMPLETED',
-
-    Cancelled = 'CANCELLED'
-}
+export const TrainingStatus = {
+    Completed: 'COMPLETED',
+    Cancelled: 'CANCELLED'
+} as const;
+export type TrainingStatus = typeof TrainingStatus[keyof typeof TrainingStatus];
 

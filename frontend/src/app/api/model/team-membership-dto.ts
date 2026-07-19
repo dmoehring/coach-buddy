@@ -22,6 +22,7 @@ export interface TeamMembershipDto {
     createdAt?: string;
     updatedAt?: string;
 }
-
+export namespace TeamMembershipDto {
+}
 
 

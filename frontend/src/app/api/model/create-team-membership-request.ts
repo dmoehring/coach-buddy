@@ -17,6 +17,7 @@ export interface CreateTeamMembershipRequest {
     joinedAt?: string;
     leftAt?: string;
 }
-
+export namespace CreateTeamMembershipRequest {
+}
 
 

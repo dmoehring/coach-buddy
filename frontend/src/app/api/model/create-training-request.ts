@@ -19,6 +19,7 @@ export interface CreateTrainingRequest {
     notes?: string;
     status?: TrainingStatus;
 }
-
+export namespace CreateTrainingRequest {
+}
 
 
