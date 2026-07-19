@@ -1,0 +1,245 @@
+<div class="app-shell">
+  <header class="mobile-header">
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [text]="true"
+      (click)="toggleMobileMenu()"
+      aria-label="Menü öffnen"
+    >
+      <i
+        class="pi"
+        [class.pi-bars]="!mobileMenuOpen()"
+        [class.pi-times]="mobileMenuOpen()"
+      ></i>
+    </button>
+
+    <div class="mobile-brand">
+      <strong>Coach Buddy</strong>
+      <span>
+        {{ context.selectedSeason()?.name ?? 'Keine Saison' }}
+        ·
+        {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
+      </span>
+    </div>
+  </header>
+
+  <div class="mobile-menu" [class.open]="mobileMenuOpen()">
+    <div class="mobile-context">
+      <label class="mobile-context-control">
+        <span>Saison</span>
+
+        <p-select
+          [options]="context.seasons()"
+          [ngModel]="context.selectedSeason()"
+          (ngModelChange)="context.selectSeason($event)"
+          [disabled]="context.loadingSeasons()"
+          optionLabel="name"
+          placeholder="Saison auswählen"
+          appendTo="body"
+        />
+      </label>
+
+      <label class="mobile-context-control">
+        <span>Mannschaft</span>
+
+        <p-select
+          [options]="context.teamsForSelectedSeason()"
+          [ngModel]="context.selectedTeam()"
+          (ngModelChange)="context.selectTeam($event)"
+          [disabled]="context.loadingTeams() || !context.selectedSeason()"
+          optionLabel="name"
+          placeholder="Mannschaft auswählen"
+          appendTo="body"
+        />
+      </label>
+    </div>
+
+    <nav class="mobile-navigation">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-home"></i>
+        Dashboard
+      </a>
+
+      <a
+        routerLink="/persons"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-users"></i>
+        Personen
+      </a>
+
+      <a
+        routerLink="/teams"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-sitemap"></i>
+        Teams
+      </a>
+
+      <a
+        routerLink="/trainings"
+        routerLinkActive="active"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-calendar"></i>
+        Trainings
+      </a>
+    </nav>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      (click)="toggleDarkMode()"
+      class="mobile-darkmode"
+    >
+      <i
+        class="pi"
+        [class.pi-moon]="!darkMode()"
+        [class.pi-sun]="darkMode()"
+      ></i>
+
+      <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
+    </button>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      (click)="logout()"
+      class="mobile-logout"
+    >
+      <i class="pi pi-sign-out"></i>
+      <span>Abmelden</span>
+    </button>
+  </div>
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="pi pi-heart"></i>
+      </div>
+
+      <div>
+        <div class="brand-title">Coach Buddy</div>
+
+        <div class="brand-subtitle">
+          {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
+          Verwaltung
+        </div>
+      </div>
+    </div>
+
+    <nav class="navigation">
+      <a routerLink="/dashboard" routerLinkActive="active">
+        <i class="pi pi-home"></i>
+        Dashboard
+      </a>
+
+      <a routerLink="/persons" routerLinkActive="active">
+        <i class="pi pi-users"></i>
+        Personen
+      </a>
+
+      <a routerLink="/teams" routerLinkActive="active">
+        <i class="pi pi-sitemap"></i>
+        Teams
+      </a>
+
+      <a routerLink="/trainings" routerLinkActive="active">
+        <i class="pi pi-calendar"></i>
+        Trainings
+      </a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <div class="topbar-title">
+        <span>Aktueller Kontext</span>
+
+        <strong>
+          {{ context.selectedSeason()?.name ?? 'Keine Saison' }}
+          ·
+          {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
+        </strong>
+      </div>
+
+      <div class="topbar-controls">
+        <label class="topbar-control">
+          <span>Saison</span>
+
+          <p-select
+            [options]="context.seasons()"
+            [ngModel]="context.selectedSeason()"
+            (ngModelChange)="context.selectSeason($event)"
+            [disabled]="context.loadingSeasons()"
+            optionLabel="name"
+            placeholder="Saison auswählen"
+            appendTo="body"
+          />
+        </label>
+
+        <label class="topbar-control">
+          <span>Mannschaft</span>
+
+          <p-select
+            [options]="context.teamsForSelectedSeason()"
+            [ngModel]="context.selectedTeam()"
+            (ngModelChange)="context.selectTeam($event)"
+            [disabled]="context.loadingTeams() || !context.selectedSeason()"
+            optionLabel="name"
+            placeholder="Mannschaft auswählen"
+            appendTo="body"
+          />
+        </label>
+
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [outlined]="true"
+          (click)="toggleDarkMode()"
+          class="topbar-darkmode"
+        >
+          <i
+            class="pi"
+            [class.pi-moon]="!darkMode()"
+            [class.pi-sun]="darkMode()"
+          ></i>
+
+          <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
+        </button>
+
+        <div class="topbar-user">
+          <span class="topbar-user-name">{{ session.displayName() }}</span>
+
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [text]="true"
+            (click)="logout()"
+            aria-label="Abmelden"
+          >
+            <i class="pi pi-sign-out"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <div class="page-content">
+      <router-outlet />
+    </div>
+  </main>
+</div>

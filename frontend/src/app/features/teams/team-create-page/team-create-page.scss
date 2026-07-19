@@ -1,0 +1,248 @@
+.team-create-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    letter-spacing: -0.04em;
+  }
+
+  button {
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--p-primary-color);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.description {
+  max-width: 46rem;
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color);
+}
+
+.season-context,
+.warning-box,
+.error-box,
+.next-step {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 0.9rem;
+}
+
+.season-context {
+  border: 1px solid var(--p-surface-200);
+  background: var(--p-surface-0);
+
+  > div:last-child {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+  }
+}
+
+.season-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.9rem;
+  color: var(--p-primary-color);
+  background: color-mix(
+    in srgb,
+    var(--p-primary-color),
+    transparent 88%
+  );
+}
+
+.warning-box {
+  border: 1px solid var(--p-orange-200);
+  color: var(--p-orange-800);
+  background: var(--p-orange-50);
+
+  > div {
+    display: grid;
+    gap: 0.15rem;
+  }
+}
+
+.error-box {
+  margin-bottom: 1rem;
+  border: 1px solid var(--p-red-200);
+  color: var(--p-red-700);
+  background: var(--p-red-50);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 46rem)
+    minmax(0, 1fr);
+}
+
+.team-form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.45rem;
+
+  > span {
+    font-size: 0.88rem;
+    font-weight: 700;
+  }
+
+  > span strong {
+    color: var(--p-red-500);
+  }
+
+  input,
+  textarea {
+    width: 100%;
+  }
+
+  textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--p-inputtext-border-color);
+    border-radius: var(--p-inputtext-border-radius);
+    color: var(--p-inputtext-color);
+    background: var(--p-inputtext-background);
+    font: inherit;
+    resize: vertical;
+    outline: none;
+
+    &:focus {
+      border-color: var(--p-inputtext-focus-border-color);
+      box-shadow: var(--p-inputtext-focus-ring-shadow);
+    }
+  }
+}
+
+.field-error {
+  color: var(--p-red-600);
+  font-size: 0.8rem;
+}
+
+.next-step {
+  align-items: flex-start;
+  border: 1px solid color-mix(
+    in srgb,
+    var(--p-primary-color),
+    transparent 65%
+  );
+  background: color-mix(
+    in srgb,
+    var(--p-primary-color),
+    transparent 93%
+  );
+
+  > i {
+    margin-top: 0.15rem;
+    color: var(--p-primary-color);
+    font-size: 1.2rem;
+  }
+
+  > div {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  span {
+    color: var(--p-text-muted-color);
+    line-height: 1.45;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+
+  button {
+    gap: 0.5rem;
+  }
+}
+
+:host-context(.app-dark) {
+  .season-context {
+    border-color: var(--p-surface-800);
+    background: var(--p-surface-900);
+  }
+
+  .warning-box {
+    border-color: color-mix(
+      in srgb,
+      var(--p-orange-400),
+      transparent 45%
+    );
+    color: var(--p-orange-300);
+    background: color-mix(
+      in srgb,
+      var(--p-orange-950),
+      transparent 30%
+    );
+  }
+
+  .error-box {
+    border-color: color-mix(
+      in srgb,
+      var(--p-red-400),
+      transparent 40%
+    );
+    color: var(--p-red-300);
+    background: color-mix(
+      in srgb,
+      var(--p-red-950),
+      transparent 30%
+    );
+  }
+}
+
+@media (max-width: 760px) {
+  .page-header {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+
+    button {
+      justify-content: center;
+    }
+  }
+}

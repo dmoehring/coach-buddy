@@ -1,0 +1,174 @@
+<section class="team-create-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Mannschaften</p>
+      <h1>Team anlegen</h1>
+
+      <p class="description">
+        Lege eine neue Mannschaft für die aktuell ausgewählte
+        Saison an. Anschließend kannst du Spieler und Trainer
+        zuweisen.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/teams"
+    >
+      <i class="pi pi-arrow-left"></i>
+      <span>Zurück</span>
+    </button>
+  </div>
+
+  @if (context.selectedSeason(); as season) {
+    <div class="season-context">
+      <div class="season-icon">
+        <i class="pi pi-calendar"></i>
+      </div>
+
+      <div>
+        <span>Team wird angelegt für</span>
+        <strong>
+          {{ season.name || 'Saison ohne Namen' }}
+        </strong>
+      </div>
+    </div>
+  } @else {
+    <div class="warning-box" role="alert">
+      <i class="pi pi-exclamation-triangle"></i>
+
+      <div>
+        <strong>Keine Saison ausgewählt</strong>
+
+        <span>
+Wähle zuerst im oberen Bereich der Anwendung eine
+Saison aus.
+</span>
+      </div>
+    </div>
+  }
+
+  <div class="form-grid">
+    <p-card styleClass="team-form-card">
+      <ng-template pTemplate="title">
+        Mannschaftsdaten
+      </ng-template>
+
+      <ng-template pTemplate="subtitle">
+        Name und optionale Beschreibung
+      </ng-template>
+
+      @if (error()) {
+        <div class="error-box" role="alert">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form
+        class="team-form"
+        [formGroup]="form"
+        (ngSubmit)="createTeam()"
+      >
+        <label class="form-field">
+<span>
+ Mannschaftsname
+<strong aria-hidden="true">*</strong>
+</span>
+
+          <input
+            pInputText
+            type="text"
+            formControlName="name"
+            placeholder="z. B. F-Jugend"
+            autocomplete="off"
+          />
+
+          @if (form.controls.name.touched &&
+          form.controls.name.hasError('required')) {
+            <small class="field-error">
+              Bitte gib einen Mannschaftsnamen ein.
+            </small>
+          }
+
+          @if (form.controls.name.touched &&
+          form.controls.name.hasError('maxlength')) {
+            <small class="field-error">
+              Der Mannschaftsname darf höchstens 100 Zeichen
+              enthalten.
+            </small>
+          }
+        </label>
+
+        <label class="form-field">
+          <span>Beschreibung</span>
+
+          <textarea
+            rows="5"
+            formControlName="description"
+            placeholder="z. B. Jahrgänge 2017–2018"
+          ></textarea>
+
+          @if (form.controls.description.touched &&
+          form.controls.description.hasError('maxlength')) {
+            <small class="field-error">
+              Die Beschreibung darf höchstens 500 Zeichen
+              enthalten.
+            </small>
+          }
+        </label>
+
+        <div class="next-step">
+          <i class="pi pi-users"></i>
+
+          <div>
+            <strong>Nächster Schritt</strong>
+
+            <span>
+ Nach dem Speichern wirst du automatisch zur
+ Zuweisung von Spielern und Trainern weitergeleitet.
+</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            routerLink="/teams"
+            [disabled]="saving()"
+          >
+            Abbrechen
+          </button>
+
+          <button
+            pButton
+            type="submit"
+            [loading]="saving()"
+            [disabled]="
+saving() ||
+              !context.selectedSeason()
+"
+          >
+            @if (!saving()) {
+              <i class="pi pi-arrow-right"></i>
+            }
+
+            <span>
+ {{
+                saving()
+                  ? 'Team wird angelegt'
+                  : 'Team anlegen und weiter'
+              }}
+</span>
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</section>

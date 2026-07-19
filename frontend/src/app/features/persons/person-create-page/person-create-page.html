@@ -1,0 +1,39 @@
+<section class="person-create-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Personen</p>
+      <h1>Person anlegen</h1>
+      <p class="description">
+        Lege eine neue Person an. Die Zuordnung zu Mannschaften erfolgt später über die Team-Mitgliedschaften.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/persons"
+    >
+      <i class="pi pi-arrow-left"></i>
+      <span>Zurück</span>
+    </button>
+  </div>
+
+  @if (error()) {
+    <div class="error-box">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <div class="form-grid">
+    <app-person-form
+      title="Neue Person"
+      subtitle="Vorname, Nachname und optionale Stammdaten"
+      submitLabel="Person speichern"
+      [saving]="saving()"
+      (submitted)="createPerson($event)"
+    />
+  </div>
+</section>

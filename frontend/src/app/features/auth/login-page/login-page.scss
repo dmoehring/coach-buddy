@@ -1,0 +1,61 @@
+.login-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--p-surface-50);
+}
+
+:host-context(.app-dark) .login-shell {
+  background: var(--p-surface-950);
+}
+
+:host ::ng-deep .login-card {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.login-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+
+  i {
+    color: var(--p-primary-color);
+  }
+}
+
+.login-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+
+  > span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  input {
+    width: 100%;
+  }
+}
+
+.login-error {
+  margin: 0;
+  color: var(--p-red-500);
+  font-size: 0.85rem;
+}
+
+.login-submit {
+  justify-content: center;
+  gap: 0.5rem;
+}

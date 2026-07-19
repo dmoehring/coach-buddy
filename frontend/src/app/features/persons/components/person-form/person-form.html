@@ -1,0 +1,144 @@
+<p-card styleClass="person-form-card">
+  <ng-template pTemplate="title">
+    {{ title }}
+  </ng-template>
+
+  <ng-template pTemplate="subtitle">
+    {{ subtitle }}
+  </ng-template>
+
+  <form class="person-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="name-grid">
+      <label class="form-field">
+        <span>Vorname</span>
+        <input
+          pInputText
+          type="text"
+          formControlName="firstName"
+          placeholder="z. B. Max"
+        />
+
+        @if (isInvalid('firstName')) {
+          <small class="field-error">Vorname ist erforderlich.</small>
+        }
+      </label>
+
+      <label class="form-field">
+        <span>Nachname</span>
+        <input
+          pInputText
+          type="text"
+          formControlName="lastName"
+          placeholder="z. B. Müller"
+        />
+
+        @if (isInvalid('lastName')) {
+          <small class="field-error">Nachname ist erforderlich.</small>
+        }
+      </label>
+    </div>
+
+    <div class="details-grid">
+      <label class="form-field">
+        <span>Geburtsdatum</span>
+        <p-datepicker
+          formControlName="birthDate"
+          dateFormat="dd.mm.yy"
+          appendTo="body"
+        />
+      </label>
+
+      <label class="form-field">
+        <span>Spitzname</span>
+        <input
+          pInputText
+          type="text"
+          formControlName="nickname"
+          placeholder="Optional"
+        />
+      </label>
+    </div>
+
+    <label class="form-field">
+      <span>Notiz</span>
+      <textarea
+        rows="5"
+        formControlName="notes"
+        placeholder="Optionale Notiz zur Person"
+      ></textarea>
+    </label>
+
+    <div class="phone-numbers-section" formArrayName="phoneNumbers">
+      <div class="phone-numbers-header">
+        <span>Telefonnummern</span>
+
+        <button
+          pButton
+          type="button"
+          severity="secondary"
+          [text]="true"
+          (click)="addPhoneNumber()"
+        >
+          <i class="pi pi-plus"></i>
+          <span>Nummer hinzufügen</span>
+        </button>
+      </div>
+
+      @for (phoneNumberGroup of phoneNumbers.controls; track $index) {
+        <div class="phone-number-row" [formGroupName]="$index">
+          <p-select
+            [options]="phoneTypeOptions"
+            formControlName="type"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+          />
+
+          <div class="phone-number-input">
+            <input
+              pInputText
+              type="text"
+              formControlName="number"
+              placeholder="z. B. 0170 1234567"
+            />
+
+            @if (isPhoneNumberInvalid($index)) {
+              <small class="field-error">Nummer ist erforderlich.</small>
+            }
+          </div>
+
+          <button
+            pButton
+            type="button"
+            severity="danger"
+            [text]="true"
+            (click)="removePhoneNumber($index)"
+            aria-label="Nummer entfernen"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      } @empty {
+        <p class="phone-numbers-empty">Noch keine Telefonnummer erfasst.</p>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        [routerLink]="cancelLink"
+        [disabled]="saving"
+      >
+        Abbrechen
+      </button>
+
+      <button pButton type="submit" [disabled]="saving">
+        <i class="pi pi-check"></i>
+        <span>{{ saving ? 'Speichert ...' : submitLabel }}</span>
+      </button>
+    </div>
+  </form>
+</p-card>

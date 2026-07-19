@@ -1,0 +1,30 @@
+<p-card styleClass="quick-actions-card">
+  <ng-template pTemplate="title">
+    Schnellaktionen
+  </ng-template>
+
+  <ng-template pTemplate="subtitle">
+    Häufige Aufgaben direkt öffnen
+  </ng-template>
+
+  <div class="quick-actions">
+    @for (action of actions; track action.label) {
+      <a
+        class="quick-action"
+        [class.primary]="action.primary"
+        [routerLink]="action.route"
+      >
+        <div class="quick-action-icon">
+          <i [class]="action.icon"></i>
+        </div>
+
+        <div class="quick-action-text">
+          <strong>{{ action.label }}</strong>
+          <span>{{ action.description }}</span>
+        </div>
+
+        <i class="pi pi-arrow-right arrow"></i>
+      </a>
+    }
+  </div>
+</p-card>

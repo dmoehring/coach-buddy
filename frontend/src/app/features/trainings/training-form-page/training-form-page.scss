@@ -1,0 +1,129 @@
+.training-form-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    letter-spacing: -0.04em;
+  }
+
+  button {
+    gap: 0.5rem;
+    white-space: nowrap;
+  }
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: var(--p-primary-color);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.description {
+  margin: 0.5rem 0 0;
+  color: var(--p-text-muted-color);
+  max-width: 44rem;
+}
+
+.form-grid {
+  display: grid;
+  max-width: 48rem;
+}
+
+.training-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.4rem;
+
+  > span {
+    color: var(--p-text-muted-color);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  textarea {
+    width: 100%;
+    resize: vertical;
+    min-height: 7rem;
+    padding: 0.75rem;
+    border: 1px solid var(--p-surface-300);
+    border-radius: 0.75rem;
+    background: var(--p-surface-0);
+    color: var(--p-text-color);
+    font: inherit;
+  }
+}
+
+:host-context(.app-dark) .form-field textarea {
+  border-color: var(--p-surface-700);
+  background: var(--p-surface-900);
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+
+  button {
+    gap: 0.5rem;
+  }
+}
+
+:host ::ng-deep .training-card {
+  overflow: hidden;
+}
+
+:host ::ng-deep .form-field .p-select,
+:host ::ng-deep .form-field .p-datepicker,
+:host ::ng-deep .form-field input {
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .form-grid {
+    max-width: none;
+  }
+
+  .form-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+@media (max-width: 560px) {
+  .time-grid {
+    grid-template-columns: 1fr;
+  }
+}

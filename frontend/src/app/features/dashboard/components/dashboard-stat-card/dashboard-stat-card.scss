@@ -1,0 +1,34 @@
+.stat-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+
+  strong {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+  }
+
+  small {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--p-text-muted-color);
+  }
+}
+
+.stat-label {
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+}
+
+.stat-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 1rem;
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color), transparent 90%);
+}

@@ -1,0 +1,21 @@
+<section class="dashboard">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Übersicht</p>
+      <h1>Dashboard</h1>
+      <p class="description">
+        Aktuelle Saison, letzte Trainings und schneller Einstieg in die Verwaltung.
+      </p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    @for (metric of metrics(); track metric.label) {
+      <app-dashboard-stat-card [metric]="metric"/>
+    }
+  </div>
+
+  <app-dashboard-quick-actions [actions]="quickActions" />
+
+  <app-recent-trainings-table [trainings]="recentTrainings()" />
+</section>

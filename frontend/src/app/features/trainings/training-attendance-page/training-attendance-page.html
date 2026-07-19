@@ -1,0 +1,270 @@
+<section class="training-attendance-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Anwesenheit</p>
+      <h1>Trainingsteilnahme erfassen</h1>
+      <p class="description">
+        Erfasse die Anwesenheit der Kinder sowie der Trainer und Helfer.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/trainings"
+    >
+      <i class="pi pi-arrow-left"></i>
+      <span>Zurück</span>
+    </button>
+  </div>
+
+  @if (error()) {
+    <p-card>
+      <p class="cancelled-text">{{ error() }}</p>
+    </p-card>
+  } @else if (loading()) {
+    <p-card>
+      <p class="cancelled-text">Training wird geladen ...</p>
+    </p-card>
+  } @else if (training(); as trainingValue) {
+    <p-card styleClass="training-summary-card">
+      <div class="training-summary">
+        <div>
+          <span>Training</span>
+          <strong>{{ formatDate(trainingValue.trainingDate) }}</strong>
+        </div>
+
+        <div>
+          <span>Mannschaft</span>
+          <strong>{{ trainingValue.team?.name }}</strong>
+        </div>
+
+        <div>
+          <span>Uhrzeit</span>
+          <strong>{{ getTimeRange() }}</strong>
+        </div>
+
+        <div>
+          <span>Ort</span>
+          <strong>{{ trainingValue.location || '-' }}</strong>
+        </div>
+
+        <div>
+          <span>Status</span>
+          <p-tag
+            [value]="getTrainingStatusLabel(trainingValue.status)"
+            [severity]="getTrainingStatusSeverity(trainingValue.status)"
+          />
+        </div>
+      </div>
+    </p-card>
+
+    @if (trainingValue.status === 'COMPLETED') {
+      <div class="attendance-stats">
+        <p-card>
+          <div class="stat-card">
+            <span>Kinder anwesend</span>
+            <strong>{{ presentPlayersCount() }}</strong>
+          </div>
+        </p-card>
+
+        <p-card>
+          <div class="stat-card">
+            <span>Kinder entschuldigt</span>
+            <strong>{{ excusedPlayersCount() }}</strong>
+          </div>
+        </p-card>
+
+        <p-card>
+          <div class="stat-card">
+            <span>Kinder unentschuldigt</span>
+            <strong>{{ absentPlayersCount() }}</strong>
+          </div>
+        </p-card>
+
+        <p-card>
+          <div class="stat-card">
+            <span>Trainer/Helfer anwesend</span>
+            <strong>{{ presentTrainersCount() }}</strong>
+          </div>
+        </p-card>
+      </div>
+
+      <p-card styleClass="participants-card">
+        <ng-template pTemplate="title">
+          Teilnehmer
+        </ng-template>
+
+        <ng-template pTemplate="subtitle">
+          Kinder der ausgewählten Mannschaft
+        </ng-template>
+
+        <div class="participants-list">
+          @for (entry of playerParticipants(); track entry.person.id) {
+            <article class="participant-row">
+              <div class="participant-main">
+                <div class="participant-name">
+                  @if (entry.person.id) {
+                    <a
+                      class="person-name-link"
+                      [routerLink]="['/persons', entry.person.id]"
+                      [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
+                    >
+                      {{ getPersonName(entry.person) }}
+                    </a>
+                  } @else {
+                    <strong>{{ getPersonName(entry.person) }}</strong>
+                  }
+                  <span>{{ getRoleLabel(entry.role) }}</span>
+                </div>
+
+                <p-tag
+                  [value]="getAttendanceLabel(entry.attendanceStatus)"
+                  [severity]="getAttendanceSeverity(entry.attendanceStatus)"
+                />
+              </div>
+
+              <div class="attendance-actions">
+                <button
+                  pButton
+                  type="button"
+                  severity="success"
+                  [outlined]="entry.attendanceStatus !== 'PRESENT'"
+                  (click)="setAttendance(entry, 'PRESENT')"
+                >
+                  <i class="pi pi-check"></i>
+                  <span>Anwesend</span>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="warn"
+                  [outlined]="entry.attendanceStatus !== 'EXCUSED'"
+                  (click)="setAttendance(entry, 'EXCUSED')"
+                >
+                  <i class="pi pi-info-circle"></i>
+                  <span>Entschuldigt</span>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  [outlined]="entry.attendanceStatus !== 'ABSENT'"
+                  (click)="setAttendance(entry, 'ABSENT')"
+                >
+                  <i class="pi pi-times"></i>
+                  <span>Unentschuldigt</span>
+                </button>
+              </div>
+            </article>
+          } @empty {
+            <p class="cancelled-text">Diesem Team sind aktuell keine Kinder zugeordnet.</p>
+          }
+        </div>
+      </p-card>
+
+      <p-card styleClass="participants-card">
+        <ng-template pTemplate="title">
+          Trainer und Helfer
+        </ng-template>
+
+        <ng-template pTemplate="subtitle">
+          Trainer, Co-Trainer und unterstützende Personen
+        </ng-template>
+
+        <div class="participants-list">
+          @for (entry of trainerParticipants(); track entry.person.id) {
+            <article class="participant-row">
+              <div class="participant-main">
+                <div class="participant-name">
+                  @if (entry.person.id) {
+                    <a
+                      class="person-name-link"
+                      [routerLink]="['/persons', entry.person.id]"
+                      [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
+                    >
+                      {{ getPersonName(entry.person) }}
+                    </a>
+                  } @else {
+                    <strong>{{ getPersonName(entry.person) }}</strong>
+                  }
+                  <span>{{ getRoleLabel(entry.role) }}</span>
+                </div>
+
+                <p-tag
+                  [value]="getAttendanceLabel(entry.attendanceStatus)"
+                  [severity]="getAttendanceSeverity(entry.attendanceStatus)"
+                />
+              </div>
+
+              <div class="attendance-actions">
+                <button
+                  pButton
+                  type="button"
+                  severity="success"
+                  [outlined]="entry.attendanceStatus !== 'PRESENT'"
+                  (click)="setAttendance(entry, 'PRESENT')"
+                >
+                  <i class="pi pi-check"></i>
+                  <span>Anwesend</span>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="warn"
+                  [outlined]="entry.attendanceStatus !== 'EXCUSED'"
+                  (click)="setAttendance(entry, 'EXCUSED')"
+                >
+                  <i class="pi pi-info-circle"></i>
+                  <span>Entschuldigt</span>
+                </button>
+
+                <button
+                  pButton
+                  type="button"
+                  severity="danger"
+                  [outlined]="entry.attendanceStatus !== 'ABSENT'"
+                  (click)="setAttendance(entry, 'ABSENT')"
+                >
+                  <i class="pi pi-times"></i>
+                  <span>Unentschuldigt</span>
+                </button>
+              </div>
+            </article>
+          } @empty {
+            <p class="cancelled-text">Diesem Team sind aktuell keine Trainer oder Helfer zugeordnet.</p>
+          }
+        </div>
+      </p-card>
+
+      @if (success()) {
+        <p class="save-success">{{ success() }}</p>
+      }
+
+      <div class="save-bar">
+        <div>
+          <strong>Trainingsteilnahme speichern</strong>
+          <span>
+            {{ presentPlayersCount() }} Kinder und {{ presentTrainersCount() }} Trainer/Helfer anwesend
+          </span>
+        </div>
+
+        <button pButton type="button" [disabled]="saving()" (click)="saveAttendance()">
+          <i class="pi pi-save"></i>
+          <span>{{ saving() ? 'Speichert ...' : 'Anwesenheit speichern' }}</span>
+        </button>
+      </div>
+    } @else {
+      <p-card>
+        <p class="cancelled-text">
+          Dieses Training ist ausgefallen. Es wird keine Anwesenheit erfasst.
+        </p>
+      </p-card>
+    }
+  }
+</section>
