@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { AppLayout } from './core/layout/app-layout/app-layout';
+import { authGuard } from './core/auth/auth.guard';
+import { LoginPage } from './features/auth/login-page/login-page';
 import { DashboardPage } from './features/dashboard/dashboard-page/dashboard-page';
 import { PersonsPage } from './features/persons/persons-page/persons-page';
 import { TeamsPage } from './features/teams/teams-page/teams-page';
@@ -14,8 +16,13 @@ import {TeamDetailPage} from './features/teams/team-detail-page/team-detail-page
 
 export const routes: Routes = [
   {
+    path: 'login',
+    component: LoginPage
+  },
+  {
     path: '',
     component: AppLayout,
+    canActivateChild: [authGuard],
     children: [
       { path: 'dashboard', component: DashboardPage },
       { path: 'persons', component: PersonsPage },

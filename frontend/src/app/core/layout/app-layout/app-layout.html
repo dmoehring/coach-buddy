@@ -110,6 +110,18 @@
 
       <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
     </button>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      (click)="logout()"
+      class="mobile-logout"
+    >
+      <i class="pi pi-sign-out"></i>
+      <span>Abmelden</span>
+    </button>
   </div>
 
   <aside class="sidebar">
@@ -208,6 +220,21 @@
 
           <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
         </button>
+
+        <div class="topbar-user">
+          <span class="topbar-user-name">{{ session.displayName() }}</span>
+
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [text]="true"
+            (click)="logout()"
+            aria-label="Abmelden"
+          >
+            <i class="pi pi-sign-out"></i>
+          </button>
+        </div>
       </div>
     </header>
 

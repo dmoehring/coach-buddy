@@ -1,11 +1,12 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 
 import { CurrentContextService } from '../../context/current-context.service';
+import { SessionService } from '../../auth/session.service';
 
 @Component({
   selector: 'app-layout',
@@ -22,9 +23,16 @@ import { CurrentContextService } from '../../context/current-context.service';
 })
 export class AppLayout {
   readonly context = inject(CurrentContextService);
+  readonly session = inject(SessionService);
+  private readonly router = inject(Router);
 
   readonly darkMode = signal(false);
   readonly mobileMenuOpen = signal(false);
+
+  logout(): void {
+    this.session.clearSession();
+    this.router.navigate(['/login']);
+  }
 
   toggleDarkMode(): void {
     this.darkMode.update(value => !value);

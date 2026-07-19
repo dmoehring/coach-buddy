@@ -177,6 +177,20 @@
   gap: 0.5rem;
 }
 
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: end;
+}
+
+.topbar-user-name {
+  color: var(--p-text-muted-color);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .page-content {
   min-width: 0;
   padding: 2rem;
@@ -332,7 +346,8 @@
     background: var(--p-surface-900);
   }
 
-  .mobile-darkmode {
+  .mobile-darkmode,
+  .mobile-logout {
     width: 100%;
     justify-content: center;
     gap: 0.5rem;
