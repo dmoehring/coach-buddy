@@ -3,6 +3,7 @@ package de.moehring.coach.buddy.backend.person.resources;
 import de.moehring.coach.buddy.backend.common.exceptions.ErrorResponse;
 import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRelationRequest;
 import de.moehring.coach.buddy.backend.person.dtos.PersonRelationDto;
+import de.moehring.coach.buddy.backend.person.search.PersonRelationSearchCriteria;
 import de.moehring.coach.buddy.backend.person.services.PersonRelationService;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.*;
@@ -12,12 +13,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.enums.SchemaType;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import java.util.List;
 import java.util.UUID;
 
 @Path("/api/v1/person-relations")
@@ -28,6 +31,20 @@ import java.util.UUID;
 public class PersonRelationResource {
 
     private final PersonRelationService personRelationService;
+
+    @GET
+    @Operation(summary = "Find person relations", description = "Returns person relations matching the optional search criteria.")
+    @APIResponse(
+            responseCode = "200",
+            description = "Person relations found",
+            content = @Content(
+                    mediaType = MediaType.APPLICATION_JSON,
+                    schema = @Schema(type = SchemaType.ARRAY, implementation = PersonRelationDto.class)
+            )
+    )
+    public List<PersonRelationDto> findAllPersonRelations(@BeanParam PersonRelationSearchCriteria personRelationSearchCriteria) {
+        return personRelationService.findAll(personRelationSearchCriteria);
+    }
 
     @POST
     @Operation(summary = "Create person relation", description = "Creates a relation between a child person and a guardian person.")

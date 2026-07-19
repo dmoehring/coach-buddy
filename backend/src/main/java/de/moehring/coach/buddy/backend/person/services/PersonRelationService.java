@@ -9,10 +9,12 @@ import de.moehring.coach.buddy.backend.common.exceptions.BadRequestException;
 import de.moehring.coach.buddy.backend.person.mappers.PersonRelationMapper;
 import de.moehring.coach.buddy.backend.person.repositories.PersonRelationRepository;
 import de.moehring.coach.buddy.backend.person.repositories.PersonRepository;
+import de.moehring.coach.buddy.backend.person.search.PersonRelationSearchCriteria;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -22,6 +24,10 @@ public class PersonRelationService {
     private final PersonRepository personRepository;
     private final PersonRelationRepository personRelationRepository;
     private final PersonRelationMapper personRelationMapper;
+
+    public List<PersonRelationDto> findAll(PersonRelationSearchCriteria criteria) {
+        return personRelationMapper.mapToDto(personRelationRepository.search(criteria));
+    }
 
     @Transactional
     public PersonRelationDto create(CreatePersonRelationRequest request) {
