@@ -108,21 +108,36 @@
         <ng-template pTemplate="body" let-team>
           <tr>
             <td>
-              <div class="team-cell">
-                <div class="team-symbol">
-                  <i class="pi pi-users"></i>
-                </div>
+              @if (team.id) {
+                <a
+                  class="team-cell team-cell-link"
+                  [routerLink]="['/teams', team.id]"
+                >
+                  <div class="team-symbol">
+                    <i class="pi pi-users"></i>
+                  </div>
 
-                <div>
-                  <strong>
-                    {{ team.name || 'Team ohne Namen' }}
-                  </strong>
+                  <div>
+                    <strong>
+                      {{ team.name || 'Team ohne Namen' }}
+                    </strong>
 
-                  @if (team.id) {
                     <span>{{ team.id }}</span>
-                  }
+                  </div>
+                </a>
+              } @else {
+                <div class="team-cell">
+                  <div class="team-symbol">
+                    <i class="pi pi-users"></i>
+                  </div>
+
+                  <div>
+                    <strong>
+                      {{ team.name || 'Team ohne Namen' }}
+                    </strong>
+                  </div>
                 </div>
-              </div>
+              }
             </td>
 
             <td>
@@ -170,20 +185,6 @@
                 >
                   <i class="pi pi-check-circle"></i>
                   <span>Auswählen</span>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="secondary"
-                  [text]="true"
-                  [routerLink]="['/teams', team.id]"
-                  [disabled]="!team.id"
-                  [attr.aria-label]="
-                    'Team ' + team.name + ' anzeigen'
-                  "
-                >
-                  <i class="pi pi-eye"></i>
                 </button>
               </div>
             </td>
@@ -240,23 +241,48 @@
             [class.team-card-selected]="isSelected(team)"
           >
             <div class="team-card-header">
-              <div class="team-symbol">
-                <i class="pi pi-users"></i>
-              </div>
+              @if (team.id) {
+                <a
+                  class="team-card-title-link"
+                  [routerLink]="['/teams', team.id]"
+                >
+                  <div class="team-symbol">
+                    <i class="pi pi-users"></i>
+                  </div>
 
-              <div class="team-card-title">
-                <strong>
-                  {{ team.name || 'Team ohne Namen' }}
-                </strong>
+                  <div class="team-card-title">
+                    <strong>
+                      {{ team.name || 'Team ohne Namen' }}
+                    </strong>
 
-                <span>
-                  {{
-                    team.seasonName ||
-                    context.selectedSeason()?.name ||
-                    '-'
-                  }}
-                </span>
-              </div>
+                    <span>
+                      {{
+                        team.seasonName ||
+                        context.selectedSeason()?.name ||
+                        '-'
+                      }}
+                    </span>
+                  </div>
+                </a>
+              } @else {
+                <div class="team-symbol">
+                  <i class="pi pi-users"></i>
+                </div>
+
+                <div class="team-card-title">
+                  <strong>
+                    {{ team.name || 'Team ohne Namen' }}
+                  </strong>
+
+                  <span>
+                    {{
+                      team.seasonName ||
+                      context.selectedSeason()?.name ||
+                      '-'
+                    }}
+                  </span>
+                </div>
+              }
 
               @if (isSelected(team)) {
                 <span class="selected-badge">
@@ -288,18 +314,6 @@
               >
                 <i class="pi pi-check-circle"></i>
                 <span>Auswählen</span>
-              </button>
-
-              <button
-                pButton
-                type="button"
-                severity="secondary"
-                [outlined]="true"
-                [routerLink]="['/teams', team.id]"
-                [disabled]="!team.id"
-              >
-                <i class="pi pi-eye"></i>
-                <span>Anzeigen</span>
               </button>
             </div>
           </article>
