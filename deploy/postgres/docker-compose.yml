@@ -1,0 +1,31 @@
+# Shared PostgreSQL instance for all apps on the Pi.
+# No port is published: apps reach it by joining the external "db" network
+# (service name "postgres"). Each app gets its own database and role, see
+# create-app-db.sh.
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    networks:
+      - db
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  db:
+    name: db
+
+volumes:
+  pgdata:

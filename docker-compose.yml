@@ -1,26 +1,7 @@
+# Postgres is not part of this stack: the backend connects to the shared
+# instance from deploy/postgres via the external "db" network.
+# For local development use docker-compose.dev.yml instead.
 services:
-  postgres:
-    image: postgres:16
-    container_name: coach-buddy-postgres
-    restart: unless-stopped
-
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-
-    ports:
-      - "${POSTGRES_PORT}:5432"
-
-    volumes:
-      - coach_buddy_postgres_data:/var/lib/postgresql/data
-
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: ./backend
@@ -38,9 +19,9 @@ services:
     volumes:
       - ./backend/src/main/resources/privateKey.pem:/deployments/keys/privateKey.pem:ro
 
-    depends_on:
-      postgres:
-        condition: service_healthy
+    networks:
+      - default
+      - db
 
   frontend:
     build:
@@ -55,5 +36,7 @@ services:
     depends_on:
       - backend
 
-volumes:
-  coach_buddy_postgres_data:
+networks:
+  db:
+    external: true
+    name: db
