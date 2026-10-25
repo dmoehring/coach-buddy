@@ -15,7 +15,15 @@
     }
   </div>
 
-  <app-dashboard-quick-actions [actions]="quickActions" />
+  <div class="dashboard-grid">
+    <app-dashboard-quick-actions [actions]="quickActions" />
+
+    <app-birthdays-card
+      [birthdays]="birthdays()"
+      [teamName]="context.selectedTeam()?.name ?? null"
+      [windowDays]="birthdayWindowDays"
+    />
+  </div>
 
   <app-recent-trainings-table [trainings]="recentTrainings()" />
 </section>

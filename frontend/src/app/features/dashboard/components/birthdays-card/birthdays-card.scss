@@ -1,0 +1,83 @@
+:host ::ng-deep .birthdays-card {
+  overflow: hidden;
+}
+
+.birthday-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.birthday {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.75rem 0.95rem;
+  border: 1px solid var(--p-surface-200);
+  border-radius: 1.1rem;
+  background: var(--p-surface-0);
+
+  &.today {
+    border-color: var(--p-primary-color);
+    background: color-mix(in srgb, var(--p-primary-color), transparent 94%);
+  }
+
+  &.past {
+    .birthday-person,
+    .birthday-when {
+      opacity: 0.7;
+    }
+  }
+}
+
+:host-context(.app-dark) .birthday {
+  border-color: var(--p-surface-800);
+  background: var(--p-surface-900);
+
+  &.today {
+    border-color: var(--p-primary-color);
+    background: color-mix(in srgb, var(--p-primary-color), transparent 90%);
+  }
+}
+
+.birthday-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 0.9rem;
+  color: var(--p-primary-color);
+  background: color-mix(in srgb, var(--p-primary-color), transparent 88%);
+}
+
+.birthday-person,
+.birthday-when {
+  display: grid;
+  gap: 0.1rem;
+
+  span {
+    color: var(--p-text-muted-color);
+    font-size: 0.82rem;
+  }
+}
+
+.birthday-when {
+  text-align: right;
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 1.5rem;
+  color: var(--p-text-muted-color);
+  text-align: center;
+
+  i {
+    font-size: 1.8rem;
+    color: var(--p-primary-color);
+  }
+}

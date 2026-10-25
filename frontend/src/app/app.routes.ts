@@ -14,6 +14,7 @@ import {PersonDetailPage} from './features/persons/person-detail-page/person-det
 import {TeamCreatePage} from './features/teams/team-create-page/team-create-page';
 import {TeamMembersPage} from './features/teams/team-members-page/team-members-page';
 import {TeamDetailPage} from './features/teams/team-detail-page/team-detail-page';
+import { SeasonCreatePage } from './features/seasons/season-create-page/season-create-page';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,7 @@ export const routes: Routes = [
       { path: 'persons/new', component: PersonCreatePage },
       { path: 'persons/:id/edit', component: PersonEditPage },
       { path: 'persons/:id', component: PersonDetailPage },
+      { path: 'seasons/new', component: SeasonCreatePage },
       { path: 'teams', component: TeamsPage },
       { path: 'teams/new', component: TeamCreatePage },
       { path: 'teams/:id/members', component: TeamMembersPage},

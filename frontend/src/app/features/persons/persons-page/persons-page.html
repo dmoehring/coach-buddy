@@ -20,7 +20,7 @@
     </ng-template>
 
     <ng-template pTemplate="subtitle">
-      Personen aus dem Backend
+      {{ filteredRows().length }} von {{ rows().length }} Personen
     </ng-template>
 
     @if (error()) {
@@ -30,39 +30,123 @@
       </div>
     }
 
+    <div class="filter-bar">
+      <p-iconfield class="filter-search">
+        <p-inputicon class="pi pi-search" />
+        <input
+          pInputText
+          type="search"
+          placeholder="Name, Spitzname oder Notiz suchen"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="searchTerm.set($event ?? '')"
+          aria-label="Personen durchsuchen"
+        />
+      </p-iconfield>
+
+      <p-select
+        [options]="teamOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="teamFilter()"
+        (ngModelChange)="setTeamFilter($event)"
+        placeholder="Alle Personen"
+        [showClear]="false"
+        appendTo="body"
+        aria-label="Nach Mannschaft filtern"
+      />
+
+      <p-select
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="roleFilter()"
+        (ngModelChange)="roleFilter.set($event)"
+        [disabled]="roleFilterDisabled()"
+        placeholder="Alle Rollen"
+        appendTo="body"
+        aria-label="Nach Rolle filtern"
+      />
+
+      <p-select
+        [options]="birthYearOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="birthYearFilter()"
+        (ngModelChange)="birthYearFilter.set($event)"
+        placeholder="Alle Jahrgänge"
+        appendTo="body"
+        aria-label="Nach Jahrgang filtern"
+      />
+
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [text]="true"
+        [disabled]="!hasActiveFilters()"
+        (click)="resetFilters()"
+      >
+        <i class="pi pi-filter-slash"></i>
+        <span>Zurücksetzen</span>
+      </button>
+    </div>
+
+    @if (context.selectedSeason(); as season) {
+      <p class="filter-hint">
+        Mannschaften und Rollen beziehen sich auf die Saison {{ season.name }}.
+      </p>
+    }
+
     <div class="desktop-table">
       <p-table
-        [value]="persons()"
+        [value]="filteredRows()"
         [loading]="loading()"
-        [tableStyle]="{ 'min-width': '52rem' }"
+        [tableStyle]="{ 'min-width': '58rem' }"
       >
         <ng-template pTemplate="header">
           <tr>
-            <th>Name</th>
-            <th>Geburtsdatum</th>
-            <th>Spitzname</th>
+            <th pSortableColumn="fullName">Name <p-sortIcon field="fullName" /></th>
+            <th pSortableColumn="birthDate">Geburtsdatum <p-sortIcon field="birthDate" /></th>
+            <th>Mannschaft</th>
             <th>Notiz</th>
             <th class="actions-column">Aktionen</th>
           </tr>
         </ng-template>
 
-        <ng-template pTemplate="body" let-person>
+        <ng-template pTemplate="body" let-row>
           <tr>
             <td>
               <div class="person-cell">
-                <strong>{{ getFullName(person) || '-' }}</strong>
-                @if (person.id) {
-                  <span>{{ person.id }}</span>
+                <strong>{{ row.fullName || '-' }}</strong>
+                @if (row.person.nickname) {
+                  <span>„{{ row.person.nickname }}“</span>
                 }
               </div>
             </td>
 
-            <td>{{ formatBirthDate(person.birthDate) }}</td>
-            <td>{{ person.nickname || '-' }}</td>
+            <td>
+              {{ formatBirthDate(row.person.birthDate) }}
+              @if (row.age !== null) {
+                <span class="age">({{ row.age }} J.)</span>
+              }
+            </td>
+
+            <td>
+              <div class="membership-tags">
+                @for (membership of row.memberships; track membership.teamId) {
+                  <p-tag
+                    [value]="membership.teamName + (membership.role ? ' · ' + getRoleLabel(membership.role) : '')"
+                    severity="secondary"
+                  />
+                } @empty {
+                  <span class="note">-</span>
+                }
+              </div>
+            </td>
 
             <td>
               <span class="note">
-                {{ person.notes || '-' }}
+                {{ row.person.notes || '-' }}
               </span>
             </td>
 
@@ -73,8 +157,8 @@
                   type="button"
                   severity="secondary"
                   [text]="true"
-                  [routerLink]="['/persons', person.id]"
-                  [disabled]="!person.id"
+                  [routerLink]="['/persons', row.person.id]"
+                  [disabled]="!row.person.id"
                   aria-label="Person anzeigen"
                 >
                   <i class="pi pi-eye"></i>
@@ -85,8 +169,8 @@
                   type="button"
                   severity="secondary"
                   [text]="true"
-                  [routerLink]="['/persons', person.id, 'edit']"
-                  [disabled]="!person.id"
+                  [routerLink]="['/persons', row.person.id, 'edit']"
+                  [disabled]="!row.person.id"
                   aria-label="Person bearbeiten"
                 >
                   <i class="pi pi-pencil"></i>
@@ -101,8 +185,13 @@
             <td colspan="5">
               <div class="empty-state">
                 <i class="pi pi-users"></i>
-                <strong>Keine Personen vorhanden</strong>
-                <span>Lege die erste Person an, um mit Mannschaften und Trainings weiterzumachen.</span>
+                @if (hasActiveFilters()) {
+                  <strong>Keine Personen gefunden</strong>
+                  <span>Passe die Filter an oder setze sie zurück.</span>
+                } @else {
+                  <strong>Keine Personen vorhanden</strong>
+                  <span>Lege die erste Person an, um mit Mannschaften und Trainings weiterzumachen.</span>
+                }
               </div>
             </td>
           </tr>
@@ -116,13 +205,13 @@
           <span>Personen werden geladen ...</span>
         </article>
       } @else {
-        @for (person of persons(); track person.id) {
+        @for (row of filteredRows(); track row.person.id) {
           <article class="person-card">
             <div class="person-card-header">
               <div>
-                <strong>{{ getFullName(person) || '-' }}</strong>
-                @if (person.nickname) {
-                  <span>{{ person.nickname }}</span>
+                <strong>{{ row.fullName || '-' }}</strong>
+                @if (row.person.nickname) {
+                  <span>{{ row.person.nickname }}</span>
                 }
               </div>
 
@@ -132,8 +221,8 @@
                   type="button"
                   severity="secondary"
                   [outlined]="true"
-                  [routerLink]="['/persons', person.id]"
-                  [disabled]="!person.id"
+                  [routerLink]="['/persons', row.person.id]"
+                  [disabled]="!row.person.id"
                 >
                   <i class="pi pi-eye"></i>
                   <span>Anzeigen</span>
@@ -144,8 +233,8 @@
                   type="button"
                   severity="secondary"
                   [outlined]="true"
-                  [routerLink]="['/persons', person.id, 'edit']"
-                  [disabled]="!person.id"
+                  [routerLink]="['/persons', row.person.id, 'edit']"
+                  [disabled]="!row.person.id"
                 >
                   <i class="pi pi-pencil"></i>
                   <span>Bearbeiten</span>
@@ -156,12 +245,31 @@
             <div class="person-card-content">
               <div class="person-info">
                 <span>Geburtsdatum</span>
-                <strong>{{ formatBirthDate(person.birthDate) }}</strong>
+                <strong>
+                  {{ formatBirthDate(row.person.birthDate) }}
+                  @if (row.age !== null) {
+                    <span class="age">({{ row.age }} J.)</span>
+                  }
+                </strong>
               </div>
+
+              @if (row.memberships.length > 0) {
+                <div class="person-info">
+                  <span>Mannschaft</span>
+                  <div class="membership-tags">
+                    @for (membership of row.memberships; track membership.teamId) {
+                      <p-tag
+                        [value]="membership.teamName + (membership.role ? ' · ' + getRoleLabel(membership.role) : '')"
+                        severity="secondary"
+                      />
+                    }
+                  </div>
+                </div>
+              }
 
               <div class="person-info">
                 <span>Notiz</span>
-                <strong>{{ person.notes || '-' }}</strong>
+                <strong>{{ row.person.notes || '-' }}</strong>
               </div>
             </div>
           </article>
@@ -169,8 +277,13 @@
           <article class="person-card">
             <div class="empty-state">
               <i class="pi pi-users"></i>
-              <strong>Keine Personen vorhanden</strong>
-              <span>Lege die erste Person an.</span>
+              @if (hasActiveFilters()) {
+                <strong>Keine Personen gefunden</strong>
+                <span>Passe die Filter an oder setze sie zurück.</span>
+              } @else {
+                <strong>Keine Personen vorhanden</strong>
+                <span>Lege die erste Person an.</span>
+              }
             </div>
           </article>
         }

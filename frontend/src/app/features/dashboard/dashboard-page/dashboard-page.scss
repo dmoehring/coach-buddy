@@ -37,6 +37,13 @@
   gap: 1rem;
 }
 
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
 .stat-card {
   display: grid;
   gap: 0.35rem;
@@ -61,6 +68,10 @@
 }
 
 @media (max-width: 900px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
   .stats-grid {
     grid-template-columns: 1fr;
   }

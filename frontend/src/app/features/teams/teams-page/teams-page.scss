@@ -21,6 +21,12 @@
   }
 }
 
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .eyebrow {
   margin: 0 0 0.35rem;
   color: var(--p-primary-color);
@@ -358,6 +364,10 @@
 }
 
 @media (max-width: 760px) {
+  .header-actions {
+    display: grid;
+  }
+
   .page-header {
     flex-direction: column;
 

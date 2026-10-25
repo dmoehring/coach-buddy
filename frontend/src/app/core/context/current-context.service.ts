@@ -47,7 +47,7 @@ export class CurrentContextService {
     this.loadSeasons();
   }
 
-  loadSeasons(): void {
+  loadSeasons(preferredSeasonId?: string): void {
     this.loadingSeasons.set(true);
     this.error.set(null);
 
@@ -63,7 +63,7 @@ export class CurrentContextService {
           return;
         }
 
-        const currentSeasonId = this.selectedSeason()?.id ?? this.persistedSeasonId;
+        const currentSeasonId = preferredSeasonId ?? this.selectedSeason()?.id ?? this.persistedSeasonId;
 
         const selectedSeason =
           seasons.find(season => season.id === currentSeasonId)
@@ -131,8 +131,8 @@ export class CurrentContextService {
     this.persistContext();
   }
 
-  reloadContext(): void {
-    this.loadSeasons();
+  reloadContext(preferredSeasonId?: string): void {
+    this.loadSeasons(preferredSeasonId);
   }
 
   private persistContext(): void {

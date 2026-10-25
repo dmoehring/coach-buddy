@@ -1,0 +1,125 @@
+<section class="season-create-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Saisons</p>
+      <h1>Neue Saison starten</h1>
+
+      <p class="description">
+        Lege eine neue Saison an. Die bisher offene Saison wird automatisch
+        am Tag vor dem Startdatum der neuen Saison beendet.
+      </p>
+    </div>
+
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      routerLink="/teams"
+    >
+      <i class="pi pi-arrow-left"></i>
+      <span>Zurück</span>
+    </button>
+  </div>
+
+  @if (openSeason(); as season) {
+    <div class="info-box">
+      <i class="pi pi-info-circle"></i>
+
+      <div>
+        <strong>Aktuell offene Saison: {{ season.name }}</strong>
+        <span>
+          Gestartet am {{ formatDisplayDate(season.startDate) }}. Sie wird mit dem
+          Start der neuen Saison abgeschlossen. Teams und Mitgliedschaften
+          bleiben dieser Saison zugeordnet; in der neuen Saison legst du
+          die Teams neu an.
+        </span>
+      </div>
+    </div>
+  }
+
+  <div class="form-grid">
+    <p-card styleClass="season-form-card">
+      <ng-template pTemplate="title">
+        Saisondaten
+      </ng-template>
+
+      <ng-template pTemplate="subtitle">
+        Name und Startdatum
+      </ng-template>
+
+      @if (error()) {
+        <div class="error-box" role="alert">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      <form
+        class="season-form"
+        [formGroup]="form"
+        (ngSubmit)="createSeason()"
+      >
+        <label class="form-field">
+          <span>Name <strong aria-hidden="true">*</strong></span>
+
+          <input
+            pInputText
+            type="text"
+            formControlName="name"
+            placeholder="z. B. 2026/27"
+            autocomplete="off"
+          />
+
+          @if (form.controls.name.touched && form.controls.name.hasError('required')) {
+            <small class="field-error">Bitte gib einen Namen ein.</small>
+          }
+
+          @if (form.controls.name.touched && form.controls.name.hasError('maxlength')) {
+            <small class="field-error">Der Name darf höchstens 100 Zeichen enthalten.</small>
+          }
+        </label>
+
+        <label class="form-field">
+          <span>Startdatum <strong aria-hidden="true">*</strong></span>
+
+          <p-datepicker
+            formControlName="startDate"
+            dateFormat="dd.mm.yy"
+            appendTo="body"
+          />
+
+          @if (form.controls.startDate.touched && form.controls.startDate.hasError('required')) {
+            <small class="field-error">Bitte wähle ein Startdatum.</small>
+          }
+        </label>
+
+        <div class="form-actions">
+          <button
+            pButton
+            type="button"
+            severity="secondary"
+            [outlined]="true"
+            routerLink="/teams"
+            [disabled]="saving()"
+          >
+            Abbrechen
+          </button>
+
+          <button
+            pButton
+            type="submit"
+            [loading]="saving()"
+            [disabled]="saving()"
+          >
+            @if (!saving()) {
+              <i class="pi pi-check"></i>
+            }
+
+            <span>{{ saving() ? 'Saison wird angelegt' : 'Saison starten' }}</span>
+          </button>
+        </div>
+      </form>
+    </p-card>
+  </div>
+</section>

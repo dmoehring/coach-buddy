@@ -83,3 +83,18 @@ body.app-dark .p-select-option:hover,
 body.app-dark .p-select-option-selected {
   background: var(--p-surface-800);
 }
+
+.select-footer {
+  padding: 0.25rem;
+  border-top: 1px solid var(--p-surface-200);
+
+  button {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+body.app-dark .select-footer {
+  border-top-color: var(--p-surface-800);
+}

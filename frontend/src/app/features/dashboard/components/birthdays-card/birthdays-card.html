@@ -1,0 +1,47 @@
+<p-card styleClass="birthdays-card">
+  <ng-template pTemplate="title">
+    Geburtstage
+  </ng-template>
+
+  <ng-template pTemplate="subtitle">
+    @if (teamName) {
+      {{ teamName }} · {{ windowDays }} Tage zurück und voraus
+    } @else {
+      Keine Mannschaft ausgewählt
+    }
+  </ng-template>
+
+  @if (birthdays.length === 0) {
+    <div class="empty-state">
+      <i class="pi pi-gift"></i>
+      <span>
+        {{ teamName ? 'Keine Geburtstage in diesem Zeitraum.' : 'Wähle oben eine Mannschaft aus.' }}
+      </span>
+    </div>
+  } @else {
+    <ul class="birthday-list">
+      @for (birthday of birthdays; track birthday.personId) {
+        <li class="birthday" [class.past]="birthday.daysFromToday < 0" [class.today]="birthday.daysFromToday === 0">
+          <div class="birthday-icon">
+            <i class="pi" [class.pi-gift]="birthday.daysFromToday >= 0" [class.pi-history]="birthday.daysFromToday < 0"></i>
+          </div>
+
+          <div class="birthday-person">
+            <strong>{{ birthday.name }}</strong>
+            <span>
+              wird {{ birthday.turnsAge }}
+              @if (birthday.role) {
+                · {{ birthday.role }}
+              }
+            </span>
+          </div>
+
+          <div class="birthday-when">
+            <strong>{{ getRelativeLabel(birthday) }}</strong>
+            <span>{{ formatDate(birthday.date) }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</p-card>

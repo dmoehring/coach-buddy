@@ -31,6 +31,7 @@
         <span>Saison</span>
 
         <p-select
+          #seasonSelect1
           [options]="context.seasons()"
           [ngModel]="context.selectedSeason()"
           (ngModelChange)="context.selectSeason($event)"
@@ -38,7 +39,23 @@
           optionLabel="name"
           placeholder="Saison auswählen"
           appendTo="body"
-        />
+        >
+          <ng-template pTemplate="footer">
+            <div class="select-footer">
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [text]="true"
+                routerLink="/seasons/new"
+                (click)="seasonSelect1.hide(); closeMobileMenu()"
+              >
+                <i class="pi pi-plus"></i>
+                <span>Neue Saison starten</span>
+              </button>
+            </div>
+          </ng-template>
+        </p-select>
       </label>
 
       <label class="mobile-context-control">
@@ -180,6 +197,7 @@
           <span>Saison</span>
 
           <p-select
+            #seasonSelect2
             [options]="context.seasons()"
             [ngModel]="context.selectedSeason()"
             (ngModelChange)="context.selectSeason($event)"
@@ -187,7 +205,23 @@
             optionLabel="name"
             placeholder="Saison auswählen"
             appendTo="body"
-          />
+          >
+            <ng-template pTemplate="footer">
+              <div class="select-footer">
+                <button
+                  pButton
+                  type="button"
+                  severity="secondary"
+                  [text]="true"
+                  routerLink="/seasons/new"
+                  (click)="seasonSelect2.hide(); closeMobileMenu()"
+                >
+                  <i class="pi pi-plus"></i>
+                  <span>Neue Saison starten</span>
+                </button>
+              </div>
+            </ng-template>
+          </p-select>
         </label>
 
         <label class="topbar-control">

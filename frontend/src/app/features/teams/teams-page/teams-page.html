@@ -9,15 +9,28 @@
       </p>
     </div>
 
-    <button
-      pButton
-      type="button"
-      routerLink="/teams/new"
-      [disabled]="!context.selectedSeason()"
-    >
-      <i class="pi pi-plus"></i>
-      <span>Team anlegen</span>
-    </button>
+    <div class="header-actions">
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        routerLink="/seasons/new"
+      >
+        <i class="pi pi-calendar-plus"></i>
+        <span>Neue Saison</span>
+      </button>
+
+      <button
+        pButton
+        type="button"
+        routerLink="/teams/new"
+        [disabled]="!context.selectedSeason()"
+      >
+        <i class="pi pi-plus"></i>
+        <span>Team anlegen</span>
+      </button>
+    </div>
   </div>
 
   @if (context.selectedSeason(); as season) {
