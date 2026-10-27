@@ -34,6 +34,11 @@
       submitLabel="Person speichern"
       [saving]="saving()"
       (submitted)="createPerson($event)"
-    />
+    >
+      <app-person-relations-draft
+        [persons]="existingPersons()"
+        [(drafts)]="relationDrafts"
+      />
+    </app-person-form>
   </div>
 </section>

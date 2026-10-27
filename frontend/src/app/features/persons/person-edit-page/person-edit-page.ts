@@ -14,17 +14,16 @@ import { PersonRelationDto } from '../../../api/model/person-relation-dto';
 import { RelationType } from '../../../api/model/relation-type';
 import { UpdatePersonRequest } from '../../../api/model/update-person-request';
 import { PersonForm, PersonFormValue } from '../components/person-form/person-form';
-
-type RelationRole = 'CHILD' | 'GUARDIAN';
+import {
+  RELATION_ROLE_OPTIONS,
+  RELATION_TYPE_OPTIONS,
+  RelationRole,
+  RelationTypeOption
+} from '../relation-options';
 
 interface PersonOption {
   label: string;
   person: PersonDto;
-}
-
-interface RelationTypeOption {
-  label: string;
-  value: RelationType;
 }
 
 @Component({
@@ -64,19 +63,8 @@ export class PersonEditPage implements OnInit {
   readonly relationsSuccess = signal<string | null>(null);
   readonly deletingRelationId = signal<string | null>(null);
 
-  readonly relationRoleOptions = [
-    { label: 'Diese Person ist das Kind', value: 'CHILD' as RelationRole },
-    { label: 'Diese Person ist die Kontaktperson', value: 'GUARDIAN' as RelationRole }
-  ];
-
-  readonly relationTypeOptions: RelationTypeOption[] = [
-    { label: 'Mutter', value: RelationType.Mother },
-    { label: 'Vater', value: RelationType.Father },
-    { label: 'Großmutter', value: RelationType.Grandmother },
-    { label: 'Großvater', value: RelationType.Grandfather },
-    { label: 'Stiefelternteil', value: RelationType.StepParent },
-    { label: 'Sonstige', value: RelationType.Other }
-  ];
+  readonly relationRoleOptions = RELATION_ROLE_OPTIONS;
+  readonly relationTypeOptions = RELATION_TYPE_OPTIONS;
 
   readonly otherPersonOptions = computed<PersonOption[]>(() =>
     this.allPersons()

@@ -1,0 +1,68 @@
+<div class="relations-draft">
+  <div class="relations-header">
+    <span>Beziehungen</span>
+  </div>
+
+  @for (draft of drafts(); track draft.otherPerson.id) {
+    <div class="relation-row">
+      <div>
+        <strong>{{ getPersonName(draft.otherPerson) }}</strong>
+        <span>{{ getRoleDescription(draft) }}</span>
+      </div>
+
+      <button
+        pButton
+        type="button"
+        severity="danger"
+        [text]="true"
+        (click)="remove($index)"
+        aria-label="Beziehung entfernen"
+      >
+        <i class="pi pi-trash"></i>
+      </button>
+    </div>
+  } @empty {
+    <p class="relations-empty">Noch keine Beziehung erfasst.</p>
+  }
+
+  <div class="relation-form" [formGroup]="form">
+    <label class="form-field">
+      <span>Rolle</span>
+      <p-select
+        [options]="roleOptions"
+        formControlName="role"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+      />
+    </label>
+
+    <label class="form-field">
+      <span>Person</span>
+      <p-select
+        [options]="personOptions()"
+        formControlName="otherPerson"
+        optionLabel="label"
+        placeholder="Person auswählen"
+        [filter]="true"
+        appendTo="body"
+      />
+    </label>
+
+    <label class="form-field">
+      <span>Beziehungsart</span>
+      <p-select
+        [options]="relationTypeOptions"
+        formControlName="relationType"
+        optionLabel="label"
+        placeholder="Beziehungsart auswählen"
+        appendTo="body"
+      />
+    </label>
+
+    <button pButton type="button" severity="secondary" [outlined]="true" class="relation-add" (click)="add()">
+      <i class="pi pi-plus"></i>
+      <span>Hinzufügen</span>
+    </button>
+  </div>
+</div>
