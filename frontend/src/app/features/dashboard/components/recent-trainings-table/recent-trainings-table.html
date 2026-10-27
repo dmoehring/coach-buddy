@@ -28,7 +28,15 @@
         <tr>
           <td>
             <div class="date-cell">
-              <strong>{{ training.date }}</strong>
+              @if (training.status === 'COMPLETED' && training.id) {
+                <a
+                  class="training-link"
+                  [routerLink]="['/trainings', training.id, 'attendance']"
+                  [queryParams]="returnUrlParams"
+                >{{ training.date }}</a>
+              } @else {
+                <strong>{{ training.date }}</strong>
+              }
               <span>{{ training.weekday }}</span>
             </div>
           </td>
@@ -54,6 +62,15 @@
   <div class="mobile-training-list">
     @for (training of trainings; track training.date) {
       <article class="training-card">
+        @if (training.status === 'COMPLETED' && training.id) {
+          <a
+            class="training-card-link"
+            [routerLink]="['/trainings', training.id, 'attendance']"
+            [queryParams]="returnUrlParams"
+            [attr.aria-label]="'Anwesenheit vom ' + training.date + ' bearbeiten'"
+          ></a>
+        }
+
         <div class="training-card-header">
           <div class="training-date">
             <strong>{{ training.date }}</strong>
@@ -94,6 +111,12 @@
             <strong>{{ training.absent }}</strong>
           </div>
         </div>
+
+        @if (training.status === 'COMPLETED' && training.id) {
+          <span class="training-card-hint">
+            Anwesenheit bearbeiten <i class="pi pi-chevron-right"></i>
+          </span>
+        }
       </article>
     }
   </div>

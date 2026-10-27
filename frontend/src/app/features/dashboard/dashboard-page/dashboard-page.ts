@@ -99,7 +99,10 @@ export class DashboardPage {
         description: lastTraining
           ? `${lastTraining.excused} entschuldigt · ${lastTraining.absent} fehlend`
           : 'Noch keine Trainings erfasst',
-        icon: 'pi pi-calendar'
+        icon: 'pi pi-calendar',
+        route: lastTraining?.status === 'COMPLETED' && lastTraining.id
+          ? `/trainings/${lastTraining.id}/attendance`
+          : undefined
       }
     ];
   });
@@ -220,6 +223,7 @@ export class DashboardPage {
     participants: TrainingParticipantDto[]
   ): DashboardTraining {
     return {
+      id: training.id,
       date: this.formatDate(training.trainingDate),
       weekday: this.getWeekday(training.trainingDate),
       team: training.team?.name ?? '-',

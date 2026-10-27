@@ -1,4 +1,6 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, Input } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { CardModule } from 'primeng/card';
 
@@ -7,6 +9,8 @@ import { DashboardMetric } from '../../dashboard.model';
 @Component({
   selector: 'app-dashboard-stat-card',
   imports: [
+    NgTemplateOutlet,
+    RouterLink,
     CardModule
   ],
   templateUrl: './dashboard-stat-card.html',

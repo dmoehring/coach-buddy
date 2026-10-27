@@ -5,9 +5,11 @@ export interface DashboardMetric {
   value: string;
   description: string;
   icon: string;
+  route?: string;
 }
 
 export interface DashboardTraining {
+  id?: string;
   date: string;
   weekday: string;
   team: string;

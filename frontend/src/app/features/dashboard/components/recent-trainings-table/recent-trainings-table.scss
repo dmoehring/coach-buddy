@@ -20,13 +20,43 @@
   overflow: hidden;
 }
 
+.training-link {
+  color: var(--p-text-color);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--p-primary-color);
+    text-decoration: underline;
+  }
+}
+
 .training-card {
+  position: relative;
   display: grid;
   gap: 1rem;
   padding: 1rem;
   border: 1px solid var(--p-surface-200);
   border-radius: 1.25rem;
   background: var(--p-surface-0);
+}
+
+.training-card-link {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 1.25rem;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.training-card-hint {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  color: var(--p-primary-color);
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 :host-context(.app-dark) .training-card {

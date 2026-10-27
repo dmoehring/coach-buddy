@@ -17,6 +17,27 @@
   }
 }
 
+.stat-card-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  .stat-text {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &:hover strong {
+    color: var(--p-primary-color);
+  }
+}
+
+.stat-chevron {
+  align-self: center;
+  color: var(--p-text-muted-color);
+}
+
 .stat-label {
   color: var(--p-text-muted-color);
   font-size: 0.85rem;

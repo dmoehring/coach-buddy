@@ -13,7 +13,7 @@
       type="button"
       severity="secondary"
       [outlined]="true"
-      routerLink="/trainings"
+      [routerLink]="returnUrl"
     >
       <i class="pi pi-arrow-left"></i>
       <span>Zurück</span>
@@ -103,64 +103,7 @@
 
         <div class="participants-list">
           @for (entry of playerParticipants(); track entry.person.id) {
-            <article class="participant-row">
-              <div class="participant-main">
-                <div class="participant-name">
-                  @if (entry.person.id) {
-                    <a
-                      class="person-name-link"
-                      [routerLink]="['/persons', entry.person.id]"
-                      [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
-                    >
-                      {{ getPersonName(entry.person) }}
-                    </a>
-                  } @else {
-                    <strong>{{ getPersonName(entry.person) }}</strong>
-                  }
-                  <span>{{ getRoleLabel(entry.role) }}</span>
-                </div>
-
-                <p-tag
-                  [value]="getAttendanceLabel(entry.attendanceStatus)"
-                  [severity]="getAttendanceSeverity(entry.attendanceStatus)"
-                />
-              </div>
-
-              <div class="attendance-actions">
-                <button
-                  pButton
-                  type="button"
-                  severity="success"
-                  [outlined]="entry.attendanceStatus !== 'PRESENT'"
-                  (click)="setAttendance(entry, 'PRESENT')"
-                >
-                  <i class="pi pi-check"></i>
-                  <span>Anwesend</span>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="warn"
-                  [outlined]="entry.attendanceStatus !== 'EXCUSED'"
-                  (click)="setAttendance(entry, 'EXCUSED')"
-                >
-                  <i class="pi pi-info-circle"></i>
-                  <span>Entschuldigt</span>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="danger"
-                  [outlined]="entry.attendanceStatus !== 'ABSENT'"
-                  (click)="setAttendance(entry, 'ABSENT')"
-                >
-                  <i class="pi pi-times"></i>
-                  <span>Unentschuldigt</span>
-                </button>
-              </div>
-            </article>
+            <ng-container *ngTemplateOutlet="participantRow; context: { $implicit: entry }" />
           } @empty {
             <p class="cancelled-text">Diesem Team sind aktuell keine Kinder zugeordnet.</p>
           }
@@ -178,87 +121,59 @@
 
         <div class="participants-list">
           @for (entry of trainerParticipants(); track entry.person.id) {
-            <article class="participant-row">
-              <div class="participant-main">
-                <div class="participant-name">
-                  @if (entry.person.id) {
-                    <a
-                      class="person-name-link"
-                      [routerLink]="['/persons', entry.person.id]"
-                      [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
-                    >
-                      {{ getPersonName(entry.person) }}
-                    </a>
-                  } @else {
-                    <strong>{{ getPersonName(entry.person) }}</strong>
-                  }
-                  <span>{{ getRoleLabel(entry.role) }}</span>
-                </div>
-
-                <p-tag
-                  [value]="getAttendanceLabel(entry.attendanceStatus)"
-                  [severity]="getAttendanceSeverity(entry.attendanceStatus)"
-                />
-              </div>
-
-              <div class="attendance-actions">
-                <button
-                  pButton
-                  type="button"
-                  severity="success"
-                  [outlined]="entry.attendanceStatus !== 'PRESENT'"
-                  (click)="setAttendance(entry, 'PRESENT')"
-                >
-                  <i class="pi pi-check"></i>
-                  <span>Anwesend</span>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="warn"
-                  [outlined]="entry.attendanceStatus !== 'EXCUSED'"
-                  (click)="setAttendance(entry, 'EXCUSED')"
-                >
-                  <i class="pi pi-info-circle"></i>
-                  <span>Entschuldigt</span>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="danger"
-                  [outlined]="entry.attendanceStatus !== 'ABSENT'"
-                  (click)="setAttendance(entry, 'ABSENT')"
-                >
-                  <i class="pi pi-times"></i>
-                  <span>Unentschuldigt</span>
-                </button>
-              </div>
-            </article>
+            <ng-container *ngTemplateOutlet="participantRow; context: { $implicit: entry }" />
           } @empty {
             <p class="cancelled-text">Diesem Team sind aktuell keine Trainer oder Helfer zugeordnet.</p>
           }
         </div>
       </p-card>
 
-      @if (success()) {
-        <p class="save-success">{{ success() }}</p>
-      }
-
-      <div class="save-bar">
-        <div>
-          <strong>Trainingsteilnahme speichern</strong>
-          <span>
-            {{ presentPlayersCount() }} Kinder und {{ presentTrainersCount() }} Trainer/Helfer anwesend
-          </span>
-        </div>
-
-        <button pButton type="button" [disabled]="saving()" (click)="saveAttendance()">
-          <i class="pi pi-save"></i>
-          <span>{{ saving() ? 'Speichert ...' : 'Anwesenheit speichern' }}</span>
-        </button>
+      <div class="save-status" role="status" aria-live="polite">
+        @if (saveError(); as message) {
+          <span class="save-status-error"><i class="pi pi-exclamation-triangle"></i> {{ message }}</span>
+        } @else if (saving()) {
+          <span><i class="pi pi-spin pi-spinner"></i> Speichert ...</span>
+        } @else if (saved()) {
+          <span class="save-status-ok"><i class="pi pi-check"></i> Gespeichert</span>
+        } @else {
+          <span>Änderungen werden automatisch gespeichert.</span>
+        }
       </div>
+
+      <ng-template #participantRow let-entry>
+        <article class="participant-row">
+          <div class="participant-name">
+            @if (entry.person.id) {
+              <a
+                class="person-name-link"
+                [routerLink]="['/persons', entry.person.id]"
+                [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/attendance' }"
+              >
+                {{ getPersonName(entry.person) }}
+              </a>
+            } @else {
+              <strong>{{ getPersonName(entry.person) }}</strong>
+            }
+            <span>{{ getRoleLabel(entry.role) }}</span>
+          </div>
+
+          <div class="attendance-options" role="group" [attr.aria-label]="'Anwesenheit ' + getPersonName(entry.person)">
+            @for (option of attendanceOptions; track option.status) {
+              <button
+                type="button"
+                class="attendance-option"
+                [class]="'attendance-option-' + option.tone"
+                [class.selected]="entry.attendanceStatus === option.status"
+                [attr.aria-pressed]="entry.attendanceStatus === option.status"
+                (click)="setAttendance(entry, option.status)"
+              >
+                <i [class]="option.icon"></i>
+                <span>{{ option.label }}</span>
+              </button>
+            }
+          </div>
+        </article>
+      </ng-template>
     } @else {
       <p-card>
         <p class="cancelled-text">

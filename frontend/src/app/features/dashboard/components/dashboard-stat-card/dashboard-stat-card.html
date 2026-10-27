@@ -1,13 +1,24 @@
 <p-card>
-  <div class="stat-card">
-    <div class="stat-icon">
-      <i [class]="metric.icon"></i>
+  @if (metric.route) {
+    <a class="stat-card stat-card-link" [routerLink]="metric.route" [queryParams]="{ returnUrl: '/dashboard' }">
+      <ng-container *ngTemplateOutlet="content" />
+      <i class="pi pi-chevron-right stat-chevron"></i>
+    </a>
+  } @else {
+    <div class="stat-card">
+      <ng-container *ngTemplateOutlet="content" />
     </div>
-
-    <div>
-      <span class="stat-label">{{ metric.label }}</span>
-      <strong>{{ metric.value }}</strong>
-      <small>{{ metric.description }}</small>
-    </div>
-  </div>
+  }
 </p-card>
+
+<ng-template #content>
+  <div class="stat-icon">
+    <i [class]="metric.icon"></i>
+  </div>
+
+  <div class="stat-text">
+    <span class="stat-label">{{ metric.label }}</span>
+    <strong>{{ metric.value }}</strong>
+    <small>{{ metric.description }}</small>
+  </div>
+</ng-template>

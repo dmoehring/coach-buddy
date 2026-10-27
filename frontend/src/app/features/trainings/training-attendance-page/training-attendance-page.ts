@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Observable, forkJoin, of, switchMap } from 'rxjs';
@@ -22,11 +23,22 @@ interface AttendanceEntry {
   person: PersonDto;
   role: TeamMemberRole;
   attendanceStatus: AttendanceStatus;
+  persistedStatus: AttendanceStatus | null;
 }
+
+interface AttendanceOption {
+  status: AttendanceStatus;
+  label: string;
+  icon: string;
+  tone: 'present' | 'excused' | 'absent';
+}
+
+const SAVED_HINT_DURATION_MS = 2500;
 
 @Component({
   selector: 'app-training-attendance-page',
   imports: [
+    NgTemplateOutlet,
     RouterLink,
     ButtonModule,
     CardModule,
@@ -42,14 +54,27 @@ export class TrainingAttendancePage {
   private readonly trainingParticipantsService = inject(TrainingParticipantsService);
 
   readonly trainingId = this.route.snapshot.paramMap.get('id') ?? '';
+  readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/trainings';
+
+  readonly attendanceOptions: AttendanceOption[] = [
+    { status: AttendanceStatus.Present, label: 'Anwesend', icon: 'pi pi-check', tone: 'present' },
+    { status: AttendanceStatus.Excused, label: 'Entschuldigt', icon: 'pi pi-info-circle', tone: 'excused' },
+    { status: AttendanceStatus.Absent, label: 'Unentschuldigt', icon: 'pi pi-times', tone: 'absent' }
+  ];
+
+  private readonly inFlight = new Set<string>();
+  private readonly dirty = new Set<string>();
+  private savedHintTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly training = signal<TrainingDto | null>(null);
   readonly entries = signal<AttendanceEntry[]>([]);
 
   readonly loading = signal(true);
-  readonly saving = signal(false);
+  readonly pendingSaves = signal(0);
+  readonly saving = computed(() => this.pendingSaves() > 0);
+  readonly saved = signal(false);
+  readonly saveError = signal<string | null>(null);
   readonly error = signal<string | null>(null);
-  readonly success = signal<string | null>(null);
 
   readonly playerParticipants = computed(() =>
     this.entries().filter(entry => entry.role === TeamMemberRole.Player)
@@ -94,56 +119,101 @@ export class TrainingAttendancePage {
   }
 
   setAttendance(entry: AttendanceEntry, attendanceStatus: AttendanceStatus): void {
-    this.entries.update(entries =>
-      entries.map(current =>
-        current === entry ? { ...current, attendanceStatus } : current
-      )
-    );
-  }
-
-  saveAttendance(): void {
-    const requests: Observable<TrainingParticipantDto>[] = this.entries().map(entry => {
-      if (entry.participantId) {
-        return this.trainingParticipantsService.apiV1TrainingParticipantsIdPatch(entry.participantId, {
-          attendanceStatus: entry.attendanceStatus
-        });
-      }
-
-      return this.trainingParticipantsService.apiV1TrainingParticipantsPost({
-        trainingId: this.trainingId,
-        personId: entry.person.id!,
-        attendanceStatus: entry.attendanceStatus
-      });
-    });
-
-    if (requests.length === 0) {
+    if (entry.attendanceStatus === attendanceStatus) {
       return;
     }
 
-    this.saving.set(true);
-    this.error.set(null);
-    this.success.set(null);
+    const personId = entry.person.id!;
 
-    forkJoin(requests).subscribe({
-      next: participants => {
-        this.entries.update(entries =>
-          entries.map((entry, index) => ({
-            ...entry,
-            participantId: participants[index].id ?? entry.participantId
-          }))
-        );
+    this.updateEntry(personId, { attendanceStatus });
+    this.persist(personId);
+  }
 
-        this.saving.set(false);
-        this.success.set('Die Anwesenheit wurde gespeichert.');
+  private persist(personId: string): void {
+    // Only one request per person at a time, otherwise quick taps could create duplicate participants.
+    if (this.inFlight.has(personId)) {
+      this.dirty.add(personId);
+      return;
+    }
+
+    const entry = this.entries().find(current => current.person.id === personId);
+
+    if (!entry || entry.attendanceStatus === entry.persistedStatus) {
+      return;
+    }
+
+    const sentStatus = entry.attendanceStatus;
+    const request: Observable<TrainingParticipantDto> = entry.participantId
+      ? this.trainingParticipantsService.apiV1TrainingParticipantsIdPatch(entry.participantId, {
+          attendanceStatus: sentStatus
+        })
+      : this.trainingParticipantsService.apiV1TrainingParticipantsPost({
+          trainingId: this.trainingId,
+          personId,
+          attendanceStatus: sentStatus
+        });
+
+    this.inFlight.add(personId);
+    this.pendingSaves.update(count => count + 1);
+    this.saveError.set(null);
+    this.saved.set(false);
+
+    request.subscribe({
+      next: participant => {
+        this.updateEntry(personId, {
+          participantId: participant.id ?? entry.participantId,
+          persistedStatus: sentStatus
+        });
+        this.finishSave(personId);
       },
       error: error => {
         console.error('Attendance could not be saved:', error);
         console.error('Backend error body:', error.error);
 
-        this.saving.set(false);
-        this.error.set('Die Anwesenheit konnte nicht gespeichert werden.');
+        const current = this.entries().find(candidate => candidate.person.id === personId);
+
+        this.dirty.delete(personId);
+        this.updateEntry(personId, {
+          attendanceStatus: current?.persistedStatus ?? sentStatus
+        });
+        this.saveError.set(
+          `Die Anwesenheit von ${this.getPersonName(entry.person)} konnte nicht gespeichert werden.`
+        );
+        this.finishSave(personId);
       }
     });
+  }
+
+  private finishSave(personId: string): void {
+    this.inFlight.delete(personId);
+    this.pendingSaves.update(count => count - 1);
+
+    if (this.dirty.delete(personId)) {
+      this.persist(personId);
+      return;
+    }
+
+    if (this.pendingSaves() === 0 && !this.saveError()) {
+      this.showSavedHint();
+    }
+  }
+
+  private showSavedHint(): void {
+    this.saved.set(true);
+
+    if (this.savedHintTimeout) {
+      clearTimeout(this.savedHintTimeout);
+    }
+
+    this.savedHintTimeout = setTimeout(() => this.saved.set(false), SAVED_HINT_DURATION_MS);
+  }
+
+  private updateEntry(personId: string, changes: Partial<AttendanceEntry>): void {
+    this.entries.update(entries =>
+      entries.map(current =>
+        current.person.id === personId ? { ...current, ...changes } : current
+      )
+    );
   }
 
   getAttendanceLabel(status: AttendanceStatus): string {
@@ -253,6 +323,7 @@ export class TrainingAttendancePage {
         next: ({ memberships, participants }) => {
           this.entries.set(this.buildEntries(memberships, participants));
           this.loading.set(false);
+          this.persistMissingEntries();
         },
         error: error => {
           console.error('Training could not be loaded:', error);
@@ -262,6 +333,13 @@ export class TrainingAttendancePage {
           this.loading.set(false);
         }
       });
+  }
+
+  // Persons without a stored attendance are shown as present, so store that default right away.
+  private persistMissingEntries(): void {
+    this.entries()
+      .filter(entry => entry.persistedStatus === null)
+      .forEach(entry => this.persist(entry.person.id!));
   }
 
   private buildEntries(
@@ -281,7 +359,8 @@ export class TrainingAttendancePage {
           participantId: existingParticipant?.id ?? null,
           person: membership.person,
           role: membership.role,
-          attendanceStatus: existingParticipant?.attendanceStatus ?? AttendanceStatus.Present
+          attendanceStatus: existingParticipant?.attendanceStatus ?? AttendanceStatus.Present,
+          persistedStatus: existingParticipant?.attendanceStatus ?? null
         };
       })
       .sort((left, right) => this.getPersonName(left.person).localeCompare(this.getPersonName(right.person), 'de'));
