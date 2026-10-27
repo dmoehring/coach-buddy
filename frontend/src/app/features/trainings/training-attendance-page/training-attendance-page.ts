@@ -22,7 +22,7 @@ interface AttendanceEntry {
   participantId: string | null;
   person: PersonDto;
   role: TeamMemberRole;
-  attendanceStatus: AttendanceStatus;
+  attendanceStatus: AttendanceStatus | null;
   persistedStatus: AttendanceStatus | null;
 }
 
@@ -138,7 +138,7 @@ export class TrainingAttendancePage {
 
     const entry = this.entries().find(current => current.person.id === personId);
 
-    if (!entry || entry.attendanceStatus === entry.persistedStatus) {
+    if (!entry || entry.attendanceStatus === null || entry.attendanceStatus === entry.persistedStatus) {
       return;
     }
 
@@ -174,7 +174,7 @@ export class TrainingAttendancePage {
 
         this.dirty.delete(personId);
         this.updateEntry(personId, {
-          attendanceStatus: current?.persistedStatus ?? sentStatus
+          attendanceStatus: current ? current.persistedStatus : sentStatus
         });
         this.saveError.set(
           `Die Anwesenheit von ${this.getPersonName(entry.person)} konnte nicht gespeichert werden.`
@@ -323,7 +323,6 @@ export class TrainingAttendancePage {
         next: ({ memberships, participants }) => {
           this.entries.set(this.buildEntries(memberships, participants));
           this.loading.set(false);
-          this.persistMissingEntries();
         },
         error: error => {
           console.error('Training could not be loaded:', error);
@@ -333,13 +332,6 @@ export class TrainingAttendancePage {
           this.loading.set(false);
         }
       });
-  }
-
-  // Persons without a stored attendance are shown as present, so store that default right away.
-  private persistMissingEntries(): void {
-    this.entries()
-      .filter(entry => entry.persistedStatus === null)
-      .forEach(entry => this.persist(entry.person.id!));
   }
 
   private buildEntries(
@@ -359,7 +351,7 @@ export class TrainingAttendancePage {
           participantId: existingParticipant?.id ?? null,
           person: membership.person,
           role: membership.role,
-          attendanceStatus: existingParticipant?.attendanceStatus ?? AttendanceStatus.Present,
+          attendanceStatus: existingParticipant?.attendanceStatus ?? null,
           persistedStatus: existingParticipant?.attendanceStatus ?? null
         };
       })
