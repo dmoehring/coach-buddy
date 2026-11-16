@@ -8,10 +8,8 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin, switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
 
 import { PersonsService } from '../../../api/api/persons.service';
 import { TeamMembershipsService } from '../../../api/api/team-memberships.service';
@@ -25,6 +23,9 @@ import { TeamMemberRole } from '../../../api/model/team-member-role';
 import { TeamMembershipDto } from '../../../api/model/team-membership-dto';
 
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
+import { CsvExportService } from '../../../shared/util/export.service';
+import { initials } from '../../../shared/util/format';
 
 interface PersonOption {
   label: string;
@@ -42,10 +43,9 @@ interface RoleOption {
     ReactiveFormsModule,
     RouterLink,
     ButtonModule,
-    CardModule,
     DatePickerModule,
     SelectModule,
-    TableModule
+    PageHeader
   ],
   templateUrl: './team-members-page.html',
   styleUrl: './team-members-page.scss'
@@ -59,6 +59,7 @@ export class TeamMembersPage {
   private readonly membershipsService = inject(TeamMembershipsService);
 
   readonly context = inject(CurrentContextService);
+  readonly csv = inject(CsvExportService);
 
   readonly teamId = this.route.snapshot.paramMap.get('id');
 
@@ -87,6 +88,21 @@ export class TeamMembersPage {
       value: TeamMemberRole.AssistantCoach
     }
   ];
+
+  readonly activeMemberships = computed(() =>
+    this.sortedMemberships().filter(membership => this.isActive(membership))
+  );
+
+  readonly formerMemberships = computed(() =>
+    this.sortedMemberships().filter(membership => !this.isActive(membership))
+  );
+
+  private readonly sortedMemberships = computed(() =>
+    [...this.memberships()].sort((left, right) =>
+      this.roleRank(left.role) - this.roleRank(right.role)
+      || this.getMembershipPersonName(left).localeCompare(this.getMembershipPersonName(right), 'de')
+    )
+  );
 
   readonly availablePersonOptions = computed<PersonOption[]>(() => {
     const assignedPersonIds = new Set(
@@ -143,6 +159,27 @@ export class TeamMembersPage {
     }
 
     this.loadData(this.teamId);
+  }
+
+  exportMembers(): void {
+    if (this.teamId) {
+      this.csv.members(this.teamId);
+    }
+  }
+
+  initialsOf(membership: TeamMembershipDto): string {
+    return initials(membership.person);
+  }
+
+  private roleRank(role?: TeamMemberRole): number {
+    switch (role) {
+      case TeamMemberRole.Coach:
+        return 0;
+      case TeamMemberRole.AssistantCoach:
+        return 1;
+      default:
+        return 2;
+    }
   }
 
   addMembership(): void {

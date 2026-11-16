@@ -1,232 +1,114 @@
-<section class="training-form-page">
-  <div class="page-header">
-    <div>
-      <p class="eyebrow">Training</p>
-      <h1>{{ isEdit ? 'Training bearbeiten' : 'Training erfassen' }}</h1>
+<section class="page page-narrow">
+  <app-page-header [title]="heading()" backLink="/trainings" backLabel="Trainings" />
 
-      <p class="description">
-        @if (isEdit) {
-          Ändere Datum, Uhrzeit, Ort, Notiz oder Status des Trainings, z. B.
-          um ein Training als ausgefallen zu markieren. Bereits erfasste
-          Anwesenheiten bleiben erhalten.
-        } @else {
-          Lege ein Training für eine Mannschaft an. Die Anwesenheit wird danach
-          auf einer eigenen Seite erfasst.
-        }
-      </p>
+  @if (loadingTraining()) {
+    <p class="muted">Wird geladen …</p>
+  } @else if (isEdit && !editedTraining()) {
+    <div class="notice notice-error" role="alert">
+      <i class="pi pi-exclamation-circle"></i>
+      <span>{{ pageError() }}</span>
     </div>
+  } @else {
+    <form class="surface form" [formGroup]="form" (ngSubmit)="save()">
+      <div class="field">
+        <span class="label">Art</span>
 
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [outlined]="true"
-      routerLink="/trainings"
-    >
-      <i class="pi pi-arrow-left"></i>
-      <span>Zurück</span>
-    </button>
-  </div>
+        <div class="segmented" role="group" aria-label="Art">
+          <button type="button" [attr.aria-pressed]="!isGameDay()" (click)="setType(TrainingType.Training)">
+            <i class="pi pi-calendar"></i> Training
+          </button>
+          <button type="button" [attr.aria-pressed]="isGameDay()" (click)="setType(TrainingType.GameDay)">
+            <i class="pi pi-flag"></i> Spielfest
+          </button>
+        </div>
+      </div>
 
-  <div class="form-grid">
-    <p-card styleClass="training-card">
-      <ng-template pTemplate="title">
-        Trainingsdaten
-      </ng-template>
+      <div class="field">
+        <span class="label">Mannschaft</span>
 
-      <ng-template pTemplate="subtitle">
-        {{ isEdit ? 'Datum, Uhrzeit, Ort und Status' : 'Saison, Mannschaft, Datum und Status' }}
-      </ng-template>
+        @if (team(); as selected) {
+          <p class="team">
+            <strong>{{ selected.name }}</strong>
+            <span class="muted">{{ selected.seasonName }}</span>
+          </p>
+        } @else {
+          <p class="notice notice-warn">
+            <i class="pi pi-info-circle"></i>
+            <span>Wähle oben eine Saison und Mannschaft aus.</span>
+          </p>
+        }
+      </div>
 
-      @if (loadingTraining()) {
-        <p class="form-hint">Training wird geladen ...</p>
-      } @else if (isEdit && !editedTraining()) {
-        <div class="form-error" role="alert">
+      @if (isGameDay()) {
+        <label class="field">
+          <span>Name des Spielfests</span>
+          <input pInputText type="text" formControlName="title" placeholder="z. B. Spielfest beim TSV Musterstadt" />
+        </label>
+      }
+
+      <label class="field">
+        <span>Datum</span>
+        <input pInputText type="date" formControlName="trainingDate" />
+
+        @if (form.controls.trainingDate.invalid && form.controls.trainingDate.touched) {
+          <small class="field-error">Bitte wähle ein Datum aus.</small>
+        }
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Beginn</span>
+          <input pInputText type="time" formControlName="startTime" />
+        </label>
+
+        <label class="field">
+          <span>Ende</span>
+          <input pInputText type="time" formControlName="endTime" />
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Ort</span>
+        <input pInputText type="text" formControlName="location" placeholder="z. B. Realschulhalle" />
+      </label>
+
+      <div class="field">
+        <span class="label">Status</span>
+
+        <div class="segmented" role="group" aria-label="Status">
+          <button type="button" [attr.aria-pressed]="status() === TrainingStatus.Completed" (click)="setStatus(TrainingStatus.Completed)">
+            Stattgefunden
+          </button>
+          <button type="button" [attr.aria-pressed]="status() === TrainingStatus.Cancelled" (click)="setStatus(TrainingStatus.Cancelled)">
+            Ausgefallen
+          </button>
+        </div>
+
+        @if (isEdit) {
+          <small>Bereits erfasste Teilnehmer bleiben erhalten, auch wenn der Eintrag als ausgefallen markiert wird.</small>
+        }
+      </div>
+
+      <label class="field">
+        <span>Notiz</span>
+        <textarea rows="3" formControlName="notes" placeholder="Optional"></textarea>
+      </label>
+
+      @if (pageError()) {
+        <div class="notice notice-error" role="alert">
           <i class="pi pi-exclamation-circle"></i>
           <span>{{ pageError() }}</span>
         </div>
-      } @else {
-
-      <form
-        class="training-form"
-        [formGroup]="form"
-        (ngSubmit)="save()"
-      >
-        @if (isEdit) {
-          <div class="form-field">
-            <span>Mannschaft</span>
-            <p class="readonly-value">
-              {{ editedTraining()?.team?.name }}
-              @if (editedTraining()?.team?.seasonName) {
-                <small>({{ editedTraining()?.team?.seasonName }})</small>
-              }
-            </p>
-          </div>
-        } @else {
-        <label class="form-field">
-          <span>Saison</span>
-
-          <p-select
-            formControlName="season"
-            [options]="context.seasons()"
-            optionLabel="name"
-            placeholder="Saison auswählen"
-            [disabled]="context.loadingSeasons()"
-            appendTo="body"
-          />
-
-          @if (
-            form.controls.season.invalid &&
-            form.controls.season.touched
-            ) {
-            <small class="field-error">
-              Bitte wähle eine Saison aus.
-            </small>
-          }
-        </label>
-
-        <label class="form-field">
-          <span>Mannschaft</span>
-
-          <p-select
-            formControlName="team"
-            [options]="context.teamsForSelectedSeason()"
-            optionLabel="name"
-            placeholder="Mannschaft auswählen"
-            [disabled]="
-              context.loadingTeams() ||
-              !context.selectedSeason()
-            "
-            appendTo="body"
-          />
-
-          @if (
-            form.controls.team.invalid &&
-            form.controls.team.touched
-            ) {
-            <small class="field-error">
-              Bitte wähle eine Mannschaft aus.
-            </small>
-          }
-        </label>
-        }
-
-        <label class="form-field">
-          <span>Datum</span>
-
-          <p-datepicker
-            formControlName="trainingDate"
-            dateFormat="dd.mm.yy"
-            [showIcon]="true"
-            appendTo="body"
-          />
-
-          @if (
-            form.controls.trainingDate.invalid &&
-            form.controls.trainingDate.touched
-            ) {
-            <small class="field-error">
-              Bitte wähle ein Trainingsdatum aus.
-            </small>
-          }
-        </label>
-
-        <div class="time-grid">
-          <label class="form-field">
-            <span>Startzeit</span>
-
-            <input
-              pInputText
-              type="time"
-              formControlName="startTime"
-            />
-          </label>
-
-          <label class="form-field">
-            <span>Endzeit</span>
-
-            <input
-              pInputText
-              type="time"
-              formControlName="endTime"
-            />
-          </label>
-        </div>
-
-        <label class="form-field">
-          <span>Ort</span>
-
-          <input
-            pInputText
-            type="text"
-            formControlName="location"
-            placeholder="z. B. Realschulhalle"
-          />
-        </label>
-
-        <label class="form-field">
-          <span>Status</span>
-
-          <p-select
-            formControlName="status"
-            [options]="trainingStatuses"
-            optionLabel="label"
-            placeholder="Status auswählen"
-            appendTo="body"
-          />
-
-          @if (
-            form.controls.status.invalid &&
-            form.controls.status.touched
-            ) {
-            <small class="field-error">
-              Bitte wähle einen Status aus.
-            </small>
-          }
-        </label>
-
-        <label class="form-field">
-          <span>Notiz</span>
-
-          <textarea
-            rows="4"
-            formControlName="notes"
-            placeholder="Optionale Notiz zum Training"
-          ></textarea>
-        </label>
-
-        @if (isEdit ? pageError() : context.error()) {
-          <div class="form-error" role="alert">
-            <i class="pi pi-exclamation-circle"></i>
-            <span>{{ isEdit ? pageError() : context.error() }}</span>
-          </div>
-        }
-
-        <div class="form-actions">
-          <button
-            pButton
-            type="button"
-            severity="secondary"
-            [outlined]="true"
-            routerLink="/trainings"
-          >
-            Abbrechen
-          </button>
-
-          <button
-            pButton
-            type="submit"
-            [disabled]="
-              saving() ||
-              (!isEdit && (context.loadingSeasons() || context.loadingTeams()))
-            "
-          >
-            <i class="pi pi-check"></i>
-            <span>{{ isEdit ? 'Änderungen speichern' : 'Training speichern' }}</span>
-          </button>
-        </div>
-      </form>
       }
-    </p-card>
-  </div>
+
+      <div class="form-actions">
+        <button pButton type="button" severity="secondary" [outlined]="true" routerLink="/trainings">Abbrechen</button>
+
+        <button pButton type="submit" [disabled]="saving() || !team()">
+          <i class="pi pi-check"></i>
+          <span>{{ isEdit ? 'Speichern' : 'Anlegen' }}</span>
+        </button>
+      </div>
+    </form>
+  }
 </section>

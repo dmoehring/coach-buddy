@@ -1,27 +1,8 @@
-<section class="person-create-page">
-  <div class="page-header">
-    <div>
-      <p class="eyebrow">Personen</p>
-      <h1>Person anlegen</h1>
-      <p class="description">
-        Lege eine neue Person an. Die Zuordnung zu Mannschaften erfolgt später über die Team-Mitgliedschaften.
-      </p>
-    </div>
-
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [outlined]="true"
-      routerLink="/persons"
-    >
-      <i class="pi pi-arrow-left"></i>
-      <span>Zurück</span>
-    </button>
-  </div>
+<section class="page person-create-page">
+  <app-page-header title="Person anlegen" backLink="/persons" backLabel="Personen" />
 
   @if (error()) {
-    <div class="error-box">
+    <div class="notice notice-error" role="alert">
       <i class="pi pi-exclamation-triangle"></i>
       <span>{{ error() }}</span>
     </div>

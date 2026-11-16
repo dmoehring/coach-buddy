@@ -1,36 +1,72 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { RouterLink } from '@angular/router';
 
 import { TrainingsService } from '../../../api/api/trainings.service';
 import { TrainingDto } from '../../../api/model/training-dto';
 import { TrainingStatus } from '../../../api/model/training-status';
+import { TrainingType } from '../../../api/model/training-type';
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
+import { CsvExportService } from '../../../shared/util/export.service';
+import {
+  formatDate,
+  isGameDay,
+  timeRange,
+  trainingLink,
+  trainingTitle,
+  weekday
+} from '../../../shared/util/format';
+
+type TypeFilter = 'ALL' | TrainingType;
+
+interface MonthGroup {
+  key: string;
+  label: string;
+  trainings: TrainingDto[];
+}
 
 @Component({
   selector: 'app-trainings-page',
-  imports: [
-    ButtonModule,
-    CardModule,
-    TableModule,
-    TagModule,
-    RouterLink
-  ],
+  imports: [ButtonModule, RouterLink, PageHeader],
   templateUrl: './trainings-page.html',
   styleUrl: './trainings-page.scss'
 })
 export class TrainingsPage {
   private readonly trainingsService = inject(TrainingsService);
   readonly context = inject(CurrentContextService);
+  readonly csv = inject(CsvExportService);
+
+  readonly TrainingType = TrainingType;
 
   readonly trainings = signal<TrainingDto[]>([]);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly deletingId = signal<string | null>(null);
+  readonly filter = signal<TypeFilter>('ALL');
+
+  readonly filtered = computed(() => {
+    const filter = this.filter();
+
+    return filter === 'ALL'
+      ? this.trainings()
+      : this.trainings().filter(training => training.type === filter);
+  });
+
+  readonly groups = computed<MonthGroup[]>(() => {
+    const groups = new Map<string, MonthGroup>();
+
+    for (const training of this.filtered()) {
+      const key = (training.trainingDate ?? '').slice(0, 7);
+      const group = groups.get(key) ?? { key, label: this.monthLabel(key), trainings: [] };
+
+      group.trainings.push(training);
+      groups.set(key, group);
+    }
+
+    return [...groups.values()];
+  });
 
   constructor() {
     effect(() => {
@@ -61,8 +97,6 @@ export class TrainingsPage {
         },
         error: error => {
           console.error('Trainings could not be loaded:', error);
-          console.error('Backend error body:', error.error);
-
           this.error.set('Trainings konnten nicht geladen werden.');
           this.loading.set(false);
         }
@@ -75,7 +109,8 @@ export class TrainingsPage {
     }
 
     const confirmed = window.confirm(
-      `Training vom ${this.formatDate(training.trainingDate)} wirklich löschen?`
+      `${this.title(training)} vom ${formatDate(training.trainingDate)} wirklich löschen? `
+      + 'Die erfasste Anwesenheit geht dabei verloren.'
     );
 
     if (!confirmed) {
@@ -92,59 +127,57 @@ export class TrainingsPage {
       },
       error: error => {
         console.error('Training could not be deleted:', error);
-        console.error('Backend error body:', error.error);
-
-        this.error.set('Das Training konnte nicht gelöscht werden.');
+        this.error.set('Der Eintrag konnte nicht gelöscht werden.');
         this.deletingId.set(null);
       }
     });
   }
 
-  getStatusLabel(status?: TrainingStatus): string {
-    return status === TrainingStatus.Completed ? 'Stattgefunden' : 'Ausgefallen';
+  exportAttendance(): void {
+    const teamId = this.context.selectedTeam()?.id;
+
+    if (teamId) {
+      this.csv.teamAttendance(teamId);
+    }
   }
 
-  getStatusSeverity(status?: TrainingStatus): 'success' | 'danger' {
-    return status === TrainingStatus.Completed ? 'success' : 'danger';
+  title(training: TrainingDto): string {
+    return trainingTitle(training);
   }
 
-  getTimeRange(training: TrainingDto): string {
-    if (!training.startTime && !training.endTime) {
-      return '-';
-    }
-
-    if (training.startTime && training.endTime) {
-      return `${training.startTime} - ${training.endTime}`;
-    }
-
-    return training.startTime ?? training.endTime ?? '-';
+  link(training: TrainingDto): string[] {
+    return trainingLink(training);
   }
 
-  formatDate(value?: string): string {
-    if (!value) {
-      return '-';
-    }
-
-    const [year, month, day] = value.slice(0, 10).split('-');
-
-    if (!year || !month || !day) {
-      return value;
-    }
-
-    return `${day}.${month}.${year}`;
+  isGameDay(training: TrainingDto): boolean {
+    return isGameDay(training);
   }
 
-  getWeekday(value?: string): string {
-    if (!value) {
-      return '';
+  isCancelled(training: TrainingDto): boolean {
+    return training.status === TrainingStatus.Cancelled;
+  }
+
+  day(training: TrainingDto): string {
+    return (training.trainingDate ?? '').slice(8, 10);
+  }
+
+  weekdayShort(training: TrainingDto): string {
+    return weekday(training.trainingDate).slice(0, 2);
+  }
+
+  meta(training: TrainingDto): string {
+    return [timeRange(training.startTime, training.endTime), training.location]
+      .filter(Boolean)
+      .join(' · ');
+  }
+
+  private monthLabel(key: string): string {
+    const [year, month] = key.split('-').map(Number);
+
+    if (!year || !month) {
+      return 'Ohne Datum';
     }
 
-    const date = new Date(`${value.slice(0, 10)}T00:00:00`);
-
-    if (Number.isNaN(date.getTime())) {
-      return '';
-    }
-
-    return date.toLocaleDateString('de-DE', { weekday: 'long' });
+    return new Date(year, month - 1, 1).toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
   }
 }

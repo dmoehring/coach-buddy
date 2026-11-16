@@ -1,159 +1,59 @@
-.trainings-page {
-  display: grid;
-  gap: 1.5rem;
+.filter {
+  width: fit-content;
+  max-width: 100%;
 }
 
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+.list-row {
+  padding-right: 0.5rem;
 
-  h1 {
-    margin: 0;
-    font-size: clamp(2rem, 4vw, 3.25rem);
-    letter-spacing: -0.04em;
-  }
-
-  button {
-    gap: 0.5rem;
-    white-space: nowrap;
+  &.cancelled .title,
+  &.cancelled .meta {
+    text-decoration: line-through;
+    opacity: 0.65;
   }
 }
 
-.eyebrow {
-  margin: 0 0 0.35rem;
-  color: var(--p-primary-color);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
-}
-
-.description {
-  margin: 0.5rem 0 0;
-  color: var(--p-text-muted-color);
-  max-width: 44rem;
-}
-
-.desktop-table {
-  display: block;
-}
-
-.mobile-training-list {
-  display: none;
-}
-
-.date-cell {
-  display: grid;
-  gap: 0.1rem;
-
-  span {
-    color: var(--p-text-muted-color);
-    font-size: 0.82rem;
-  }
-}
-
-.note {
-  color: var(--p-text-muted-color);
-}
-
-.actions-column {
-  width: 8rem;
-}
-
-.table-actions {
+.open {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  flex: 1 1 auto;
+  gap: 0.9rem;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
 }
 
-:host ::ng-deep .trainings-card {
-  overflow: hidden;
-}
-
-.training-card {
+.date {
   display: grid;
-  gap: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 1.25rem;
-  background: var(--p-surface-0);
-}
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  padding: 0.3rem 0;
+  border-radius: 0.75rem;
+  background: var(--cb-surface-muted);
+  border: 1px solid var(--cb-border);
+  line-height: 1.1;
 
-:host-context(.app-dark) .training-card {
-  border-color: var(--p-surface-800);
-  background: var(--p-surface-900);
-}
-
-.training-card-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.training-date {
-  display: grid;
-  gap: 0.1rem;
-
-  span {
-    color: var(--p-text-muted-color);
-    font-size: 0.85rem;
-  }
-}
-
-.training-card-content {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.training-info {
-  display: grid;
-  gap: 0.15rem;
-
-  span {
-    color: var(--p-text-muted-color);
-    font-size: 0.8rem;
+  small {
+    color: var(--cb-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
   }
 
   strong {
-    font-weight: 650;
+    font-size: 1.15rem;
   }
 }
 
-.training-note {
-  margin: 0;
-  color: var(--p-text-muted-color);
+.row-actions {
+  display: flex;
+  flex: none;
 }
 
-.training-card-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
-  gap: 0.75rem;
-
-  button {
-    justify-content: center;
-    gap: 0.45rem;
-  }
-}
-
-@media (max-width: 760px) {
-  .page-header {
-    flex-direction: column;
-
-    button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-
-  .desktop-table {
-    display: none;
-  }
-
-  .mobile-training-list {
-    display: grid;
-    gap: 1rem;
-  }
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
 }

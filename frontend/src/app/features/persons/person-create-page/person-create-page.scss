@@ -3,39 +3,6 @@
   gap: 1.5rem;
 }
 
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-
-  h1 {
-    margin: 0;
-    font-size: clamp(2rem, 4vw, 3.25rem);
-    letter-spacing: -0.04em;
-  }
-
-  button {
-    gap: 0.5rem;
-    white-space: nowrap;
-  }
-}
-
-.eyebrow {
-  margin: 0 0 0.35rem;
-  color: var(--p-primary-color);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
-}
-
-.description {
-  margin: 0.5rem 0 0;
-  color: var(--p-text-muted-color);
-  max-width: 44rem;
-}
-
 .form-grid {
   display: grid;
   max-width: 48rem;

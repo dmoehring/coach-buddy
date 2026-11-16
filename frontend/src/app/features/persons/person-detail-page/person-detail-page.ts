@@ -1,14 +1,13 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
 
 import { PersonRelationsService } from '../../../api/api/person-relations.service';
 import { PersonsService } from '../../../api/api/persons.service';
 import { TeamMembershipsService } from '../../../api/api/team-memberships.service';
+import { TrainingParticipantsService } from '../../../api/api/training-participants.service';
 
 import { PersonDto } from '../../../api/model/person-dto';
 import { PersonRelationDto } from '../../../api/model/person-relation-dto';
@@ -16,6 +15,9 @@ import { PhoneType } from '../../../api/model/phone-type';
 import { RelationType } from '../../../api/model/relation-type';
 import { TeamMemberRole } from '../../../api/model/team-member-role';
 import { TeamMembershipDto } from '../../../api/model/team-membership-dto';
+import { TrainingParticipantDto } from '../../../api/model/training-participant-dto';
+import { AttendanceStatus } from '../../../api/model/attendance-status';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
 
 interface ContactEntry {
   label: string;
@@ -28,8 +30,7 @@ interface ContactEntry {
   imports: [
     RouterLink,
     ButtonModule,
-    CardModule,
-    TableModule
+    PageHeader
   ],
   templateUrl: './person-detail-page.html',
   styleUrl: './person-detail-page.scss'
@@ -39,6 +40,7 @@ export class PersonDetailPage {
   private readonly personsService = inject(PersonsService);
   private readonly personRelationsService = inject(PersonRelationsService);
   private readonly membershipsService = inject(TeamMembershipsService);
+  private readonly participantsService = inject(TrainingParticipantsService);
 
   readonly personId = this.route.snapshot.paramMap.get('id');
   readonly returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/persons';
@@ -47,6 +49,24 @@ export class PersonDetailPage {
   readonly guardianRelations = signal<PersonRelationDto[]>([]);
   readonly childRelations = signal<PersonRelationDto[]>([]);
   readonly memberships = signal<TeamMembershipDto[]>([]);
+  readonly participations = signal<TrainingParticipantDto[]>([]);
+
+  /** Attendance over everything recorded for this person, cancelled trainings excluded. */
+  readonly attendance = computed(() => {
+    const held = this.participations().filter(entry => entry.training?.status !== 'CANCELLED');
+    const present = held.filter(entry => entry.attendanceStatus === AttendanceStatus.Present);
+    const recorded = held.length;
+
+    return {
+      recorded,
+      present: present.length,
+      excused: held.filter(entry => entry.attendanceStatus === AttendanceStatus.Excused).length,
+      absent: held.filter(entry => entry.attendanceStatus === AttendanceStatus.Absent).length,
+      rate: recorded === 0 ? null : Math.round((present.length * 100) / recorded),
+      goalMinutes: present.reduce((sum, entry) => sum + (entry.minutesInGoal ?? 0), 0),
+      gameDays: present.filter(entry => entry.training?.type === 'GAME_DAY').length
+    };
+  });
 
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
@@ -189,6 +209,11 @@ export class PersonDetailPage {
         personId,
         undefined,
         undefined
+      ),
+      participations: this.participantsService.apiV1TrainingParticipantsGet(
+        undefined,
+        personId,
+        undefined
       )
     }).subscribe({
       next: result => {
@@ -196,6 +221,7 @@ export class PersonDetailPage {
         this.guardianRelations.set(result.guardianRelations);
         this.childRelations.set(result.childRelations);
         this.memberships.set(result.memberships);
+        this.participations.set(result.participations);
 
         this.loading.set(false);
       },

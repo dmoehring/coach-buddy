@@ -7,12 +7,12 @@ import {
 import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { TeamsService } from '../../../api/api/teams.service';
 import { CreateTeamRequest } from '../../../api/model/create-team-request';
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
 
 @Component({
   selector: 'app-team-create-page',
@@ -20,8 +20,8 @@ import { CurrentContextService } from '../../../core/context/current-context.ser
     ReactiveFormsModule,
     RouterLink,
     ButtonModule,
-    CardModule,
-    InputTextModule
+    InputTextModule,
+    PageHeader
   ],
   templateUrl: './team-create-page.html',
   styleUrl: './team-create-page.scss'

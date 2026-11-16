@@ -7,13 +7,13 @@ import {
 import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { SeasonsService } from '../../../api/api/seasons.service';
 import { CreateSeasonRequest } from '../../../api/model/create-season-request';
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
 
 @Component({
   selector: 'app-season-create-page',
@@ -21,9 +21,9 @@ import { CurrentContextService } from '../../../core/context/current-context.ser
     ReactiveFormsModule,
     RouterLink,
     ButtonModule,
-    CardModule,
     DatePickerModule,
-    InputTextModule
+    InputTextModule,
+    PageHeader
   ],
   templateUrl: './season-create-page.html',
   styleUrl: './season-create-page.scss'

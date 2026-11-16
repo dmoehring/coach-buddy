@@ -3,7 +3,6 @@ import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeng/themes/aura';
 
 import { routes } from './app.routes';
 
@@ -11,6 +10,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideApi } from './api/provide-api';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { environment } from '../environments/environment';
+import { CoachBuddyPreset } from './core/theme/coach-buddy-preset';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-        preset: Aura,
+        preset: CoachBuddyPreset,
         options: {
           darkModeSelector: '.app-dark'
         }

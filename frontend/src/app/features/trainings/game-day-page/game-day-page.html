@@ -1,0 +1,232 @@
+<section class="page">
+  <app-page-header [title]="title()" [subtitle]="subtitle()" [backLink]="returnUrl" backLabel="Zurück">
+    @if (session.training(); as training) {
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        [disabled]="csv.busy()"
+        (click)="exportParticipants()"
+      >
+        <i class="pi pi-download"></i>
+        <span>Teilnehmer (CSV)</span>
+      </button>
+
+      <button
+        pButton
+        type="button"
+        severity="secondary"
+        [outlined]="true"
+        [routerLink]="['/trainings', training.id, 'edit']"
+      >
+        <i class="pi pi-pencil"></i>
+        <span>Bearbeiten</span>
+      </button>
+    }
+  </app-page-header>
+
+  @if (session.error(); as message) {
+    <div class="notice notice-error" role="alert">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ message }}</span>
+    </div>
+  } @else if (session.loading()) {
+    <p class="muted">Wird geladen …</p>
+  } @else if (session.training()?.status === Cancelled) {
+    <div class="surface empty">
+      <i class="pi pi-ban"></i>
+      <strong>Dieses Spielfest ist ausgefallen</strong>
+      <span>Es werden keine Teilnehmer erfasst.</span>
+    </div>
+  } @else {
+    @if (csv.error(); as message) {
+      <div class="notice notice-error" role="alert">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ message }}</span>
+      </div>
+    }
+
+    <div class="summary" aria-label="Zusammenfassung">
+      <div class="stat present"><strong>{{ present() }}</strong><span>Kinder dabei</span></div>
+      <div class="stat"><strong>{{ open() }}</strong><span>noch offen</span></div>
+      <div class="stat"><strong>{{ totalGoalMinutes() }}</strong><span>Min. im Tor</span></div>
+    </div>
+
+    <div class="save-line" role="status" aria-live="polite">
+      @if (session.saveError(); as message) {
+        <span class="error"><i class="pi pi-exclamation-triangle"></i> {{ message }}</span>
+      } @else if (session.saving()) {
+        <span><i class="pi pi-spin pi-spinner"></i> Speichert …</span>
+      } @else if (session.saved()) {
+        <span class="ok"><i class="pi pi-check"></i> Gespeichert</span>
+      } @else {
+        <span>Änderungen werden automatisch gespeichert.</span>
+      }
+    </div>
+
+    @if (duplicateJerseys()) {
+      <div class="notice notice-warn" role="status">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>Mindestens eine Trikotnummer ist doppelt vergeben.</span>
+      </div>
+    }
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Kinder</h2>
+
+        @if (open() > 0) {
+          <button pButton type="button" size="small" severity="secondary" [outlined]="true" (click)="markAllPresent()">
+            <i class="pi pi-check-circle"></i>
+            <span>Alle offenen auf „dabei“</span>
+          </button>
+        }
+      </div>
+
+      @if (session.players().length === 0) {
+        <div class="surface empty">
+          <i class="pi pi-users"></i>
+          <strong>Keine Kinder in dieser Mannschaft</strong>
+          <span>Füge unter „Teams“ Mitglieder hinzu.</span>
+        </div>
+      } @else {
+        <ul class="list">
+          @for (entry of session.players(); track entry.person.id) {
+            <li class="player">
+              <div class="player-head">
+                <a class="who" [routerLink]="['/persons', entry.person.id]" [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/game-day' }">
+                  <span class="avatar" aria-hidden="true">{{ initials(entry) }}</span>
+                  <span class="title">{{ name(entry) }}</span>
+                </a>
+
+                <app-attendance-toggle [status]="entry.attendanceStatus" [name]="name(entry)" (selected)="select(entry, $event)" />
+              </div>
+
+              @if (entry.attendanceStatus === Present) {
+                <div class="details">
+                  <label class="field">
+                    <span>Trikot-Nr.</span>
+                    <input
+                      class="p-inputtext"
+                      type="number"
+                      inputmode="numeric"
+                      min="0"
+                      max="999"
+                      [value]="entry.jerseyNumber ?? ''"
+                      (change)="setNumber(entry, 'jerseyNumber', $event)"
+                    />
+                  </label>
+
+                  <label class="field">
+                    <span>Spielzeit (Min.)</span>
+                    <input
+                      class="p-inputtext"
+                      type="number"
+                      inputmode="numeric"
+                      min="0"
+                      max="999"
+                      step="5"
+                      [value]="entry.minutesPlayed ?? ''"
+                      (change)="setNumber(entry, 'minutesPlayed', $event)"
+                    />
+                  </label>
+
+                  <label class="field">
+                    <span>Im Tor (Min.)</span>
+                    <input
+                      class="p-inputtext"
+                      type="number"
+                      inputmode="numeric"
+                      min="0"
+                      max="999"
+                      step="5"
+                      [value]="entry.minutesInGoal ?? ''"
+                      (change)="setNumber(entry, 'minutesInGoal', $event)"
+                    />
+                  </label>
+
+                  <label class="field notes">
+                    <span>Notiz</span>
+                    <input
+                      class="p-inputtext"
+                      type="text"
+                      maxlength="500"
+                      placeholder="z. B. hat durchgespielt"
+                      [value]="entry.notes"
+                      (change)="setNotes(entry, $event)"
+                    />
+                  </label>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    </section>
+
+    @if (summary().length > 0) {
+      <section class="section">
+        <h2 class="section-title">Übersicht</h2>
+
+        <div class="surface table-wrap">
+          <table class="overview">
+            <thead>
+              <tr>
+                <th class="num">Nr.</th>
+                <th>Name</th>
+                <th class="num">Spielzeit</th>
+                <th class="num">Tor</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of summary(); track row.entry.person.id) {
+                <tr>
+                  <td class="num">
+                    @if (row.entry.jerseyNumber !== null) {
+                      <span [class.duplicate]="row.duplicateJersey">{{ row.entry.jerseyNumber }}</span>
+                    } @else {
+                      <span class="muted">–</span>
+                    }
+                  </td>
+                  <td>
+                    {{ name(row.entry) }}
+                    @if (row.entry.notes) {
+                      <small class="muted">{{ row.entry.notes }}</small>
+                    }
+                  </td>
+                  <td class="num">{{ row.entry.minutesPlayed ?? '–' }}</td>
+                  <td class="num">{{ row.entry.minutesInGoal ?? '–' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @if (session.staff().length > 0) {
+      <section class="section">
+        <h2 class="section-title">Trainer und Betreuer · {{ staffPresent() }} dabei</h2>
+
+        <ul class="list">
+          @for (entry of session.staff(); track entry.person.id) {
+            <li class="player">
+              <div class="player-head">
+                <a class="who" [routerLink]="['/persons', entry.person.id]" [queryParams]="{ returnUrl: '/trainings/' + trainingId + '/game-day' }">
+                  <span class="avatar" aria-hidden="true">{{ initials(entry) }}</span>
+                  <span class="grow">
+                    <span class="title">{{ name(entry) }}</span>
+                    <span class="meta">{{ roleLabel(entry.role) }}</span>
+                  </span>
+                </a>
+
+                <app-attendance-toggle [status]="entry.attendanceStatus" [name]="name(entry)" (selected)="select(entry, $event)" />
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+</section>

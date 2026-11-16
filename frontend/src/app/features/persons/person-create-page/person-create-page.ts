@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Observable, catchError, forkJoin, map, of, switchMap, tap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -8,16 +8,17 @@ import { PersonRelationsService } from '../../../api/api/person-relations.servic
 import { PersonsService } from '../../../api/api/persons.service';
 import { CreatePersonRequest } from '../../../api/model/create-person-request';
 import { PersonDto } from '../../../api/model/person-dto';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import { PersonForm, PersonFormValue } from '../components/person-form/person-form';
 import { PersonRelationsDraft, RelationDraft } from '../components/person-relations-draft/person-relations-draft';
 
 @Component({
   selector: 'app-person-create-page',
   imports: [
-    RouterLink,
     ButtonModule,
     PersonForm,
-    PersonRelationsDraft
+    PersonRelationsDraft,
+    PageHeader
   ],
   templateUrl: './person-create-page.html',
   styleUrl: './person-create-page.scss'

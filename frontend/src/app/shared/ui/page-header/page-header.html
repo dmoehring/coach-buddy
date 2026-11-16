@@ -1,0 +1,20 @@
+<header class="page-header">
+  <div class="text">
+    @if (backLink(); as link) {
+      <a class="back" [routerLink]="link" [queryParams]="backQueryParams()">
+        <i class="pi pi-arrow-left"></i>
+        <span>{{ backLabel() }}</span>
+      </a>
+    }
+
+    <h1>{{ title() }}</h1>
+
+    @if (subtitle(); as text) {
+      <p class="subtitle">{{ text }}</p>
+    }
+  </div>
+
+  <div class="actions">
+    <ng-content />
+  </div>
+</header>

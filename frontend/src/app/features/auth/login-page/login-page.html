@@ -1,47 +1,33 @@
 <div class="login-shell">
-  <p-card styleClass="login-card">
-    <ng-template pTemplate="title">
-      <div class="login-brand">
-        <i class="pi pi-heart"></i>
-        <span>Coach Buddy</span>
+  <form class="login-card surface" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="brand">
+      <span class="brand-mark"><i class="pi pi-heart-fill"></i></span>
+      <div>
+        <h1>Coach Buddy</h1>
+        <p class="muted">Melde dich an, um fortzufahren.</p>
       </div>
-    </ng-template>
+    </div>
 
-    <ng-template pTemplate="subtitle">
-      Melde dich an, um fortzufahren.
-    </ng-template>
+    <label class="field">
+      <span>Benutzername</span>
+      <input pInputText type="text" formControlName="username" autocomplete="username" />
+    </label>
 
-    <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
-      <label class="form-field">
-        <span>Benutzername</span>
-        <input
-          pInputText
-          type="text"
-          formControlName="username"
-          autocomplete="username"
-          placeholder="Benutzername"
-        />
-      </label>
+    <label class="field">
+      <span>Passwort</span>
+      <input pInputText type="password" formControlName="password" autocomplete="current-password" />
+    </label>
 
-      <label class="form-field">
-        <span>Passwort</span>
-        <input
-          pInputText
-          type="password"
-          formControlName="password"
-          autocomplete="current-password"
-          placeholder="Passwort"
-        />
-      </label>
+    @if (error()) {
+      <div class="notice notice-error" role="alert">
+        <i class="pi pi-exclamation-circle"></i>
+        <span>{{ error() }}</span>
+      </div>
+    }
 
-      @if (error()) {
-        <p class="login-error">{{ error() }}</p>
-      }
-
-      <button pButton type="submit" [disabled]="loading()" class="login-submit">
-        <i class="pi pi-sign-in"></i>
-        <span>{{ loading() ? 'Meldet an ...' : 'Anmelden' }}</span>
-      </button>
-    </form>
-  </p-card>
+    <button pButton type="submit" [disabled]="loading()" class="submit">
+      <i class="pi pi-sign-in"></i>
+      <span>{{ loading() ? 'Meldet an …' : 'Anmelden' }}</span>
+    </button>
+  </form>
 </div>

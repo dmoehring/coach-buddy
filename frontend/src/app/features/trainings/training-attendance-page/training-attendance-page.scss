@@ -1,277 +1,81 @@
-.training-attendance-page {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.page-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-
-  h1 {
-    margin: 0;
-    font-size: clamp(2rem, 4vw, 3.25rem);
-    letter-spacing: -0.04em;
-  }
-
-  button {
-    gap: 0.5rem;
-    white-space: nowrap;
-  }
-}
-
-.eyebrow {
-  margin: 0 0 0.35rem;
-  color: var(--p-primary-color);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.75rem;
-}
-
-.description {
-  margin: 0.5rem 0 0;
-  color: var(--p-text-muted-color);
-  max-width: 44rem;
-}
-
-.training-summary {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 1rem;
-
-  div {
-    display: grid;
-    gap: 0.2rem;
-  }
-
-  span {
-    color: var(--p-text-muted-color);
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  strong {
-    font-weight: 700;
-  }
-}
-
-.attendance-stats {
+.summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 0.6rem;
 }
 
-.stat-card {
+.stat {
   display: grid;
-  gap: 0.25rem;
-
-  span {
-    color: var(--p-text-muted-color);
-    font-size: 0.85rem;
-  }
+  gap: 0.1rem;
+  padding: 0.7rem 0.5rem;
+  text-align: center;
+  border-radius: var(--cb-radius-sm);
+  background: var(--cb-neutral-bg);
 
   strong {
-    font-size: 1.7rem;
-    letter-spacing: -0.04em;
+    font-size: 1.5rem;
+    line-height: 1.1;
   }
-}
-
-.participants-list {
-  display: grid;
-  gap: 0.75rem;
-}
-
-.participant-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
-  align-items: center;
-  gap: 1rem;
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 1rem;
-  background: var(--p-surface-0);
-}
-
-:host-context(.app-dark) .participant-row {
-  border-color: var(--p-surface-800);
-  background: var(--p-surface-900);
-}
-
-.participant-name {
-  display: grid;
-  gap: 0.15rem;
-  min-width: 0;
 
   span {
-    color: var(--p-text-muted-color);
-    font-size: 0.82rem;
+    font-size: 0.8rem;
+    color: var(--cb-muted);
+  }
+
+  &.present {
+    background: var(--cb-success-bg);
+    strong { color: var(--cb-success); }
+  }
+
+  &.excused {
+    background: var(--cb-warn-bg);
+    strong { color: var(--cb-warn); }
+  }
+
+  &.absent {
+    background: var(--cb-danger-bg);
+    strong { color: var(--cb-danger); }
   }
 }
 
-.person-name-link {
-  width: fit-content;
-  color: var(--p-text-color);
-  font-weight: 700;
-  text-decoration: none;
+.save-line {
+  min-height: 1.25rem;
+  margin-top: -0.4rem;
+  color: var(--cb-muted);
+  font-size: 0.85rem;
 
-  &:hover {
-    color: var(--p-primary-color);
-    text-decoration: underline;
-  }
+  .ok { color: var(--cb-success); }
+  .error { color: var(--cb-danger); }
 }
 
-.attendance-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
+.person-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  padding: 0.75rem 1.1rem;
 }
 
-.attendance-option {
-  --option-color: var(--p-primary-color);
-
+.who {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  min-height: 2.75rem;
-  padding: 0.5rem 0.4rem;
-  border: 1px solid var(--p-surface-300);
-  border-radius: 0.75rem;
-  background: transparent;
-  color: var(--p-text-muted-color);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-  transition: background-color 0.12s, color 0.12s, border-color 0.12s;
+  flex: 1 1 12rem;
+  gap: 0.8rem;
+  min-width: 0;
+  text-decoration: none;
 
-  &.attendance-option-present {
-    --option-color: var(--p-green-500);
-  }
-
-  &.attendance-option-excused {
-    --option-color: var(--p-orange-500);
-  }
-
-  &.attendance-option-absent {
-    --option-color: var(--p-red-500);
-  }
-
-  &.selected {
-    border-color: var(--option-color);
-    background: var(--option-color);
-    color: #fff;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--option-color);
-    outline-offset: 2px;
+  &:hover .title {
+    color: var(--p-primary-color);
   }
 }
 
-:host-context(.app-dark) .attendance-option:not(.selected) {
-  border-color: var(--p-surface-700);
+app-attendance-toggle {
+  flex: 1 1 100%;
 }
 
-.save-status {
-  position: sticky;
-  bottom: 0.75rem;
-  z-index: 10;
-  justify-self: center;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--p-surface-200);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--p-surface-0), transparent 4%);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 8px 20px rgb(15 23 42 / 0.12);
-  color: var(--p-text-muted-color);
-  font-size: 0.85rem;
-
-  i {
-    margin-right: 0.25rem;
-  }
-}
-
-:host-context(.app-dark) .save-status {
-  border-color: var(--p-surface-800);
-  background: color-mix(in srgb, var(--p-surface-900), transparent 4%);
-  box-shadow: 0 8px 20px rgb(0 0 0 / 0.35);
-}
-
-.save-status-ok {
-  color: var(--p-green-500);
-  font-weight: 600;
-}
-
-.save-status-error {
-  color: var(--p-red-500);
-  font-weight: 600;
-}
-
-.cancelled-text {
-  margin: 0;
-  color: var(--p-text-muted-color);
-}
-
-:host ::ng-deep .training-summary-card,
-:host ::ng-deep .participants-card {
-  overflow: hidden;
-}
-
-@media (max-width: 1200px) {
-  .training-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .attendance-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 900px) {
-  .participant-row {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
-
-  .attendance-option {
-    flex-direction: column;
-    gap: 0.2rem;
-    min-height: 3.5rem;
-    font-size: 0.75rem;
-  }
-
-  .page-header {
-    flex-direction: column;
-
-    button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-}
-
-@media (max-width: 560px) {
-  .training-attendance-page {
-    gap: 1rem;
-  }
-
-  .training-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .attendance-stats {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-  }
-
-  .participant-row {
-    padding: 0.75rem;
+@media (min-width: 700px) {
+  app-attendance-toggle {
+    flex: none;
   }
 }

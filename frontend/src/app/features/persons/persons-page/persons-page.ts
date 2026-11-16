@@ -3,13 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
 
 import { PersonsService } from '../../../api/api/persons.service';
 import { TeamMembershipsService } from '../../../api/api/team-memberships.service';
@@ -17,6 +14,9 @@ import { PersonDto } from '../../../api/model/person-dto';
 import { TeamMemberRole } from '../../../api/model/team-member-role';
 import { TeamMembershipDto } from '../../../api/model/team-membership-dto';
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
+import { CsvExportService } from '../../../shared/util/export.service';
+import { initials } from '../../../shared/util/format';
 
 const NO_TEAM = '__none__';
 
@@ -52,13 +52,11 @@ const ROLE_LABELS: Record<TeamMemberRole, string> = {
     FormsModule,
     RouterLink,
     ButtonModule,
-    CardModule,
     IconFieldModule,
     InputIconModule,
     InputTextModule,
     SelectModule,
-    TableModule,
-    TagModule
+    PageHeader
   ],
   templateUrl: './persons-page.html',
   styleUrl: './persons-page.scss'
@@ -68,6 +66,7 @@ export class PersonsPage implements OnInit {
   private readonly membershipsService = inject(TeamMembershipsService);
 
   readonly context = inject(CurrentContextService);
+  readonly csv = inject(CsvExportService);
 
   readonly persons = signal<PersonDto[]>([]);
   readonly memberships = signal<TeamMembershipDto[]>([]);
@@ -228,6 +227,17 @@ export class PersonsPage implements OnInit {
     }
   }
 
+
+  /** Active members of the filtered team, or of all teams if no team is selected. */
+  exportMembers(): void {
+    const filter = this.teamFilter();
+
+    this.csv.members(filter && filter !== NO_TEAM ? filter : undefined);
+  }
+
+  initials(person: PersonDto): string {
+    return initials(person);
+  }
 
   resetFilters(): void {
     this.searchTerm.set('');

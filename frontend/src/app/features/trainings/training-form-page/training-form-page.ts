@@ -1,42 +1,23 @@
-import { Component, effect, inject, signal } from '@angular/core';
-import {
-  FormBuilder,
-  ReactiveFormsModule,
-  Validators
-} from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
 
 import { CurrentContextService } from '../../../core/context/current-context.service';
 import { TrainingsService } from '../../../api/api/trainings.service';
 import { CreateTrainingRequest } from '../../../api/model/create-training-request';
 import { TrainingDto } from '../../../api/model/training-dto';
 import { TrainingStatus } from '../../../api/model/training-status';
+import { TrainingType } from '../../../api/model/training-type';
 import { UpdateTrainingRequest } from '../../../api/model/update-training-request';
-import { SeasonDto } from '../../../api/model/season-dto';
-import { TeamDto } from '../../../api/model/team-dto';
-
-interface TrainingStatusOption {
-  value: TrainingStatus;
-  label: string;
-}
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
+import { trainingLink } from '../../../shared/util/format';
 
 @Component({
   selector: 'app-training-form-page',
-  imports: [
-    ReactiveFormsModule,
-    RouterLink,
-    ButtonModule,
-    CardModule,
-    DatePickerModule,
-    InputTextModule,
-    SelectModule
-  ],
+  imports: [ReactiveFormsModule, RouterLink, ButtonModule, InputTextModule, PageHeader],
   templateUrl: './training-form-page.html',
   styleUrl: './training-form-page.scss'
 })
@@ -48,6 +29,9 @@ export class TrainingFormPage {
 
   readonly context = inject(CurrentContextService);
 
+  readonly TrainingType = TrainingType;
+  readonly TrainingStatus = TrainingStatus;
+
   /** Set when the page is opened via `trainings/:id/edit`. */
   readonly trainingId = this.route.snapshot.paramMap.get('id');
   readonly isEdit = this.trainingId !== null;
@@ -57,80 +41,46 @@ export class TrainingFormPage {
   readonly saving = signal(false);
   readonly pageError = signal<string | null>(null);
 
-  readonly trainingStatuses: TrainingStatusOption[] = [
-    {
-      value: TrainingStatus.Completed,
-      label: 'Stattgefunden'
-    },
-    {
-      value: TrainingStatus.Cancelled,
-      label: 'Ausgefallen'
-    }
-  ];
-
-  readonly form = this.formBuilder.group({
-    season: this.formBuilder.control<SeasonDto | null>(
-      null,
-      Validators.required
-    ),
-    team: this.formBuilder.control<TeamDto | null>(
-      null,
-      Validators.required
-    ),
-    trainingDate: this.formBuilder.nonNullable.control(
-      new Date(),
-      Validators.required
-    ),
+  readonly form = this.formBuilder.nonNullable.group({
+    type: this.formBuilder.nonNullable.control<TrainingType>(this.initialType()),
+    title: this.formBuilder.nonNullable.control(''),
+    trainingDate: this.formBuilder.nonNullable.control(this.today(), Validators.required),
     startTime: this.formBuilder.nonNullable.control(''),
     endTime: this.formBuilder.nonNullable.control(''),
     location: this.formBuilder.nonNullable.control(''),
-    status: this.formBuilder.nonNullable.control(
-      this.trainingStatuses[0],
-      Validators.required
-    ),
+    status: this.formBuilder.nonNullable.control<TrainingStatus>(TrainingStatus.Completed),
     notes: this.formBuilder.nonNullable.control('')
+  });
+
+  readonly type = signal<TrainingType>(this.form.controls.type.value);
+  readonly status = signal<TrainingStatus>(this.form.controls.status.value);
+
+  readonly isGameDay = computed(() => this.type() === TrainingType.GameDay);
+
+  readonly team = computed(() =>
+    this.isEdit ? (this.editedTraining()?.team ?? null) : this.context.selectedTeam()
+  );
+
+  readonly heading = computed(() => {
+    const noun = this.isGameDay() ? 'Spielfest' : 'Training';
+
+    return this.isEdit ? `${noun} bearbeiten` : `${noun} erfassen`;
   });
 
   constructor() {
     if (this.trainingId) {
-      // Season and team are fixed for an existing training, so they neither
-      // have to be validated nor kept in sync with the global context.
-      this.form.controls.season.clearValidators();
-      this.form.controls.team.clearValidators();
-      this.form.controls.season.updateValueAndValidity();
-      this.form.controls.team.updateValueAndValidity();
-
       this.loadTraining(this.trainingId);
-      return;
     }
+  }
 
-    this.form.controls.season.valueChanges.subscribe(season => {
-      this.context.selectSeason(season);
-    });
+  setType(type: TrainingType): void {
+    this.form.controls.type.setValue(type);
+    this.type.set(type);
+  }
 
-    this.form.controls.team.valueChanges.subscribe(team => {
-      this.context.selectTeam(team);
-    });
-
-    effect(() => {
-      const selectedSeason = this.context.selectedSeason();
-      const selectedTeam = this.context.selectedTeam();
-
-      const formSeason = this.form.controls.season.value;
-      const formTeam = this.form.controls.team.value;
-
-      if (formSeason?.id !== selectedSeason?.id) {
-        this.form.controls.season.setValue(selectedSeason, {
-          emitEvent: false
-        });
-      }
-
-      if (formTeam?.id !== selectedTeam?.id) {
-        this.form.controls.team.setValue(selectedTeam, {
-          emitEvent: false
-        });
-      }
-    });
+  setStatus(status: TrainingStatus): void {
+    this.form.controls.status.setValue(status);
+    this.status.set(status);
   }
 
   save(): void {
@@ -141,10 +91,9 @@ export class TrainingFormPage {
 
     if (this.trainingId) {
       this.updateTraining(this.trainingId);
-      return;
+    } else {
+      this.createTraining();
     }
-
-    this.createTraining();
   }
 
   private loadTraining(trainingId: string): void {
@@ -155,39 +104,39 @@ export class TrainingFormPage {
       next: training => {
         this.editedTraining.set(training);
         this.form.patchValue({
-          trainingDate: training.trainingDate
-            ? this.parseDate(training.trainingDate)
-            : new Date(),
+          type: training.type ?? TrainingType.Training,
+          title: training.title ?? '',
+          trainingDate: training.trainingDate?.slice(0, 10) ?? this.today(),
           startTime: this.toTimeInputValue(training.startTime),
           endTime: this.toTimeInputValue(training.endTime),
           location: training.location ?? '',
           notes: training.notes ?? '',
-          status:
-            this.trainingStatuses.find(option => option.value === training.status) ??
-            this.trainingStatuses[0]
+          status: training.status ?? TrainingStatus.Completed
         });
+        this.type.set(this.form.controls.type.value);
+        this.status.set(this.form.controls.status.value);
         this.loadingTraining.set(false);
       },
       error: error => {
         console.error('Training could not be loaded:', error);
-        console.error('Backend error body:', error.error);
-
-        this.pageError.set('Das Training konnte nicht geladen werden.');
+        this.pageError.set('Der Eintrag konnte nicht geladen werden.');
         this.loadingTraining.set(false);
       }
     });
   }
 
   private updateTraining(trainingId: string): void {
-    const formValue = this.form.getRawValue();
+    const value = this.form.getRawValue();
 
     const request: UpdateTrainingRequest = {
-      trainingDate: this.formatDate(formValue.trainingDate),
-      startTime: formValue.startTime || undefined,
-      endTime: formValue.endTime || undefined,
-      location: formValue.location || undefined,
-      status: formValue.status.value,
-      notes: formValue.notes || undefined
+      type: value.type,
+      title: value.title || undefined,
+      trainingDate: value.trainingDate,
+      startTime: value.startTime || undefined,
+      endTime: value.endTime || undefined,
+      location: value.location || undefined,
+      status: value.status,
+      notes: value.notes || undefined
     };
 
     this.saving.set(true);
@@ -198,77 +147,72 @@ export class TrainingFormPage {
         this.saving.set(false);
         this.router.navigate(['/trainings']);
       },
-      error: error => {
-        console.error('Training could not be updated:', error);
-        console.error('Backend error body:', error.error);
-
-        this.pageError.set(
-          error.error?.message ?? 'Das Training konnte nicht gespeichert werden.'
-        );
-        this.saving.set(false);
-      }
+      error: error => this.failSave(error, 'Der Eintrag konnte nicht gespeichert werden.')
     });
   }
 
   private createTraining(): void {
-    const formValue = this.form.getRawValue();
-    const teamId = formValue.team?.id;
+    const teamId = this.context.selectedTeam()?.id;
 
     if (!teamId) {
-      this.form.controls.team.setErrors({ required: true });
-      this.form.controls.team.markAsTouched();
+      this.pageError.set('Bitte wähle zuerst oben eine Mannschaft aus.');
       return;
     }
 
+    const value = this.form.getRawValue();
+
     const request: CreateTrainingRequest = {
       teamId,
-      trainingDate: this.formatDate(formValue.trainingDate),
-      startTime: formValue.startTime || undefined,
-      endTime: formValue.endTime || undefined,
-      location: formValue.location || undefined,
-      status: formValue.status.value,
-      notes: formValue.notes || undefined
+      type: value.type,
+      title: value.title || undefined,
+      trainingDate: value.trainingDate,
+      startTime: value.startTime || undefined,
+      endTime: value.endTime || undefined,
+      location: value.location || undefined,
+      status: value.status,
+      notes: value.notes || undefined
     };
 
+    this.saving.set(true);
+    this.pageError.set(null);
+
     this.trainingsService.apiV1TrainingsPost(request).subscribe({
-      next: createdTraining => {
-        if (
-          createdTraining.status === TrainingStatus.Completed &&
-          createdTraining.id
-        ) {
-          this.router.navigate([
-            '/trainings',
-            createdTraining.id,
-            'attendance'
-          ]);
+      next: created => {
+        this.saving.set(false);
+
+        if (created.status === TrainingStatus.Completed && created.id) {
+          this.router.navigate(trainingLink(created));
           return;
         }
 
         this.router.navigate(['/trainings']);
       },
-      error: error => {
-        console.error('Training could not be created:', error);
-        console.error('Backend error body:', error.error);
-      }
+      error: error => this.failSave(error, 'Der Eintrag konnte nicht angelegt werden.')
     });
   }
 
-  private parseDate(value: string): Date {
-    const [year, month, day] = value.split('-').map(Number);
+  private failSave(error: { error?: { message?: string } }, fallback: string): void {
+    console.error('Training could not be saved:', error);
+    this.pageError.set(error.error?.message ?? fallback);
+    this.saving.set(false);
+  }
 
-    return new Date(year, month - 1, day);
+  private initialType(): TrainingType {
+    return this.route.snapshot.queryParamMap.get('type') === TrainingType.GameDay
+      ? TrainingType.GameDay
+      : TrainingType.Training;
+  }
+
+  private today(): string {
+    const now = new Date();
+    const month = `${now.getMonth() + 1}`.padStart(2, '0');
+    const day = `${now.getDate()}`.padStart(2, '0');
+
+    return `${now.getFullYear()}-${month}-${day}`;
   }
 
   /** `<input type="time">` expects HH:mm, the backend returns HH:mm:ss. */
   private toTimeInputValue(value?: string): string {
     return value ? value.slice(0, 5) : '';
-  }
-
-  private formatDate(date: Date): string {
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-
-    return `${year}-${month}-${day}`;
   }
 }

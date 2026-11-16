@@ -3,8 +3,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
 
 import { PersonsService } from '../../../api/api/persons.service';
 import { TeamMembershipsService } from '../../../api/api/team-memberships.service';
@@ -19,6 +17,9 @@ import { TeamMemberRole } from '../../../api/model/team-member-role';
 import { TeamMembershipDto } from '../../../api/model/team-membership-dto';
 
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
+import { CsvExportService } from '../../../shared/util/export.service';
+import { initials } from '../../../shared/util/format';
 
 interface ContactEntry {
   label: string;
@@ -31,8 +32,7 @@ interface ContactEntry {
   imports: [
     RouterLink,
     ButtonModule,
-    CardModule,
-    TableModule
+    PageHeader
   ],
   templateUrl: './team-detail-page.html',
   styleUrl: './team-detail-page.scss'
@@ -44,6 +44,7 @@ export class TeamDetailPage {
   private readonly personsService = inject(PersonsService);
 
   readonly context = inject(CurrentContextService);
+  readonly csv = inject(CsvExportService);
 
   readonly teamId = this.route.snapshot.paramMap.get('id');
 
@@ -92,6 +93,22 @@ export class TeamDetailPage {
     }
 
     this.loadTeam(this.teamId);
+  }
+
+  exportMembers(): void {
+    if (this.teamId) {
+      this.csv.members(this.teamId);
+    }
+  }
+
+  exportAttendance(): void {
+    if (this.teamId) {
+      this.csv.teamAttendance(this.teamId);
+    }
+  }
+
+  initialsOf(person?: PersonDto): string {
+    return initials(person);
   }
 
   getPersonName(person?: PersonDto): string {

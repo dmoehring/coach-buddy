@@ -1,6 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, switchMap } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
@@ -13,6 +13,7 @@ import { PersonDto } from '../../../api/model/person-dto';
 import { PersonRelationDto } from '../../../api/model/person-relation-dto';
 import { RelationType } from '../../../api/model/relation-type';
 import { UpdatePersonRequest } from '../../../api/model/update-person-request';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
 import { PersonForm, PersonFormValue } from '../components/person-form/person-form';
 import {
   RELATION_ROLE_OPTIONS,
@@ -30,11 +31,11 @@ interface PersonOption {
   selector: 'app-person-edit-page',
   imports: [
     ReactiveFormsModule,
-    RouterLink,
     ButtonModule,
     CardModule,
     SelectModule,
-    PersonForm
+    PersonForm,
+    PageHeader
   ],
   templateUrl: './person-edit-page.html',
   styleUrl: './person-edit-page.scss'

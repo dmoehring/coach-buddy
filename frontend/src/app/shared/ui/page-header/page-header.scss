@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
+.text {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  margin-bottom: 0.25rem;
+  color: var(--cb-muted);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--p-primary-color);
+  }
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--cb-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  &:empty {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  .actions {
+    width: 100%;
+
+    ::ng-deep > * {
+      flex: 1 1 auto;
+    }
+  }
+}

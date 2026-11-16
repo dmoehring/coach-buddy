@@ -3,7 +3,6 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 
 import { AuthService } from '../../../api/api/auth.service';
@@ -14,7 +13,6 @@ import { SessionService } from '../../../core/auth/session.service';
   imports: [
     ReactiveFormsModule,
     ButtonModule,
-    CardModule,
     InputTextModule
   ],
   templateUrl: './login-page.html',

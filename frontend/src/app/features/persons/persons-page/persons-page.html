@@ -1,293 +1,139 @@
-<section class="persons-page">
-  <div class="page-header">
-    <div>
-      <p class="eyebrow">Personen</p>
-      <h1>Personenverwaltung</h1>
-      <p class="description">
-        Verwalte Spieler, Trainer, Helfer und Kontakte als Grundlage für Mannschaften und Anwesenheiten.
-      </p>
-    </div>
+<section class="page">
+  <app-page-header title="Personen" [subtitle]="filteredRows().length + ' von ' + rows().length">
+    <button
+      pButton
+      type="button"
+      severity="secondary"
+      [outlined]="true"
+      [disabled]="csv.busy()"
+      (click)="exportMembers()"
+    >
+      <i class="pi pi-download"></i>
+      <span>Aktive Mitglieder (CSV)</span>
+    </button>
 
     <button pButton type="button" routerLink="/persons/new">
       <i class="pi pi-plus"></i>
       <span>Person anlegen</span>
     </button>
-  </div>
+  </app-page-header>
 
-  <p-card styleClass="persons-card">
-    <ng-template pTemplate="title">
-      Personenübersicht
-    </ng-template>
+  @if (error() || csv.error()) {
+    <div class="notice notice-error" role="alert">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ error() ?? csv.error() }}</span>
+    </div>
+  }
 
-    <ng-template pTemplate="subtitle">
-      {{ filteredRows().length }} von {{ rows().length }} Personen
-    </ng-template>
-
-    @if (error()) {
-      <div class="error-box">
-        <i class="pi pi-exclamation-triangle"></i>
-        <span>{{ error() }}</span>
-      </div>
-    }
-
-    <div class="filter-bar">
-      <p-iconfield class="filter-search">
-        <p-inputicon class="pi pi-search" />
-        <input
-          pInputText
-          type="search"
-          placeholder="Name, Spitzname oder Notiz suchen"
-          [ngModel]="searchTerm()"
-          (ngModelChange)="searchTerm.set($event ?? '')"
-          aria-label="Personen durchsuchen"
-        />
-      </p-iconfield>
-
-      <p-select
-        [options]="teamOptions()"
-        optionLabel="label"
-        optionValue="value"
-        [ngModel]="teamFilter()"
-        (ngModelChange)="setTeamFilter($event)"
-        placeholder="Alle Personen"
-        [showClear]="false"
-        appendTo="body"
-        aria-label="Nach Mannschaft filtern"
+  <div class="filters">
+    <p-iconfield class="search">
+      <p-inputicon class="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        placeholder="Name, Spitzname oder Notiz suchen"
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event ?? '')"
+        aria-label="Personen durchsuchen"
       />
+    </p-iconfield>
 
-      <p-select
-        [options]="roleOptions"
-        optionLabel="label"
-        optionValue="value"
-        [ngModel]="roleFilter()"
-        (ngModelChange)="roleFilter.set($event)"
-        [disabled]="roleFilterDisabled()"
-        placeholder="Alle Rollen"
-        appendTo="body"
-        aria-label="Nach Rolle filtern"
-      />
+    <p-select
+      [options]="teamOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="teamFilter()"
+      (ngModelChange)="setTeamFilter($event)"
+      placeholder="Alle Personen"
+      appendTo="body"
+      aria-label="Nach Mannschaft filtern"
+    />
 
-      <p-select
-        [options]="birthYearOptions()"
-        optionLabel="label"
-        optionValue="value"
-        [ngModel]="birthYearFilter()"
-        (ngModelChange)="birthYearFilter.set($event)"
-        placeholder="Alle Jahrgänge"
-        appendTo="body"
-        aria-label="Nach Jahrgang filtern"
-      />
+    <p-select
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="roleFilter()"
+      (ngModelChange)="roleFilter.set($event)"
+      [disabled]="roleFilterDisabled()"
+      placeholder="Alle Rollen"
+      appendTo="body"
+      aria-label="Nach Rolle filtern"
+    />
 
-      <button
-        pButton
-        type="button"
-        severity="secondary"
-        [text]="true"
-        [disabled]="!hasActiveFilters()"
-        (click)="resetFilters()"
-      >
+    <p-select
+      [options]="birthYearOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="birthYearFilter()"
+      (ngModelChange)="birthYearFilter.set($event)"
+      placeholder="Alle Jahrgänge"
+      appendTo="body"
+      aria-label="Nach Jahrgang filtern"
+    />
+
+    @if (hasActiveFilters()) {
+      <button pButton type="button" severity="secondary" [text]="true" (click)="resetFilters()">
         <i class="pi pi-filter-slash"></i>
         <span>Zurücksetzen</span>
       </button>
-    </div>
-
-    @if (context.selectedSeason(); as season) {
-      <p class="filter-hint">
-        Mannschaften und Rollen beziehen sich auf die Saison {{ season.name }}.
-      </p>
     }
+  </div>
 
-    <div class="desktop-table">
-      <p-table
-        [value]="filteredRows()"
-        [loading]="loading()"
-        [tableStyle]="{ 'min-width': '58rem' }"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th pSortableColumn="fullName">Name <p-sortIcon field="fullName" /></th>
-            <th pSortableColumn="birthDate">Geburtsdatum <p-sortIcon field="birthDate" /></th>
-            <th>Mannschaft</th>
-            <th>Notiz</th>
-            <th class="actions-column">Aktionen</th>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="body" let-row>
-          <tr>
-            <td>
-              <div class="person-cell">
-                <strong>{{ row.fullName || '-' }}</strong>
-                @if (row.person.nickname) {
-                  <span>„{{ row.person.nickname }}“</span>
-                }
-              </div>
-            </td>
-
-            <td>
-              {{ formatBirthDate(row.person.birthDate) }}
-              @if (row.age !== null) {
-                <span class="age">({{ row.age }} J.)</span>
-              }
-            </td>
-
-            <td>
-              <div class="membership-tags">
-                @for (membership of row.memberships; track membership.teamId) {
-                  <p-tag
-                    [value]="membership.teamName + (membership.role ? ' · ' + getRoleLabel(membership.role) : '')"
-                    severity="secondary"
-                  />
-                } @empty {
-                  <span class="note">-</span>
-                }
-              </div>
-            </td>
-
-            <td>
-              <span class="note">
-                {{ row.person.notes || '-' }}
-              </span>
-            </td>
-
-            <td>
-              <div class="table-actions">
-                <button
-                  pButton
-                  type="button"
-                  severity="secondary"
-                  [text]="true"
-                  [routerLink]="['/persons', row.person.id]"
-                  [disabled]="!row.person.id"
-                  aria-label="Person anzeigen"
-                >
-                  <i class="pi pi-eye"></i>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="secondary"
-                  [text]="true"
-                  [routerLink]="['/persons', row.person.id, 'edit']"
-                  [disabled]="!row.person.id"
-                  aria-label="Person bearbeiten"
-                >
-                  <i class="pi pi-pencil"></i>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-
-        <ng-template pTemplate="emptymessage">
-          <tr>
-            <td colspan="5">
-              <div class="empty-state">
-                <i class="pi pi-users"></i>
-                @if (hasActiveFilters()) {
-                  <strong>Keine Personen gefunden</strong>
-                  <span>Passe die Filter an oder setze sie zurück.</span>
-                } @else {
-                  <strong>Keine Personen vorhanden</strong>
-                  <span>Lege die erste Person an, um mit Mannschaften und Trainings weiterzumachen.</span>
-                }
-              </div>
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-    </div>
-
-    <div class="mobile-person-list">
-      @if (loading()) {
-        <article class="person-card">
-          <span>Personen werden geladen ...</span>
-        </article>
+  @if (loading()) {
+    <p class="muted">Wird geladen …</p>
+  } @else if (filteredRows().length === 0) {
+    <div class="surface empty">
+      <i class="pi pi-users"></i>
+      @if (hasActiveFilters()) {
+        <strong>Keine Personen gefunden</strong>
+        <span>Passe die Filter an oder setze sie zurück.</span>
       } @else {
-        @for (row of filteredRows(); track row.person.id) {
-          <article class="person-card">
-            <div class="person-card-header">
-              <div>
-                <strong>{{ row.fullName || '-' }}</strong>
-                @if (row.person.nickname) {
-                  <span>{{ row.person.nickname }}</span>
-                }
-              </div>
-
-              <div class="person-card-actions">
-                <button
-                  pButton
-                  type="button"
-                  severity="secondary"
-                  [outlined]="true"
-                  [routerLink]="['/persons', row.person.id]"
-                  [disabled]="!row.person.id"
-                >
-                  <i class="pi pi-eye"></i>
-                  <span>Anzeigen</span>
-                </button>
-
-                <button
-                  pButton
-                  type="button"
-                  severity="secondary"
-                  [outlined]="true"
-                  [routerLink]="['/persons', row.person.id, 'edit']"
-                  [disabled]="!row.person.id"
-                >
-                  <i class="pi pi-pencil"></i>
-                  <span>Bearbeiten</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="person-card-content">
-              <div class="person-info">
-                <span>Geburtsdatum</span>
-                <strong>
-                  {{ formatBirthDate(row.person.birthDate) }}
-                  @if (row.age !== null) {
-                    <span class="age">({{ row.age }} J.)</span>
-                  }
-                </strong>
-              </div>
-
-              @if (row.memberships.length > 0) {
-                <div class="person-info">
-                  <span>Mannschaft</span>
-                  <div class="membership-tags">
-                    @for (membership of row.memberships; track membership.teamId) {
-                      <p-tag
-                        [value]="membership.teamName + (membership.role ? ' · ' + getRoleLabel(membership.role) : '')"
-                        severity="secondary"
-                      />
-                    }
-                  </div>
-                </div>
-              }
-
-              <div class="person-info">
-                <span>Notiz</span>
-                <strong>{{ row.person.notes || '-' }}</strong>
-              </div>
-            </div>
-          </article>
-        } @empty {
-          <article class="person-card">
-            <div class="empty-state">
-              <i class="pi pi-users"></i>
-              @if (hasActiveFilters()) {
-                <strong>Keine Personen gefunden</strong>
-                <span>Passe die Filter an oder setze sie zurück.</span>
-              } @else {
-                <strong>Keine Personen vorhanden</strong>
-                <span>Lege die erste Person an.</span>
-              }
-            </div>
-          </article>
-        }
+        <strong>Noch keine Personen</strong>
+        <span>Lege die erste Person an, um Mannschaften und Trainings zu füllen.</span>
       }
     </div>
-  </p-card>
+  } @else {
+    <ul class="list">
+      @for (row of filteredRows(); track row.person.id) {
+        <li class="list-row">
+          <a class="open" [routerLink]="['/persons', row.person.id]">
+            <span class="avatar" aria-hidden="true">{{ initials(row.person) }}</span>
+
+            <span class="grow">
+              <span class="title">
+                {{ row.fullName || '–' }}
+                @if (row.person.nickname) {
+                  <span class="nick">„{{ row.person.nickname }}“</span>
+                }
+              </span>
+
+              <span class="meta">
+                @if (row.birthYear !== null) {
+                  Jg. {{ row.birthYear }}@if (row.age !== null) { · {{ row.age }} J.}
+                } @else {
+                  Kein Geburtsdatum
+                }
+                @for (membership of row.memberships; track membership.teamId) {
+                  · {{ membership.teamName }}@if (membership.role) { ({{ getRoleLabel(membership.role) }})}
+                }
+              </span>
+            </span>
+          </a>
+
+          <button
+            pButton
+            type="button"
+            class="icon-only"
+            severity="secondary"
+            [text]="true"
+            [routerLink]="['/persons', row.person.id, 'edit']"
+            aria-label="Bearbeiten"
+          >
+            <i class="pi pi-pencil"></i>
+          </button>
+        </li>
+      }
+    </ul>
+  }
 </section>

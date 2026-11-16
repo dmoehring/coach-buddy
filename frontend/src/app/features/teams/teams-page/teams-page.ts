@@ -2,19 +2,17 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
-import { TableModule } from 'primeng/table';
 
 import { TeamDto } from '../../../api/model/team-dto';
 import { CurrentContextService } from '../../../core/context/current-context.service';
+import { PageHeader } from '../../../shared/ui/page-header/page-header';
 
 @Component({
   selector: 'app-teams-page',
   imports: [
     RouterLink,
     ButtonModule,
-    CardModule,
-    TableModule
+    PageHeader
   ],
   templateUrl: './teams-page.html',
   styleUrl: './teams-page.scss'

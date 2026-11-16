@@ -1,279 +1,145 @@
-<div class="app-shell">
-  <header class="mobile-header">
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [text]="true"
-      (click)="toggleMobileMenu()"
-      aria-label="Menü öffnen"
-    >
-      <i
-        class="pi"
-        [class.pi-bars]="!mobileMenuOpen()"
-        [class.pi-times]="mobileMenuOpen()"
-      ></i>
-    </button>
-
-    <div class="mobile-brand">
-      <strong>Coach Buddy</strong>
-      <span>
-        {{ context.selectedSeason()?.name ?? 'Keine Saison' }}
-        ·
-        {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
-      </span>
-    </div>
-  </header>
-
-  <div class="mobile-menu" [class.open]="mobileMenuOpen()">
-    <div class="mobile-context">
-      <label class="mobile-context-control">
-        <span>Saison</span>
-
-        <p-select
-          #seasonSelect1
-          [options]="context.seasons()"
-          [ngModel]="context.selectedSeason()"
-          (ngModelChange)="context.selectSeason($event)"
-          [disabled]="context.loadingSeasons()"
-          optionLabel="name"
-          placeholder="Saison auswählen"
-          appendTo="body"
-        >
-          <ng-template pTemplate="footer">
-            <div class="select-footer">
-              <button
-                pButton
-                type="button"
-                severity="secondary"
-                [text]="true"
-                routerLink="/seasons/new"
-                (click)="seasonSelect1.hide(); closeMobileMenu()"
-              >
-                <i class="pi pi-plus"></i>
-                <span>Neue Saison starten</span>
-              </button>
-            </div>
-          </ng-template>
-        </p-select>
-      </label>
-
-      <label class="mobile-context-control">
-        <span>Mannschaft</span>
-
-        <p-select
-          [options]="context.teamsForSelectedSeason()"
-          [ngModel]="context.selectedTeam()"
-          (ngModelChange)="context.selectTeam($event)"
-          [disabled]="context.loadingTeams() || !context.selectedSeason()"
-          optionLabel="name"
-          placeholder="Mannschaft auswählen"
-          appendTo="body"
-        />
-      </label>
-    </div>
-
-    <nav class="mobile-navigation">
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="active"
-        (click)="closeMobileMenu()"
-      >
-        <i class="pi pi-home"></i>
-        Dashboard
-      </a>
-
-      <a
-        routerLink="/persons"
-        routerLinkActive="active"
-        (click)="closeMobileMenu()"
-      >
-        <i class="pi pi-users"></i>
-        Personen
-      </a>
-
-      <a
-        routerLink="/teams"
-        routerLinkActive="active"
-        (click)="closeMobileMenu()"
-      >
-        <i class="pi pi-sitemap"></i>
-        Teams
-      </a>
-
-      <a
-        routerLink="/trainings"
-        routerLinkActive="active"
-        (click)="closeMobileMenu()"
-      >
-        <i class="pi pi-calendar"></i>
-        Trainings
-      </a>
-    </nav>
-
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [outlined]="true"
-      (click)="toggleDarkMode()"
-      class="mobile-darkmode"
-    >
-      <i
-        class="pi"
-        [class.pi-moon]="!darkMode()"
-        [class.pi-sun]="darkMode()"
-      ></i>
-
-      <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
-    </button>
-
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [outlined]="true"
-      (click)="logout()"
-      class="mobile-logout"
-    >
-      <i class="pi pi-sign-out"></i>
-      <span>Abmelden</span>
-    </button>
-  </div>
-
+<div class="shell">
+  <!-- Desktop sidebar -->
   <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-icon">
-        <i class="pi pi-heart"></i>
-      </div>
+    <a class="brand" routerLink="/dashboard">
+      <span class="brand-mark"><i class="pi pi-heart-fill"></i></span>
+      <span class="brand-name">Coach Buddy</span>
+    </a>
 
-      <div>
-        <div class="brand-title">Coach Buddy</div>
+    <section class="context-box" aria-label="Saison und Mannschaft">
+      <ng-container *ngTemplateOutlet="contextControls" />
+    </section>
 
-        <div class="brand-subtitle">
-          {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
-          Verwaltung
-        </div>
-      </div>
-    </div>
-
-    <nav class="navigation">
-      <a routerLink="/dashboard" routerLinkActive="active">
-        <i class="pi pi-home"></i>
-        Dashboard
-      </a>
-
-      <a routerLink="/persons" routerLinkActive="active">
-        <i class="pi pi-users"></i>
-        Personen
-      </a>
-
-      <a routerLink="/teams" routerLinkActive="active">
-        <i class="pi pi-sitemap"></i>
-        Teams
-      </a>
-
-      <a routerLink="/trainings" routerLinkActive="active">
-        <i class="pi pi-calendar"></i>
-        Trainings
-      </a>
+    <nav class="nav" aria-label="Hauptnavigation">
+      @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="active">
+          <i [class]="item.icon"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
     </nav>
+
+    <div class="sidebar-footer">
+      <div class="user">
+        <span class="user-name">{{ session.displayName() }}</span>
+      </div>
+
+      <button
+        type="button"
+        class="icon-btn"
+        (click)="toggleDarkMode()"
+        [attr.aria-label]="darkMode() ? 'Helles Design' : 'Dunkles Design'"
+      >
+        <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
+      </button>
+
+      <button type="button" class="icon-btn" (click)="logout()" aria-label="Abmelden">
+        <i class="pi pi-sign-out"></i>
+      </button>
+    </div>
   </aside>
 
-  <main class="content">
-    <header class="topbar">
-      <div class="topbar-title">
-        <span>Aktueller Kontext</span>
+  <!-- Mobile top bar -->
+  <header class="topbar">
+    <a class="brand" routerLink="/dashboard">
+      <span class="brand-mark"><i class="pi pi-heart-fill"></i></span>
+    </a>
 
-        <strong>
-          {{ context.selectedSeason()?.name ?? 'Keine Saison' }}
-          ·
-          {{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}
-        </strong>
-      </div>
+    <button
+      type="button"
+      class="context-chip"
+      (click)="toggleSheet()"
+      [attr.aria-expanded]="sheetOpen()"
+      aria-controls="context-sheet"
+    >
+      <span class="chip-text">
+        <strong>{{ context.selectedTeam()?.name ?? 'Keine Mannschaft' }}</strong>
+        <small>{{ context.selectedSeason()?.name ?? 'Keine Saison' }}</small>
+      </span>
+      <i class="pi" [class.pi-chevron-down]="!sheetOpen()" [class.pi-chevron-up]="sheetOpen()"></i>
+    </button>
+  </header>
 
-      <div class="topbar-controls">
-        <label class="topbar-control">
-          <span>Saison</span>
+  @if (sheetOpen()) {
+    <div class="sheet-backdrop" (click)="closeSheet()"></div>
 
-          <p-select
-            #seasonSelect2
-            [options]="context.seasons()"
-            [ngModel]="context.selectedSeason()"
-            (ngModelChange)="context.selectSeason($event)"
-            [disabled]="context.loadingSeasons()"
-            optionLabel="name"
-            placeholder="Saison auswählen"
-            appendTo="body"
-          >
-            <ng-template pTemplate="footer">
-              <div class="select-footer">
-                <button
-                  pButton
-                  type="button"
-                  severity="secondary"
-                  [text]="true"
-                  routerLink="/seasons/new"
-                  (click)="seasonSelect2.hide(); closeMobileMenu()"
-                >
-                  <i class="pi pi-plus"></i>
-                  <span>Neue Saison starten</span>
-                </button>
-              </div>
-            </ng-template>
-          </p-select>
-        </label>
+    <section class="sheet" id="context-sheet" aria-label="Saison und Mannschaft wählen">
+      <ng-container *ngTemplateOutlet="contextControls" />
 
-        <label class="topbar-control">
-          <span>Mannschaft</span>
+      <div class="sheet-actions">
+        <span class="user-name">{{ session.displayName() }}</span>
 
-          <p-select
-            [options]="context.teamsForSelectedSeason()"
-            [ngModel]="context.selectedTeam()"
-            (ngModelChange)="context.selectTeam($event)"
-            [disabled]="context.loadingTeams() || !context.selectedSeason()"
-            optionLabel="name"
-            placeholder="Mannschaft auswählen"
-            appendTo="body"
-          />
-        </label>
-
-        <button
-          pButton
-          type="button"
-          severity="secondary"
-          [outlined]="true"
-          (click)="toggleDarkMode()"
-          class="topbar-darkmode"
-        >
-          <i
-            class="pi"
-            [class.pi-moon]="!darkMode()"
-            [class.pi-sun]="darkMode()"
-          ></i>
-
-          <span>{{ darkMode() ? 'Hell' : 'Dunkel' }}</span>
+        <button type="button" class="icon-btn" (click)="toggleDarkMode()" aria-label="Design wechseln">
+          <i class="pi" [class.pi-moon]="!darkMode()" [class.pi-sun]="darkMode()"></i>
         </button>
 
-        <div class="topbar-user">
-          <span class="topbar-user-name">{{ session.displayName() }}</span>
+        <button type="button" class="icon-btn" (click)="logout()" aria-label="Abmelden">
+          <i class="pi pi-sign-out"></i>
+        </button>
+      </div>
+    </section>
+  }
 
+  <main class="content">
+    <router-outlet />
+  </main>
+
+  <!-- Mobile tab bar -->
+  <nav class="tabbar" aria-label="Hauptnavigation">
+    @for (item of navItems; track item.route) {
+      <a [routerLink]="item.route" routerLinkActive="active">
+        <i [class]="item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</div>
+
+<ng-template #contextControls>
+  <label class="context-field">
+    <span>Saison</span>
+
+    <p-select
+      #seasonSelect
+      [options]="context.seasons()"
+      [ngModel]="context.selectedSeason()"
+      (ngModelChange)="context.selectSeason($event)"
+      [disabled]="context.loadingSeasons()"
+      optionLabel="name"
+      placeholder="Saison auswählen"
+      appendTo="body"
+      [fluid]="true"
+    >
+      <ng-template pTemplate="footer">
+        <div class="select-footer">
           <button
             pButton
             type="button"
             severity="secondary"
             [text]="true"
-            (click)="logout()"
-            aria-label="Abmelden"
+            routerLink="/seasons/new"
+            (click)="seasonSelect.hide(); closeSheet()"
           >
-            <i class="pi pi-sign-out"></i>
+            <i class="pi pi-plus"></i>
+            <span>Neue Saison starten</span>
           </button>
         </div>
-      </div>
-    </header>
+      </ng-template>
+    </p-select>
+  </label>
 
-    <div class="page-content">
-      <router-outlet />
-    </div>
-  </main>
-</div>
+  <label class="context-field">
+    <span>Mannschaft</span>
+
+    <p-select
+      [options]="context.teamsForSelectedSeason()"
+      [ngModel]="context.selectedTeam()"
+      (ngModelChange)="context.selectTeam($event)"
+      [disabled]="context.loadingTeams() || !context.selectedSeason()"
+      optionLabel="name"
+      placeholder="Mannschaft auswählen"
+      appendTo="body"
+      [fluid]="true"
+    />
+  </label>
+</ng-template>

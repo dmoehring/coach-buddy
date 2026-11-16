@@ -1,27 +1,8 @@
-<section class="person-edit-page">
-  <div class="page-header">
-    <div>
-      <p class="eyebrow">Personen</p>
-      <h1>Person bearbeiten</h1>
-      <p class="description">
-        Bearbeite die Stammdaten einer bestehenden Person.
-      </p>
-    </div>
-
-    <button
-      pButton
-      type="button"
-      severity="secondary"
-      [outlined]="true"
-      routerLink="/persons"
-    >
-      <i class="pi pi-arrow-left"></i>
-      <span>Zurück</span>
-    </button>
-  </div>
+<section class="page person-edit-page">
+  <app-page-header title="Person bearbeiten" backLink="/persons" backLabel="Personen" />
 
   @if (error()) {
-    <div class="error-box">
+    <div class="notice notice-error" role="alert">
       <i class="pi pi-exclamation-triangle"></i>
       <span>{{ error() }}</span>
     </div>
