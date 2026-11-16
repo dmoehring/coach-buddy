@@ -7,11 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { TrainingType } from './training-type';
 import { TrainingStatus } from './training-status';
 
 
 export interface CreateTrainingRequest { 
     teamId: string;
+    type?: TrainingType;
+    title?: string;
     trainingDate: string;
     startTime?: string;
     endTime?: string;

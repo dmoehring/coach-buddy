@@ -2,6 +2,7 @@ package de.moehring.coach.buddy.backend.team.resources;
 
 import de.moehring.coach.buddy.backend.person.dtos.CreatePersonRequest;
 import de.moehring.coach.buddy.backend.support.AuthTestSupport;
+import de.moehring.coach.buddy.backend.support.SeasonTestSupport;
 import de.moehring.coach.buddy.backend.team.dtos.CreateSeasonRequest;
 import de.moehring.coach.buddy.backend.team.dtos.CreateTeamMembershipRequest;
 import de.moehring.coach.buddy.backend.team.dtos.CreateTeamRequest;
@@ -102,7 +103,7 @@ class TeamMembershipResourceTest {
         return given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
-                .body(new CreateSeasonRequest(name, LocalDate.of(2026, 1, 1)))
+                .body(new CreateSeasonRequest(name, SeasonTestSupport.nextSeasonStartDate(token)))
                 .when().post("/api/v1/seasons")
                 .then().statusCode(201)
                 .extract().path("id");

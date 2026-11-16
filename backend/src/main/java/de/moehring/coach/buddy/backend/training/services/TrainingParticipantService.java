@@ -52,6 +52,9 @@ public class TrainingParticipantService {
         trainingParticipant.setTraining(training);
         trainingParticipant.setPerson(person);
         trainingParticipant.setAttendanceStatus(request.attendanceStatus());
+        trainingParticipant.setJerseyNumber(request.jerseyNumber());
+        trainingParticipant.setMinutesPlayed(request.minutesPlayed());
+        trainingParticipant.setMinutesInGoal(request.minutesInGoal());
         trainingParticipant.setNotes(trimToNull(request.notes()));
 
         trainingParticipantRepository.persist(trainingParticipant);
@@ -65,6 +68,9 @@ public class TrainingParticipantService {
                 .orElseThrow(() -> new NotFoundException("Trainingsteilnahme wurde nicht gefunden."));
 
         trainingParticipant.setAttendanceStatus(request.attendanceStatus());
+        trainingParticipant.setJerseyNumber(request.jerseyNumber());
+        trainingParticipant.setMinutesPlayed(request.minutesPlayed());
+        trainingParticipant.setMinutesInGoal(request.minutesInGoal());
         trainingParticipant.setNotes(trimToNull(request.notes()));
 
         return trainingParticipantMapper.mapToDto(trainingParticipant);

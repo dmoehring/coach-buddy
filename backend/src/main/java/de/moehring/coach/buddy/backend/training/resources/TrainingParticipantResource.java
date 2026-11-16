@@ -98,7 +98,7 @@ public class TrainingParticipantResource {
 
     @PATCH
     @Path("/{id}")
-    @Operation(summary = "Update training participant", description = "Updates the attendance status and notes of an existing training participant.")
+    @Operation(summary = "Update training participant", description = "Replaces attendance status, jersey number, minutes played, minutes in goal and notes of an existing training participant.")
     @APIResponses(value = {
             @APIResponse(
                     responseCode = "200",

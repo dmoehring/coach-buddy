@@ -42,6 +42,11 @@ public class TrainingRepository implements PanacheRepositoryBase<Training, UUID>
             params.put("status", criteria.getStatus());
         }
 
+        if (criteria.getType() != null) {
+            query.append(" and type = :type");
+            params.put("type", criteria.getType());
+        }
+
         query.append(" order by trainingDate desc, startTime desc");
 
         return find(query.toString(), params).list();

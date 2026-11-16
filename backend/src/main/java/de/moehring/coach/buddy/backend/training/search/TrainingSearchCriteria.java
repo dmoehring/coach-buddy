@@ -1,6 +1,7 @@
 package de.moehring.coach.buddy.backend.training.search;
 
 import de.moehring.coach.buddy.backend.training.util.TrainingStatus;
+import de.moehring.coach.buddy.backend.training.util.TrainingType;
 import jakarta.ws.rs.QueryParam;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,4 +27,7 @@ public class TrainingSearchCriteria {
 
     @QueryParam("status")
     private TrainingStatus status;
+
+    @QueryParam("type")
+    private TrainingType type;
 }

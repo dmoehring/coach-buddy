@@ -12,6 +12,9 @@ import { AttendanceStatus } from './attendance-status';
 
 export interface UpdateTrainingParticipantRequest { 
     attendanceStatus: AttendanceStatus;
+    jerseyNumber?: number;
+    minutesPlayed?: number;
+    minutesInGoal?: number;
     notes?: string;
 }
 export namespace UpdateTrainingParticipantRequest {

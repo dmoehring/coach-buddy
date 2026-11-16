@@ -2,6 +2,7 @@ package de.moehring.coach.buddy.backend.training.entities;
 
 import de.moehring.coach.buddy.backend.team.entities.Team;
 import de.moehring.coach.buddy.backend.training.util.TrainingStatus;
+import de.moehring.coach.buddy.backend.training.util.TrainingType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,6 +29,13 @@ public class Training {
     @ManyToOne(optional = false)
     @JoinColumn(name = "team_id", nullable = false)
     private Team team;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 50)
+    private TrainingType type = TrainingType.TRAINING;
+
+    @Column(name = "title")
+    private String title;
 
     @Column(name = "training_date", nullable = false)
     private LocalDate trainingDate;

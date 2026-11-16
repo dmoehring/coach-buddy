@@ -1,6 +1,7 @@
 package de.moehring.coach.buddy.backend.training.dtos;
 
 import de.moehring.coach.buddy.backend.training.util.TrainingStatus;
+import de.moehring.coach.buddy.backend.training.util.TrainingType;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
@@ -9,6 +10,8 @@ import java.util.UUID;
 
 public record CreateTrainingRequest(
         @NotNull UUID teamId,
+        TrainingType type,
+        String title,
         @NotNull LocalDate trainingDate,
         LocalTime startTime,
         LocalTime endTime,

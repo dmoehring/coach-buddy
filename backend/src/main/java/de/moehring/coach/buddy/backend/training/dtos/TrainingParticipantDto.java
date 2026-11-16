@@ -11,6 +11,9 @@ public record TrainingParticipantDto(
         TrainingDto training,
         PersonDto person,
         AttendanceStatus attendanceStatus,
+        Integer jerseyNumber,
+        Integer minutesPlayed,
+        Integer minutesInGoal,
         String notes,
         Instant createdAt,
         Instant updatedAt

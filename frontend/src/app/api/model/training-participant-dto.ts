@@ -17,6 +17,9 @@ export interface TrainingParticipantDto {
     training?: TrainingDto;
     person?: PersonDto;
     attendanceStatus?: AttendanceStatus;
+    jerseyNumber?: number;
+    minutesPlayed?: number;
+    minutesInGoal?: number;
     notes?: string;
     createdAt?: string;
     updatedAt?: string;

@@ -35,6 +35,15 @@ public class TrainingParticipant {
     @Column(name = "attendance_status", nullable = false, length = 50)
     private AttendanceStatus attendanceStatus;
 
+    @Column(name = "jersey_number")
+    private Integer jerseyNumber;
+
+    @Column(name = "minutes_played")
+    private Integer minutesPlayed;
+
+    @Column(name = "minutes_in_goal")
+    private Integer minutesInGoal;
+
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 

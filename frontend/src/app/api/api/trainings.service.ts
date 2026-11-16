@@ -25,6 +25,8 @@ import { TrainingDto } from '../model/training-dto';
 // @ts-ignore
 import { TrainingStatus } from '../model/training-status';
 // @ts-ignore
+import { TrainingType } from '../model/training-type';
+// @ts-ignore
 import { UpdateTrainingRequest } from '../model/update-training-request';
 
 // @ts-ignore
@@ -52,14 +54,15 @@ export class TrainingsService extends BaseService {
      * @param status 
      * @param teamId 
      * @param trainingDate 
+     * @param type 
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      * @param options additional options
      */
-    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<TrainingDto>>;
-    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<TrainingDto>>>;
-    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<TrainingDto>>>;
-    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
+    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, type?: TrainingType, observe?: 'body', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<Array<TrainingDto>>;
+    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, type?: TrainingType, observe?: 'response', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpResponse<Array<TrainingDto>>>;
+    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, type?: TrainingType, observe?: 'events', reportProgress?: boolean, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<HttpEvent<Array<TrainingDto>>>;
+    public apiV1TrainingsGet(dateFrom?: string, dateTo?: string, status?: TrainingStatus, teamId?: string, trainingDate?: string, type?: TrainingType, observe: any = 'body', reportProgress: boolean = false, options?: {httpHeaderAccept?: 'application/json', context?: HttpContext, transferCache?: boolean}): Observable<any> {
 
         let localVarQueryParameters = new OpenApiHttpParams(this.encoder);
 
@@ -103,6 +106,15 @@ export class TrainingsService extends BaseService {
             localVarQueryParameters,
             'trainingDate',
             <any>trainingDate,
+            QueryParamStyle.Form,
+            true,
+        );
+
+
+        localVarQueryParameters = this.addToHttpParams(
+            localVarQueryParameters,
+            'type',
+            <any>type,
             QueryParamStyle.Form,
             true,
         );

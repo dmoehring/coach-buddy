@@ -14,6 +14,9 @@ export interface CreateTrainingParticipantRequest {
     trainingId: string;
     personId: string;
     attendanceStatus: AttendanceStatus;
+    jerseyNumber?: number;
+    minutesPlayed?: number;
+    minutesInGoal?: number;
     notes?: string;
 }
 export namespace CreateTrainingParticipantRequest {

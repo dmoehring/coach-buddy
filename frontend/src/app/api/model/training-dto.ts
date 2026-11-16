@@ -7,6 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { TrainingType } from './training-type';
 import { TeamDto } from './team-dto';
 import { TrainingStatus } from './training-status';
 
@@ -14,6 +15,8 @@ import { TrainingStatus } from './training-status';
 export interface TrainingDto { 
     id?: string;
     team?: TeamDto;
+    type?: TrainingType;
+    title?: string;
     trainingDate?: string;
     startTime?: string;
     endTime?: string;

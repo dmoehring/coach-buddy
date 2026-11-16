@@ -4,6 +4,9 @@
     "name" : "Auth",
     "description" : "Anmeldung am System"
   }, {
+    "name" : "Exports",
+    "description" : "CSV-Exporte von Mitgliedern, Teilnehmern und Anwesenheiten"
+  }, {
     "name" : "Person Relations",
     "description" : "Verwaltung von Beziehungen zwischen Personen"
   }, {
@@ -167,6 +170,24 @@
           "attendanceStatus" : {
             "$ref" : "#/components/schemas/AttendanceStatus"
           },
+          "jerseyNumber" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 999,
+            "minimum" : 0
+          },
+          "minutesPlayed" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 999,
+            "minimum" : 0
+          },
+          "minutesInGoal" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 999,
+            "minimum" : 0
+          },
           "notes" : {
             "type" : "string"
           }
@@ -178,6 +199,12 @@
         "properties" : {
           "teamId" : {
             "$ref" : "#/components/schemas/UUID"
+          },
+          "type" : {
+            "$ref" : "#/components/schemas/TrainingType"
+          },
+          "title" : {
+            "type" : "string"
           },
           "trainingDate" : {
             "$ref" : "#/components/schemas/LocalDate"
@@ -440,6 +467,12 @@
           "team" : {
             "$ref" : "#/components/schemas/TeamDto"
           },
+          "type" : {
+            "$ref" : "#/components/schemas/TrainingType"
+          },
+          "title" : {
+            "type" : "string"
+          },
           "trainingDate" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
@@ -481,6 +514,18 @@
           "attendanceStatus" : {
             "$ref" : "#/components/schemas/AttendanceStatus"
           },
+          "jerseyNumber" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "minutesPlayed" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "minutesInGoal" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
           "notes" : {
             "type" : "string"
           },
@@ -495,6 +540,10 @@
       "TrainingStatus" : {
         "type" : "string",
         "enum" : [ "COMPLETED", "CANCELLED" ]
+      },
+      "TrainingType" : {
+        "type" : "string",
+        "enum" : [ "TRAINING", "GAME_DAY" ]
       },
       "UUID" : {
         "type" : "string",
@@ -550,6 +599,24 @@
           "attendanceStatus" : {
             "$ref" : "#/components/schemas/AttendanceStatus"
           },
+          "jerseyNumber" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 999,
+            "minimum" : 0
+          },
+          "minutesPlayed" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 999,
+            "minimum" : 0
+          },
+          "minutesInGoal" : {
+            "type" : "integer",
+            "format" : "int32",
+            "maximum" : 999,
+            "minimum" : 0
+          },
           "notes" : {
             "type" : "string"
           }
@@ -557,8 +624,13 @@
       },
       "UpdateTrainingRequest" : {
         "type" : "object",
-        "required" : [ "trainingDate", "status" ],
         "properties" : {
+          "type" : {
+            "$ref" : "#/components/schemas/TrainingType"
+          },
+          "title" : {
+            "type" : "string"
+          },
           "trainingDate" : {
             "$ref" : "#/components/schemas/LocalDate"
           },
@@ -577,7 +649,8 @@
           "status" : {
             "$ref" : "#/components/schemas/TrainingStatus"
           }
-        }
+        },
+        "required" : [ "trainingDate", "status" ]
       }
     },
     "securitySchemes" : {
@@ -628,6 +701,133 @@
           },
           "400" : {
             "description" : "Bad Request"
+          }
+        }
+      }
+    },
+    "/api/v1/exports/members" : {
+      "get" : {
+        "summary" : "Export members",
+        "description" : "CSV with contact data of team members. Without teamId all teams are included; by default only active members (no left date) are exported.",
+        "tags" : [ "Exports" ],
+        "parameters" : [ {
+          "name" : "activeOnly",
+          "in" : "query",
+          "schema" : {
+            "type" : "boolean",
+            "default" : true
+          }
+        }, {
+          "name" : "teamId",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "CSV file",
+            "content" : {
+              "text/csv;charset=UTF-8" : {
+                "schema" : {
+                  "format" : "binary",
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Team not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exports/teams/{id}/attendance" : {
+      "get" : {
+        "summary" : "Export attendance matrix",
+        "description" : "CSV with one row per team member and one column per completed training, including totals and attendance rate.",
+        "tags" : [ "Exports" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "CSV file",
+            "content" : {
+              "text/csv;charset=UTF-8" : {
+                "schema" : {
+                  "format" : "binary",
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Team not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/exports/trainings/{id}/participants" : {
+      "get" : {
+        "summary" : "Export training participants",
+        "description" : "CSV with the participants of a training or game day. Game days additionally contain jersey number, minutes played and minutes in goal. By default only present participants are exported.",
+        "tags" : [ "Exports" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        }, {
+          "name" : "onlyPresent",
+          "in" : "query",
+          "schema" : {
+            "type" : "boolean",
+            "default" : true
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "CSV file",
+            "content" : {
+              "text/csv;charset=UTF-8" : {
+                "schema" : {
+                  "format" : "binary",
+                  "type" : "string"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Training not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -1491,7 +1691,7 @@
     "/api/v1/training-participants/{id}" : {
       "patch" : {
         "summary" : "Update training participant",
-        "description" : "Updates the attendance status and notes of an existing training participant.",
+        "description" : "Replaces attendance status, jersey number, minutes played, minutes in goal and notes of an existing training participant.",
         "tags" : [ "Training Participants" ],
         "parameters" : [ {
           "name" : "id",
@@ -1607,6 +1807,12 @@
           "in" : "query",
           "schema" : {
             "$ref" : "#/components/schemas/LocalDate"
+          }
+        }, {
+          "name" : "type",
+          "in" : "query",
+          "schema" : {
+            "$ref" : "#/components/schemas/TrainingType"
           }
         } ],
         "responses" : {

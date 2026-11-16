@@ -188,7 +188,7 @@ export class TrainingParticipantsService extends BaseService {
 
     /**
      * Update training participant
-     * Updates the attendance status and notes of an existing training participant.
+     * Replaces attendance status, jersey number, minutes played, minutes in goal and notes of an existing training participant.
      * @endpoint patch /api/v1/training-participants/{id}
      * @param id 
      * @param updateTrainingParticipantRequest 

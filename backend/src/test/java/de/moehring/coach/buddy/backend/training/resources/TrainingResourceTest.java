@@ -6,9 +6,11 @@ import de.moehring.coach.buddy.backend.team.dtos.CreateSeasonRequest;
 import de.moehring.coach.buddy.backend.team.dtos.CreateTeamRequest;
 import de.moehring.coach.buddy.backend.training.dtos.CreateTrainingParticipantRequest;
 import de.moehring.coach.buddy.backend.training.dtos.CreateTrainingRequest;
+import de.moehring.coach.buddy.backend.training.dtos.UpdateTrainingParticipantRequest;
 import de.moehring.coach.buddy.backend.training.dtos.UpdateTrainingRequest;
 import de.moehring.coach.buddy.backend.training.util.AttendanceStatus;
 import de.moehring.coach.buddy.backend.training.util.TrainingStatus;
+import de.moehring.coach.buddy.backend.training.util.TrainingType;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,6 +52,8 @@ class TrainingResourceTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .body(new UpdateTrainingRequest(
+                        null,
+                        null,
                         LocalDate.of(2026, 3, 12),
                         LocalTime.of(18, 0),
                         LocalTime.of(19, 30),
@@ -90,6 +94,9 @@ class TrainingResourceTest {
                         UUID.fromString(trainingId),
                         UUID.fromString(personId),
                         AttendanceStatus.PRESENT,
+                        null,
+                        null,
+                        null,
                         null
                 ))
                 .when().post("/api/v1/training-participants")
@@ -100,6 +107,8 @@ class TrainingResourceTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .body(new UpdateTrainingRequest(
+                        null,
+                        null,
                         LocalDate.of(2026, 3, 10),
                         null,
                         null,
@@ -129,6 +138,8 @@ class TrainingResourceTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .body(new UpdateTrainingRequest(
+                        null,
+                        null,
                         LocalDate.of(2026, 3, 10),
                         LocalTime.of(19, 0),
                         LocalTime.of(18, 0),
@@ -168,6 +179,8 @@ class TrainingResourceTest {
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .body(new UpdateTrainingRequest(
+                        null,
+                        null,
                         LocalDate.of(2026, 3, 10),
                         null,
                         null,
@@ -180,12 +193,134 @@ class TrainingResourceTest {
                 .statusCode(404);
     }
 
+    @Test
+    void gameDayStoresJerseyAndPlayingTimesPerParticipant() {
+        String trainingId = given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new CreateTrainingRequest(
+                        UUID.fromString(teamId),
+                        TrainingType.GAME_DAY,
+                        "  Spielfest in Musterstadt  ",
+                        LocalDate.of(2026, 5, 16),
+                        null, null, null, null,
+                        TrainingStatus.COMPLETED
+                ))
+                .when().post("/api/v1/trainings")
+                .then()
+                .statusCode(201)
+                .body("type", equalTo("GAME_DAY"))
+                .body("title", equalTo("Spielfest in Musterstadt"))
+                .extract().path("id");
+
+        String participantId = given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new CreateTrainingParticipantRequest(
+                        UUID.fromString(trainingId),
+                        UUID.fromString(createPerson()),
+                        AttendanceStatus.PRESENT,
+                        7, 30, 10, "Hat im Tor angefangen"
+                ))
+                .when().post("/api/v1/training-participants")
+                .then()
+                .statusCode(201)
+                .body("jerseyNumber", equalTo(7))
+                .body("minutesPlayed", equalTo(30))
+                .body("minutesInGoal", equalTo(10))
+                .extract().path("id");
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new UpdateTrainingParticipantRequest(AttendanceStatus.PRESENT, 11, 40, 0, null))
+                .when().patch("/api/v1/training-participants/{id}", participantId)
+                .then()
+                .statusCode(200)
+                .body("jerseyNumber", equalTo(11))
+                .body("minutesPlayed", equalTo(40))
+                .body("minutesInGoal", equalTo(0))
+                .body("notes", equalTo(null));
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .queryParam("type", "GAME_DAY")
+                .queryParam("teamId", teamId)
+                .when().get("/api/v1/trainings")
+                .then()
+                .statusCode(200)
+                .body("", hasSize(1))
+                .body("[0].id", equalTo(trainingId));
+    }
+
+    @Test
+    void participantRejectsOutOfRangeValues() {
+        String trainingId = createTraining(teamId);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new CreateTrainingParticipantRequest(
+                        UUID.fromString(trainingId),
+                        UUID.fromString(createPerson()),
+                        AttendanceStatus.PRESENT,
+                        -1, null, null, null
+                ))
+                .when().post("/api/v1/training-participants")
+                .then()
+                .statusCode(400);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new CreateTrainingParticipantRequest(
+                        UUID.fromString(trainingId),
+                        UUID.fromString(createPerson()),
+                        AttendanceStatus.PRESENT,
+                        null, 1000, null, null
+                ))
+                .when().post("/api/v1/training-participants")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void updateKeepsTypeWhenOmitted() {
+        String trainingId = createTraining(teamId);
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new UpdateTrainingRequest(
+                        TrainingType.GAME_DAY, "Turnier", LocalDate.of(2026, 3, 10), null, null, null, null,
+                        TrainingStatus.COMPLETED))
+                .when().put("/api/v1/trainings/{id}", trainingId)
+                .then()
+                .statusCode(200)
+                .body("type", equalTo("GAME_DAY"))
+                .body("title", equalTo("Turnier"));
+
+        given()
+                .header("Authorization", "Bearer " + token)
+                .contentType(ContentType.JSON)
+                .body(new UpdateTrainingRequest(
+                        null, null, LocalDate.of(2026, 3, 10), null, null, null, null,
+                        TrainingStatus.CANCELLED))
+                .when().put("/api/v1/trainings/{id}", trainingId)
+                .then()
+                .statusCode(200)
+                .body("type", equalTo("GAME_DAY"))
+                .body("title", equalTo(null));
+    }
+
     private static String createTraining(String teamId) {
         return given()
                 .header("Authorization", "Bearer " + token)
                 .contentType(ContentType.JSON)
                 .body(new CreateTrainingRequest(
                         UUID.fromString(teamId),
+                        null,
+                        null,
                         LocalDate.of(2026, 3, 10),
                         LocalTime.of(17, 30),
                         LocalTime.of(19, 0),

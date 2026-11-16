@@ -24,6 +24,7 @@ export * from './team-membership-dto';
 export * from './training-dto';
 export * from './training-participant-dto';
 export * from './training-status';
+export * from './training-type';
 export * from './update-person-request';
 export * from './update-phone-number-request';
 export * from './update-training-participant-request';

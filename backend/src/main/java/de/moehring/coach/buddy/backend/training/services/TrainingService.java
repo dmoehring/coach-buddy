@@ -12,6 +12,7 @@ import de.moehring.coach.buddy.backend.training.mappers.TrainingMapper;
 import de.moehring.coach.buddy.backend.training.repositories.TrainingRepository;
 import de.moehring.coach.buddy.backend.training.search.TrainingSearchCriteria;
 import de.moehring.coach.buddy.backend.training.util.TrainingStatus;
+import de.moehring.coach.buddy.backend.training.util.TrainingType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,8 @@ public class TrainingService {
 
         Training training = new Training();
         training.setTeam(team);
+        training.setType(request.type() != null ? request.type() : TrainingType.TRAINING);
+        training.setTitle(trimToNull(request.title()));
         training.setTrainingDate(request.trainingDate());
         training.setStartTime(request.startTime());
         training.setEndTime(request.endTime());
@@ -70,6 +73,10 @@ public class TrainingService {
         Training training = trainingRepository.findByIdOptional(id)
                 .orElseThrow(() -> new NotFoundException("Training wurde nicht gefunden."));
 
+        if (request.type() != null) {
+            training.setType(request.type());
+        }
+        training.setTitle(trimToNull(request.title()));
         training.setTrainingDate(request.trainingDate());
         training.setStartTime(request.startTime());
         training.setEndTime(request.endTime());
