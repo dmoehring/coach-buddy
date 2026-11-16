@@ -9,7 +9,7 @@ import de.moehring.coach.buddy.backend.team.dtos.DeactivateTeamMembershipRequest
 import de.moehring.coach.buddy.backend.team.util.TeamMemberRole;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -25,9 +25,13 @@ class TeamMembershipResourceTest {
 
     private static String token;
 
-    @BeforeAll
-    static void login() {
-        token = AuthTestSupport.adminToken();
+    // Not @BeforeAll: Quarkus points RestAssured at the test port only right
+    // before each test, so a static login would hit the default port 8080.
+    @BeforeEach
+    void login() {
+        if (token == null) {
+            token = AuthTestSupport.adminToken();
+        }
     }
 
     @Test
