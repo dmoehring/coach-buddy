@@ -2,11 +2,17 @@
   <div class="page-header">
     <div>
       <p class="eyebrow">Training</p>
-      <h1>Training erfassen</h1>
+      <h1>{{ isEdit ? 'Training bearbeiten' : 'Training erfassen' }}</h1>
 
       <p class="description">
-        Lege ein Training für eine Mannschaft an. Die Anwesenheit wird danach
-        auf einer eigenen Seite erfasst.
+        @if (isEdit) {
+          Ändere Datum, Uhrzeit, Ort, Notiz oder Status des Trainings, z. B.
+          um ein Training als ausgefallen zu markieren. Bereits erfasste
+          Anwesenheiten bleiben erhalten.
+        } @else {
+          Lege ein Training für eine Mannschaft an. Die Anwesenheit wird danach
+          auf einer eigenen Seite erfasst.
+        }
       </p>
     </div>
 
@@ -29,14 +35,34 @@
       </ng-template>
 
       <ng-template pTemplate="subtitle">
-        Saison, Mannschaft, Datum und Status
+        {{ isEdit ? 'Datum, Uhrzeit, Ort und Status' : 'Saison, Mannschaft, Datum und Status' }}
       </ng-template>
+
+      @if (loadingTraining()) {
+        <p class="form-hint">Training wird geladen ...</p>
+      } @else if (isEdit && !editedTraining()) {
+        <div class="form-error" role="alert">
+          <i class="pi pi-exclamation-circle"></i>
+          <span>{{ pageError() }}</span>
+        </div>
+      } @else {
 
       <form
         class="training-form"
         [formGroup]="form"
-        (ngSubmit)="createTraining()"
+        (ngSubmit)="save()"
       >
+        @if (isEdit) {
+          <div class="form-field">
+            <span>Mannschaft</span>
+            <p class="readonly-value">
+              {{ editedTraining()?.team?.name }}
+              @if (editedTraining()?.team?.seasonName) {
+                <small>({{ editedTraining()?.team?.seasonName }})</small>
+              }
+            </p>
+          </div>
+        } @else {
         <label class="form-field">
           <span>Saison</span>
 
@@ -83,6 +109,7 @@
             </small>
           }
         </label>
+        }
 
         <label class="form-field">
           <span>Datum</span>
@@ -168,10 +195,10 @@
           ></textarea>
         </label>
 
-        @if (context.error()) {
+        @if (isEdit ? pageError() : context.error()) {
           <div class="form-error" role="alert">
             <i class="pi pi-exclamation-circle"></i>
-            <span>{{ context.error() }}</span>
+            <span>{{ isEdit ? pageError() : context.error() }}</span>
           </div>
         }
 
@@ -190,15 +217,16 @@
             pButton
             type="submit"
             [disabled]="
-              context.loadingSeasons() ||
-              context.loadingTeams()
+              saving() ||
+              (!isEdit && (context.loadingSeasons() || context.loadingTeams()))
             "
           >
             <i class="pi pi-check"></i>
-            <span>Training speichern</span>
+            <span>{{ isEdit ? 'Änderungen speichern' : 'Training speichern' }}</span>
           </button>
         </div>
       </form>
+      }
     </p-card>
   </div>
 </section>

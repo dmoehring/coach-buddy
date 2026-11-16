@@ -95,6 +95,17 @@
                   <button
                     pButton
                     type="button"
+                    severity="secondary"
+                    [text]="true"
+                    [routerLink]="['/trainings', training.id, 'edit']"
+                    aria-label="Training bearbeiten"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+
+                  <button
+                    pButton
+                    type="button"
                     severity="danger"
                     [text]="true"
                     [disabled]="deletingId() === training.id"
@@ -158,6 +169,17 @@
               >
                 <i class="pi pi-list-check"></i>
                 <span>Anwesenheit</span>
+              </button>
+
+              <button
+                pButton
+                type="button"
+                severity="secondary"
+                [outlined]="true"
+                [routerLink]="['/trainings', training.id, 'edit']"
+              >
+                <i class="pi pi-pencil"></i>
+                <span>Bearbeiten</span>
               </button>
 
               <button

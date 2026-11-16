@@ -6,6 +6,7 @@ import de.moehring.coach.buddy.backend.team.entities.Team;
 import de.moehring.coach.buddy.backend.team.repositories.TeamRepository;
 import de.moehring.coach.buddy.backend.training.dtos.CreateTrainingRequest;
 import de.moehring.coach.buddy.backend.training.dtos.TrainingDto;
+import de.moehring.coach.buddy.backend.training.dtos.UpdateTrainingRequest;
 import de.moehring.coach.buddy.backend.training.entities.Training;
 import de.moehring.coach.buddy.backend.training.mappers.TrainingMapper;
 import de.moehring.coach.buddy.backend.training.repositories.TrainingRepository;
@@ -58,6 +59,23 @@ public class TrainingService {
         training.setStatus(request.status() != null ? request.status() : TrainingStatus.COMPLETED);
 
         trainingRepository.persist(training);
+
+        return trainingMapper.mapToDto(training);
+    }
+
+    @Transactional
+    public TrainingDto update(UUID id, UpdateTrainingRequest request) {
+        validateTimeRange(request.startTime(), request.endTime());
+
+        Training training = trainingRepository.findByIdOptional(id)
+                .orElseThrow(() -> new NotFoundException("Training wurde nicht gefunden."));
+
+        training.setTrainingDate(request.trainingDate());
+        training.setStartTime(request.startTime());
+        training.setEndTime(request.endTime());
+        training.setLocation(trimToNull(request.location()));
+        training.setNotes(trimToNull(request.notes()));
+        training.setStatus(request.status());
 
         return trainingMapper.mapToDto(training);
     }

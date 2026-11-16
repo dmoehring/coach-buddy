@@ -76,6 +76,21 @@
   background: var(--p-surface-900);
 }
 
+.readonly-value {
+  margin: 0;
+  font-weight: 600;
+
+  small {
+    color: var(--p-text-muted-color);
+    font-weight: 400;
+  }
+}
+
+.form-hint {
+  margin: 0;
+  color: var(--p-text-muted-color);
+}
+
 .time-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

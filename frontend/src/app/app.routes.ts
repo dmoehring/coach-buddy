@@ -37,6 +37,7 @@ export const routes: Routes = [
       { path: 'teams/:id/members', component: TeamMembersPage},
       { path: 'teams/:id', component: TeamDetailPage },
       { path: 'trainings/new', component: TrainingFormPage },
+      { path: 'trainings/:id/edit', component: TrainingFormPage },
       { path: 'trainings/:id/attendance', component: TrainingAttendancePage },
       { path: 'trainings', component: TrainingsPage },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }

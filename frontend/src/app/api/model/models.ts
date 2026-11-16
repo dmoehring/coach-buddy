@@ -27,3 +27,4 @@ export * from './training-status';
 export * from './update-person-request';
 export * from './update-phone-number-request';
 export * from './update-training-participant-request';
+export * from './update-training-request';

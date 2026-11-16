@@ -554,6 +554,30 @@
             "type" : "string"
           }
         }
+      },
+      "UpdateTrainingRequest" : {
+        "type" : "object",
+        "required" : [ "trainingDate", "status" ],
+        "properties" : {
+          "trainingDate" : {
+            "$ref" : "#/components/schemas/LocalDate"
+          },
+          "startTime" : {
+            "$ref" : "#/components/schemas/LocalTime"
+          },
+          "endTime" : {
+            "$ref" : "#/components/schemas/LocalTime"
+          },
+          "location" : {
+            "type" : "string"
+          },
+          "notes" : {
+            "type" : "string"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/TrainingStatus"
+          }
+        }
       }
     },
     "securitySchemes" : {
@@ -1650,6 +1674,61 @@
       }
     },
     "/api/v1/trainings/{id}" : {
+      "put" : {
+        "summary" : "Update training",
+        "description" : "Updates date, times, location, notes and status of a training. The team cannot be changed. Recorded participants are kept, e.g. when a training is cancelled.",
+        "tags" : [ "Trainings" ],
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "$ref" : "#/components/schemas/UUID"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/UpdateTrainingRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "200" : {
+            "description" : "Training updated",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/TrainingDto"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Invalid request",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description" : "Training not found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "get" : {
         "summary" : "Find training by id",
         "description" : "Returns a single training by id.",

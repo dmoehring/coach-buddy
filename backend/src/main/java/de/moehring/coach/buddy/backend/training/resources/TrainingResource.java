@@ -3,6 +3,7 @@ package de.moehring.coach.buddy.backend.training.resources;
 import de.moehring.coach.buddy.backend.common.exceptions.ErrorResponse;
 import de.moehring.coach.buddy.backend.training.dtos.CreateTrainingRequest;
 import de.moehring.coach.buddy.backend.training.dtos.TrainingDto;
+import de.moehring.coach.buddy.backend.training.dtos.UpdateTrainingRequest;
 import de.moehring.coach.buddy.backend.training.search.TrainingSearchCriteria;
 import de.moehring.coach.buddy.backend.training.services.TrainingService;
 import jakarta.validation.Valid;
@@ -69,6 +70,45 @@ public class TrainingResource {
     })
     public TrainingDto findById(@PathParam("id") UUID id) {
         return trainingService.findById(id);
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Operation(
+            summary = "Update training",
+            description = "Updates date, times, location, notes and status of a training. "
+                    + "The team cannot be changed. Recorded participants are kept, e.g. when a training is cancelled."
+    )
+    @APIResponses(value = {
+            @APIResponse(
+                    responseCode = "200",
+                    description = "Training updated",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = TrainingDto.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "400",
+                    description = "Invalid request",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            ),
+            @APIResponse(
+                    responseCode = "404",
+                    description = "Training not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON,
+                            schema = @Schema(implementation = ErrorResponse.class)
+                    )
+            )
+    })
+    public TrainingDto updateTraining(
+            @PathParam("id") UUID id,
+            @Valid UpdateTrainingRequest updateTrainingRequest) {
+        return trainingService.update(id, updateTrainingRequest);
     }
 
     @DELETE
